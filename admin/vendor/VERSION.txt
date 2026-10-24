@@ -1,0 +1,3 @@
+Decap CMS 3.17.1
+Source: npm package decap-cms@3.17.1 (npm verified integrity)
+License notices: decap-cms.js.LICENSE.txt

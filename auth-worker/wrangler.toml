@@ -1,0 +1,10 @@
+name = "epiphany-interior-auth"
+main = "src/worker.mjs"
+compatibility_date = "2026-01-01"
+workers_dev = true
+
+[vars]
+SITE_ORIGIN = "https://milyaevpasha2017-cmd.github.io"
+REPO = "milyaevpasha2017-cmd/design.site"
+# Add GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in Cloudflare settings.
+# Never add the Client Secret to this file or to GitHub.

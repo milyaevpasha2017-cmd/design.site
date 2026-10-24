@@ -1,0 +1,274 @@
+backend:
+  name: github
+  repo: milyaevpasha2017-cmd/design.site
+  branch: main
+  base_url: https://auth-not-configured.invalid
+  auth_endpoint: auth
+locale: ru
+site_url: https://milyaevpasha2017-cmd.github.io/design.site/
+display_url: https://milyaevpasha2017-cmd.github.io/design.site/
+media_folder: assets/uploads
+public_folder: assets/uploads
+editor:
+  preview: false
+collections:
+- name: website
+  label: Сайт Epiphany Interior
+  files:
+  - name: site
+    label: Контент сайта
+    file: content/site.json
+    format: json
+    description: Измените поля и нажмите «Опубликовать». Обновление сайта займёт несколько минут. Пустые контакты
+      скрываются. Не размещайте здесь заявки клиентов и секретные данные.
+    fields:
+    - name: texts
+      label: Тексты и заголовки
+      widget: object
+      fields:
+      - name: page_title
+        label: Заголовок вкладки браузера
+        widget: text
+      - name: description
+        label: Описание для поисковиков
+        widget: text
+      - name: brand
+        label: Название в логотипе
+        widget: string
+      - name: brand_subtitle
+        label: Подпись под логотипом
+        widget: text
+      - name: hero_label
+        label: 'Первый экран: надзаголовок'
+        widget: string
+      - name: availability
+        label: География работы
+        widget: string
+      - name: hero_title
+        label: 'Первый экран: заголовок'
+        widget: text
+      - name: hero_emphasis
+        label: 'Первый экран: акцент курсивом'
+        widget: string
+      - name: hero_intro
+        label: 'Первый экран: краткое описание'
+        widget: text
+      - name: hero_caption
+        label: Подпись главной фотографии
+        widget: string
+      - name: hero_note
+        label: Примечание к главной фотографии
+        widget: string
+      - name: hero_bottom
+        label: Подпись под первым экраном
+        widget: string
+      - name: about_label
+        label: 'Обо мне: надзаголовок'
+        widget: string
+      - name: about_title
+        label: 'Обо мне: заголовок'
+        widget: text
+      - name: about_emphasis
+        label: 'Обо мне: акцент'
+        widget: string
+      - name: projects_label
+        label: 'Проекты: надзаголовок'
+        widget: string
+      - name: projects_title
+        label: 'Проекты: заголовок'
+        widget: text
+      - name: projects_emphasis
+        label: 'Проекты: акцент'
+        widget: string
+      - name: projects_note
+        label: 'Проекты: примечание'
+        widget: text
+      - name: services_label
+        label: 'Услуги: надзаголовок'
+        widget: string
+      - name: services_title
+        label: 'Услуги: заголовок'
+        widget: text
+      - name: services_emphasis
+        label: 'Услуги: акцент'
+        widget: string
+      - name: services_intro
+        label: 'Услуги: описание'
+        widget: text
+      - name: process_label
+        label: 'Этапы: надзаголовок'
+        widget: string
+      - name: process_title
+        label: 'Этапы: заголовок'
+        widget: text
+      - name: process_emphasis
+        label: 'Этапы: акцент'
+        widget: string
+      - name: video_label
+        label: 'Видео: надзаголовок'
+        widget: string
+      - name: video_title
+        label: 'Видео: заголовок'
+        widget: text
+      - name: video_emphasis
+        label: 'Видео: акцент'
+        widget: string
+      - name: video_intro
+        label: 'Видео: описание'
+        widget: string
+      - name: contact_label
+        label: 'Контакты: надзаголовок'
+        widget: string
+      - name: contact_title
+        label: 'Контакты: заголовок'
+        widget: text
+      - name: contact_emphasis
+        label: 'Контакты: акцент'
+        widget: string
+      - name: contact_intro
+        label: 'Контакты: описание'
+        widget: text
+      - name: footer_tagline
+        label: 'Подвал: слоган'
+        widget: string
+      - name: footer_note
+        label: 'Подвал: примечание'
+        widget: string
+    - name: hero_image
+      label: Главная фотография
+      widget: image
+    - name: about
+      label: 'Обо мне: абзацы'
+      widget: list
+      field:
+        name: paragraph
+        label: Абзац
+        widget: text
+    - name: principles
+      label: Принципы
+      widget: list
+      field:
+        name: principle
+        label: Принцип
+        widget: string
+    - name: projects
+      label: Проекты
+      widget: list
+      summary: '{{fields.title}}'
+      fields:
+      - name: title
+        label: Название
+        widget: string
+      - name: subtitle
+        label: Короткая подпись
+        widget: string
+      - name: description
+        label: Описание
+        widget: text
+      - name: image
+        label: Обложка
+        widget: image
+      - name: image_alt
+        label: Описание обложки для доступности
+        widget: string
+      - name: is_concept
+        label: Это демонстрационная концепция
+        widget: boolean
+        default: false
+        required: false
+      - name: images
+        label: Дополнительные фотографии
+        widget: list
+        required: false
+        fields:
+        - name: image
+          label: Фотография
+          widget: image
+        - name: alt
+          label: Описание фотографии
+          widget: string
+    - name: services
+      label: Услуги
+      widget: list
+      summary: '{{fields.title}}'
+      fields:
+      - name: title
+        label: Название
+        widget: string
+      - name: description
+        label: Описание
+        widget: text
+    - name: steps
+      label: Этапы работы
+      widget: list
+      summary: '{{fields.title}}'
+      fields:
+      - name: label
+        label: Номер и подпись
+        widget: string
+      - name: title
+        label: Заголовок
+        widget: string
+      - name: description
+        label: Описание
+        widget: text
+    - name: videos
+      label: Видео ВКонтакте
+      widget: list
+      required: false
+      summary: '{{fields.title}}'
+      fields:
+      - name: title
+        label: Название
+        widget: string
+      - name: description
+        label: Описание
+        widget: text
+      - name: url
+        label: Ссылка VK Видео или код iframe
+        widget: text
+        hint: Поддерживаются https://vk.com/video-123_456, https://vkvideo.ru/video-123_456 и код из «Поделиться
+          → Экспортировать». Для закрытых видео нужен полный код с hash.
+        pattern:
+        - ^(https://(www\.)?(vk\.com|vkvideo\.ru)/video(-?\d+_\d+/?|_ext\.php\?)[\s\S]*|<iframe\s[\s\S]*)$
+        - Вставьте HTTPS-ссылку VK Видео или код iframe.
+      - name: poster
+        label: Обложка
+        widget: image
+        required: false
+    - name: contacts
+      label: Контакты
+      widget: object
+      fields:
+      - name: youtube
+        label: YouTube
+        widget: string
+        required: false
+        hint: Полная ссылка https://www.youtube.com/@...
+        pattern:
+        - ^$|^https://(www\.)?(youtube\.com|youtu\.be)/[^\s]+$
+        - Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка.
+      - name: telegram
+        label: Telegram
+        widget: string
+        required: false
+        hint: Полная ссылка https://t.me/...
+        pattern:
+        - ^$|^https://t\.me/[^\s]+$
+        - Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка.
+      - name: vk
+        label: Группа ВКонтакте
+        widget: string
+        required: false
+        hint: Полная ссылка https://vk.com/...
+        pattern:
+        - ^$|^https://(www\.)?(vk\.com|vk\.ru)/[^\s]+$
+        - Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка.
+      - name: email
+        label: Email
+        widget: string
+        required: false
+        hint: 'Адрес почты без mailto:'
+        pattern:
+        - ^$|^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$
+        - Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка.
