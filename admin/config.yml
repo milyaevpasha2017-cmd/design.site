@@ -134,6 +134,9 @@ collections:
       - name: footer_note
         label: 'Подвал: примечание'
         widget: string
+      - name: hero_cta
+        label: 'Первый экран: текст кнопки обращения'
+        widget: string
     - name: hero_image
       label: Главная фотография
       widget: image

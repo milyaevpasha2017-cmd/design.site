@@ -1,6 +1,12 @@
 import { vkEmbed, contactURL, imageURL } from './content-utils.mjs';
 const $ = selector => document.querySelector(selector);
 const node = (tag, className, text) => { const el = document.createElement(tag); if (className) el.className = className; if (text != null) el.textContent = text; return el; };
+function icon(name = 'arrow-up-right') {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.classList.add('icon'); svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', `#icon-${name}`); svg.append(use); return svg;
+}
 function setImage(el, source, alt) {
   const url = imageURL(source, document.baseURI);
   el.style.backgroundImage = url ? `url(${JSON.stringify(url)})` : 'none';
@@ -8,27 +14,57 @@ function setImage(el, source, alt) {
 }
 const menuButton = $('.menu-toggle');
 const navigation = $('#navigation');
+function closeMenu(restoreFocus = false) {
+  const wasOpen = menuButton.getAttribute('aria-expanded') === 'true';
+  menuButton.setAttribute('aria-expanded', 'false'); navigation.classList.remove('open');
+  if (restoreFocus && wasOpen) menuButton.focus();
+}
 menuButton.addEventListener('click', () => {
   const open = menuButton.getAttribute('aria-expanded') !== 'true';
   menuButton.setAttribute('aria-expanded', String(open)); navigation.classList.toggle('open', open);
 });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(true); });
+document.addEventListener('click', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); });
+matchMedia('(max-width: 900px)').addEventListener('change', () => closeMenu());
 navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-  navigation.classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false');
+  closeMenu();
 }));
 const dialog = $('#project-dialog');
+let projectPhotos = [];
+let photoIndex = 0;
+function showPhoto(index) {
+  if (!projectPhotos.length) return;
+  photoIndex = (index + projectPhotos.length) % projectPhotos.length;
+  const current = projectPhotos[photoIndex];
+  const photo = $('#dialog-photo'); photo.src = current.url; photo.alt = current.alt;
+  $('#photo-count').textContent = `${photoIndex + 1} / ${projectPhotos.length}`;
+  $('#project-gallery').querySelectorAll('button').forEach((button, i) => button.setAttribute('aria-pressed', String(i === photoIndex)));
+}
 function openProject(project) {
   $('#dialog-title').textContent = project.title;
   $('#dialog-description').textContent = project.description;
   $('#dialog-label').textContent = project.is_concept ? 'КОНЦЕПЦИЯ ИНТЕРЬЕРА' : 'ПРОЕКТ ИНТЕРЬЕРА';
   $('#dialog-note').hidden = !project.is_concept;
-  setImage($('.dialog-image'), project.image, project.image_alt || project.title);
-  $('#project-gallery').replaceChildren();
-  for (const item of project.images || []) {
-    const url = imageURL(item.image, document.baseURI); if (!url) continue;
-    const img = node('img'); img.src = url; img.alt = item.alt || project.title; img.loading = 'lazy'; $('#project-gallery').append(img);
-  }
-  dialog.showModal(); document.body.classList.add('modal-open');
+  projectPhotos = [{ image: project.image, alt: project.image_alt || project.title }, ...(project.images || [])]
+    .map(item => ({ url: imageURL(item.image, document.baseURI), alt: item.alt || project.title })).filter(item => item.url);
+  const gallery = $('#project-gallery'); gallery.replaceChildren();
+  $('#viewer-controls').hidden = projectPhotos.length < 2;
+  $('#project-viewer').hidden = projectPhotos.length === 0;
+  if (projectPhotos.length > 1) projectPhotos.forEach((item, i) => {
+    const button = node('button', 'gallery-thumb'); button.type = 'button';
+    button.setAttribute('aria-label', `Фото ${i + 1}: ${item.alt}`);
+    const img = node('img'); img.src = item.url; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+    button.append(img); button.addEventListener('click', () => showPhoto(i)); gallery.append(button);
+  });
+  showPhoto(0);
+  dialog.showModal(); dialog.scrollTop = 0; document.body.classList.add('modal-open');
 }
+$('#photo-previous').addEventListener('click', () => showPhoto(photoIndex - 1));
+$('#photo-next').addEventListener('click', () => showPhoto(photoIndex + 1));
+dialog.addEventListener('keydown', event => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName) || projectPhotos.length < 2) return;
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); showPhoto(photoIndex + (event.key === 'ArrowLeft' ? -1 : 1)); }
+});
 $('.dialog-close').addEventListener('click', () => dialog.close());
 $('#dialog-contact').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => document.body.classList.remove('modal-open'));
@@ -39,7 +75,9 @@ dialog.addEventListener('click', event => {
 });
 function renderVideos(videos) {
   const grid = $('#video-grid'); grid.replaceChildren();
-  if (!videos.length) { grid.append(node('p', 'empty-state', 'Скоро здесь появятся видео о проектах.')); return; }
+  $('#videos').hidden = videos.length === 0;
+  document.querySelectorAll('[data-video-nav]').forEach(link => { link.hidden = videos.length === 0; });
+  if (!videos.length) return;
   for (const video of videos) {
     const card = node('article', 'video-card'); const embed = vkEmbed(video.url);
     const frame = node('div', 'video-frame');
@@ -53,7 +91,7 @@ function renderVideos(videos) {
     } else { frame.append(node('p', 'video-error', 'Для этого видео пока не настроено встраивание.')); }
     card.append(frame, node('h3', '', video.title), node('p', '', video.description));
     if (embed) {
-      const u = new URL(embed); const link = node('a', 'video-source', 'Открыть во ВКонтакте ↗');
+      const u = new URL(embed); const link = node('a', 'video-source', 'Открыть во ВКонтакте '); link.append(icon());
       link.href = `https://vk.com/video${u.searchParams.get('oid')}_${u.searchParams.get('id')}`; link.target = '_blank'; link.rel = 'noopener noreferrer'; card.append(link);
     }
     grid.append(card);
@@ -70,7 +108,7 @@ function render(data) {
   $('#principles').replaceChildren(...data.principles.map(p => node('span', '', p)));
   $('#project-grid').replaceChildren(...data.projects.map((project, i) => {
     const button = node('button', `project-card${i % 3 === 2 ? ' wide' : ''}`); button.type = 'button'; button.dataset.project = i;
-    const image = node('div', `project-image interior-image ${['first','second','third'][i % 3]}`); setImage(image, project.image, project.image_alt || project.title); image.append(node('span', 'project-arrow', '↗'));
+    const image = node('div', `project-image interior-image ${['first','second','third'][i % 3]}`); setImage(image, project.image, project.image_alt || project.title); const arrow = node('span', 'project-arrow'); arrow.append(icon()); image.append(arrow);
     const title = node('div', 'project-title'); title.append(node('h3', '', project.title), node('span', '', String(i + 1).padStart(2, '0')));
     button.append(image, title, node('p', '', project.subtitle)); button.addEventListener('click', () => openProject(project)); return button;
   }));
@@ -84,11 +122,11 @@ function render(data) {
   const contacts = $('#contact-links'); contacts.replaceChildren();
   for (const [kind, label] of Object.entries({youtube: 'YouTube', telegram: 'Telegram', vk: 'ВКонтакте', email: 'Написать на почту'})) {
     const url = contactURL(kind, data.contacts?.[kind]); if (!url) continue;
-    const a = node('a', '', label); a.href = url; a.append(node('span', '', '↗'));
+    const a = node('a', '', label); a.href = url; a.append(icon());
     if (kind !== 'email') { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
     contacts.append(a);
   }
-  if (!contacts.children.length) contacts.append(node('p', 'empty-state', 'Контакты скоро появятся.'));
+  contacts.hidden = !contacts.children.length;
   const email = contactURL('email', data.contacts?.email);
   const emailButton = $('#email-brief'); emailButton.hidden = !email;
   if (email) emailButton.dataset.email = email;
