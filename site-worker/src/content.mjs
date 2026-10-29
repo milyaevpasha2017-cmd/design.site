@@ -27,7 +27,9 @@ export function repository(env,fetcher) {
   const branch=env.CONTENT_BRANCH||'main';const base=`https://api.github.com/repos/${env.CONTENT_REPO}/contents/`;
   async function request(file,method='GET',body){
     const url=base+file.split('/').map(encodeURIComponent).join('/')+(method==='GET'?'?ref='+encodeURIComponent(branch):'');
-    const response=await fetcher(url,{method,redirect:'error',headers:{Authorization:`Bearer ${env.GITHUB_CONTENT_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'Epiphany-Content-Admin',...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,branch})}:{})});
+    // Workers supports manual/follow, not error. Reject redirects below without
+    // forwarding the server credential to the Location supplied by an upstream.
+    const response=await fetcher(url,{method,redirect:'manual',headers:{Authorization:`Bearer ${env.GITHUB_CONTENT_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'Epiphany-Content-Admin',...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify({...body,branch})}:{})});
     if(!response.ok){const status=[409,422].includes(response.status)?409:response.status===404?404:502;throw Object.assign(new Error(status===409?'Запись уже изменена. Скопируйте свои правки и откройте её заново, чтобы избежать перезаписи.':status===404?'Запись не найдена.':'Не удалось сохранить или загрузить данные. Проверьте доступ сервера к хранилищу.'),{status});}
     return response.json();
   }
