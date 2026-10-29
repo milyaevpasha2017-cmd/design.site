@@ -58,6 +58,18 @@ class BuildTests(unittest.TestCase):
         path=self.content/'pages/videos.json';p=json.loads(path.read_text());p['items']=None;path.write_text(json.dumps(p))
         pages=self.build();self.assertIn('<form id="brief-form" hidden>',pages['contact/index.html']);self.assertIn('<noscript>',pages['contact/index.html'])
 
+    def test_password_admin_is_a_separate_build_and_keeps_github_admin_unchanged(self):
+        output=self.root/'password-site'
+        pages=module.build(self.content,output,'https://example.test/',admin_mode='password')
+        self.assertIn('href="/about/"',pages['index.html'])
+        self.assertIn('type="password"',(output/'admin/login/index.html').read_text())
+        self.assertTrue((output/'admin/editor.js').exists())
+        self.assertFalse((output/'admin/schema.json').exists())
+        self.assertFalse((output/'admin/config.yml').exists())
+        self.assertFalse((output/'admin/vendor').exists())
+        github=self.build()
+        self.assertTrue((self.root/'public/admin/vendor').exists())
+
     def test_invalid_and_duplicate_project_urls_fail_build(self):
         p=self.content/'projects/warm-minimalism.json';d=json.loads(p.read_text());d['slug']='../escape';p.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'Invalid project slug'):self.build()

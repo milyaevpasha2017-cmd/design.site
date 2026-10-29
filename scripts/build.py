@@ -142,7 +142,7 @@ class Site:
         extra=self.gallery_dialog()+f'<script id="gallery-data" type="application/json">{safe_json(dict(title=p["title"],photos=photos))}</script>'
         return self.shell(p['title']+' — Epiphany Interior',p.get('seo_description') or p['description'],body,'projects','projects/'+p['slug']+'/',extra)
 
-def build(content,output,url=DEFAULT_URL):
+def build(content,output,url=DEFAULT_URL,admin_mode="github"):
     site=Site(content,url);output=Path(output)
     if output.resolve() in (ROOT.resolve(),Path(content).resolve()) or ROOT.resolve().is_relative_to(output.resolve()): raise ValueError('Unsafe output directory')
     if output.exists():shutil.rmtree(output)
@@ -155,7 +155,13 @@ def build(content,output,url=DEFAULT_URL):
     pages['404.html']=site.shell(u['not_found_title'],u['not_found_text'],f'<section class="section page-heading"><p class="eyebrow">404</p>{heading(u["not_found_title"])}<p class="page-intro">{e(u["not_found_text"])}</p>{site.button("home",u["home"])}</section>','')
     for path,body in pages.items():
         target=output/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(body)
-    for directory in ['assets','admin']:shutil.copytree(ROOT/directory,output/directory)
+    shutil.copytree(ROOT/'assets',output/'assets')
+    if admin_mode == 'password':
+        if site.base != '/': raise ValueError('Password admin requires a root domain URL')
+        shutil.copytree(ROOT/'password-admin',output/'admin',ignore=shutil.ignore_patterns('schema.json'))
+        login=output/'admin/login';login.mkdir();shutil.copy2(ROOT/'password-admin/login.html',login/'index.html')
+    elif admin_mode == 'github': shutil.copytree(ROOT/'admin',output/'admin')
+    else: raise ValueError('Unknown admin mode')
     for file in ['style.css','script.js','content-utils.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
     # Formatted source JSON is private to the build/CMS, never needed by site visitors.
     urls=[site.url+(path.removesuffix('index.html')) for path in pages if path!='404.html']
@@ -164,4 +170,5 @@ def build(content,output,url=DEFAULT_URL):
     return pages
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--site-url',default=DEFAULT_URL);parser.add_argument('--output',default=str(ROOT/'_site'))
-    args=parser.parse_args();build(ROOT/'content',args.output,args.site_url)
+    parser.add_argument('--admin-mode',choices=['github','password'],default='github')
+    args=parser.parse_args();build(ROOT/'content',args.output,args.site_url,args.admin_mode)

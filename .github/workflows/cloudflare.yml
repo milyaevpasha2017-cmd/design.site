@@ -1,0 +1,39 @@
+name: Publish Cloudflare site
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'auth-worker/**'
+      - 'docs/**'
+      - 'tests/**'
+      - '*.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cloudflare-site
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    env:
+      EPIPHANY_SITE_URL: ${{ vars.CLOUDFLARE_SITE_URL || 'https://epiphany-int.ru/' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/*.test.mjs
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - run: python3 scripts/build.py --site-url "$EPIPHANY_SITE_URL" --output _site-cloudflare --admin-mode password
+      - run: npm ci --prefix site-worker --ignore-scripts
+      - run: npm exec --prefix site-worker -- wrangler deploy --config site-worker/wrangler.toml --dry-run --outdir "$RUNNER_TEMP/epiphany-worker"
+      - run: node tests/browser/workerd-auth.mjs "$RUNNER_TEMP/epiphany-worker/entry.js"
+      - run: npm exec --prefix site-worker -- wrangler deploy --config site-worker/wrangler.toml --var "SITE_ORIGIN:${EPIPHANY_SITE_URL%/}"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

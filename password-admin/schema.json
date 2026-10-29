@@ -1,0 +1,1092 @@
+{
+  "pages": [
+    {
+      "id": "home",
+      "label": "Главная",
+      "path": "content/pages/home.json",
+      "fields": [
+        {
+          "name": "seo_title",
+          "label": "Заголовок для поисковиков",
+          "widget": "string"
+        },
+        {
+          "name": "seo_description",
+          "label": "Описание для поисковиков",
+          "widget": "text"
+        },
+        {
+          "name": "label",
+          "label": "Надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "availability",
+          "label": "География работы",
+          "widget": "string"
+        },
+        {
+          "name": "title",
+          "label": "Заголовок",
+          "widget": "text"
+        },
+        {
+          "name": "emphasis",
+          "label": "Акцент курсивом",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "label": "Вступительный текст",
+          "widget": "text"
+        },
+        {
+          "name": "image",
+          "label": "Фотография",
+          "widget": "image"
+        },
+        {
+          "name": "image_alt",
+          "label": "Описание фотографии",
+          "widget": "string"
+        },
+        {
+          "name": "caption",
+          "label": "Подпись к фотографии",
+          "widget": "string"
+        },
+        {
+          "name": "image_note",
+          "label": "Примечание к фотографии",
+          "widget": "string"
+        },
+        {
+          "name": "bottom",
+          "label": "Подпись под первым экраном",
+          "widget": "string"
+        },
+        {
+          "name": "button",
+          "label": "Текст кнопки",
+          "widget": "string"
+        },
+        {
+          "name": "explore",
+          "label": "Ссылка на портфолио",
+          "widget": "string"
+        },
+        {
+          "name": "projects_label",
+          "label": "Проекты: надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "projects_title",
+          "label": "Проекты: заголовок",
+          "widget": "string"
+        },
+        {
+          "name": "projects_emphasis",
+          "label": "Проекты: акцент",
+          "widget": "string"
+        },
+        {
+          "name": "projects_note",
+          "label": "Проекты: примечание",
+          "widget": "text"
+        },
+        {
+          "name": "about_label",
+          "label": "О дизайнере: надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "about_title",
+          "label": "О дизайнере: заголовок",
+          "widget": "text"
+        },
+        {
+          "name": "about_emphasis",
+          "label": "О дизайнере: акцент",
+          "widget": "string"
+        },
+        {
+          "name": "about_intro",
+          "label": "О дизайнере: короткий текст",
+          "widget": "text"
+        },
+        {
+          "name": "services_label",
+          "label": "Услуги: надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "services_title",
+          "label": "Услуги: заголовок",
+          "widget": "string"
+        },
+        {
+          "name": "services_emphasis",
+          "label": "Услуги: акцент",
+          "widget": "string"
+        },
+        {
+          "name": "cta",
+          "label": "Приглашение обсудить проект",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "label",
+              "label": "Надзаголовок",
+              "widget": "string"
+            },
+            {
+              "name": "title",
+              "label": "Заголовок приглашения",
+              "widget": "text"
+            },
+            {
+              "name": "emphasis",
+              "label": "Акцент курсивом",
+              "widget": "string"
+            },
+            {
+              "name": "intro",
+              "label": "Вступительный текст",
+              "widget": "text"
+            },
+            {
+              "name": "button",
+              "label": "Текст кнопки",
+              "widget": "string"
+            }
+          ],
+          "collapsed": true
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "label": "О дизайнере",
+      "path": "content/pages/about.json",
+      "fields": [
+        {
+          "name": "seo_title",
+          "label": "Заголовок для поисковиков",
+          "widget": "string"
+        },
+        {
+          "name": "seo_description",
+          "label": "Описание для поисковиков",
+          "widget": "text"
+        },
+        {
+          "name": "label",
+          "label": "Надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "title",
+          "label": "Заголовок",
+          "widget": "text"
+        },
+        {
+          "name": "emphasis",
+          "label": "Акцент курсивом",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "label": "Вступительный текст",
+          "widget": "text"
+        },
+        {
+          "name": "paragraphs",
+          "label": "Текст обо мне: абзацы",
+          "widget": "list",
+          "field": {
+            "name": "paragraph",
+            "label": "Абзац",
+            "widget": "text"
+          }
+        },
+        {
+          "name": "image",
+          "label": "Фотография",
+          "widget": "image"
+        },
+        {
+          "name": "image_alt",
+          "label": "Описание фотографии",
+          "widget": "string"
+        },
+        {
+          "name": "principles_title",
+          "label": "Заголовок принципов",
+          "widget": "string"
+        },
+        {
+          "name": "principles",
+          "label": "Принципы",
+          "widget": "list",
+          "field": {
+            "name": "principle",
+            "label": "Принцип",
+            "widget": "string"
+          }
+        },
+        {
+          "name": "process_label",
+          "label": "Этапы: надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "process_title",
+          "label": "Этапы: заголовок",
+          "widget": "string"
+        },
+        {
+          "name": "process_emphasis",
+          "label": "Этапы: акцент",
+          "widget": "string"
+        },
+        {
+          "name": "cta",
+          "label": "Приглашение обсудить проект",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "label",
+              "label": "Надзаголовок",
+              "widget": "string"
+            },
+            {
+              "name": "title",
+              "label": "Заголовок приглашения",
+              "widget": "text"
+            },
+            {
+              "name": "emphasis",
+              "label": "Акцент курсивом",
+              "widget": "string"
+            },
+            {
+              "name": "intro",
+              "label": "Вступительный текст",
+              "widget": "text"
+            },
+            {
+              "name": "button",
+              "label": "Текст кнопки",
+              "widget": "string"
+            }
+          ],
+          "collapsed": true
+        }
+      ]
+    },
+    {
+      "id": "projects",
+      "label": "Портфолио: вступление",
+      "path": "content/pages/projects.json",
+      "fields": [
+        {
+          "name": "seo_title",
+          "label": "Заголовок для поисковиков",
+          "widget": "string"
+        },
+        {
+          "name": "seo_description",
+          "label": "Описание для поисковиков",
+          "widget": "text"
+        },
+        {
+          "name": "label",
+          "label": "Надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "title",
+          "label": "Заголовок",
+          "widget": "text"
+        },
+        {
+          "name": "emphasis",
+          "label": "Акцент курсивом",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "label": "Вступительный текст",
+          "widget": "text"
+        },
+        {
+          "name": "cta",
+          "label": "Приглашение обсудить проект",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "label",
+              "label": "Надзаголовок",
+              "widget": "string"
+            },
+            {
+              "name": "title",
+              "label": "Заголовок приглашения",
+              "widget": "text"
+            },
+            {
+              "name": "emphasis",
+              "label": "Акцент курсивом",
+              "widget": "string"
+            },
+            {
+              "name": "intro",
+              "label": "Вступительный текст",
+              "widget": "text"
+            },
+            {
+              "name": "button",
+              "label": "Текст кнопки",
+              "widget": "string"
+            }
+          ],
+          "collapsed": true
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "label": "Услуги и этапы",
+      "path": "content/pages/services.json",
+      "fields": [
+        {
+          "name": "seo_title",
+          "label": "Заголовок для поисковиков",
+          "widget": "string"
+        },
+        {
+          "name": "seo_description",
+          "label": "Описание для поисковиков",
+          "widget": "text"
+        },
+        {
+          "name": "label",
+          "label": "Надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "title",
+          "label": "Заголовок",
+          "widget": "text"
+        },
+        {
+          "name": "emphasis",
+          "label": "Акцент курсивом",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "label": "Вступительный текст",
+          "widget": "text"
+        },
+        {
+          "name": "items",
+          "label": "Услуги",
+          "widget": "list",
+          "summary": "{{fields.title}}",
+          "fields": [
+            {
+              "name": "title",
+              "label": "Название",
+              "widget": "string"
+            },
+            {
+              "name": "description",
+              "label": "Описание",
+              "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "process_label",
+          "label": "Этапы: надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "process_title",
+          "label": "Этапы: заголовок",
+          "widget": "string"
+        },
+        {
+          "name": "process_emphasis",
+          "label": "Этапы: акцент",
+          "widget": "string"
+        },
+        {
+          "name": "steps",
+          "label": "Этапы работы",
+          "widget": "list",
+          "summary": "{{fields.title}}",
+          "fields": [
+            {
+              "name": "label",
+              "label": "Номер и подпись",
+              "widget": "string"
+            },
+            {
+              "name": "title",
+              "label": "Заголовок",
+              "widget": "string"
+            },
+            {
+              "name": "description",
+              "label": "Описание",
+              "widget": "text"
+            }
+          ]
+        },
+        {
+          "name": "cta",
+          "label": "Приглашение обсудить проект",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "label",
+              "label": "Надзаголовок",
+              "widget": "string"
+            },
+            {
+              "name": "title",
+              "label": "Заголовок приглашения",
+              "widget": "text"
+            },
+            {
+              "name": "emphasis",
+              "label": "Акцент курсивом",
+              "widget": "string"
+            },
+            {
+              "name": "intro",
+              "label": "Вступительный текст",
+              "widget": "text"
+            },
+            {
+              "name": "button",
+              "label": "Текст кнопки",
+              "widget": "string"
+            }
+          ],
+          "collapsed": true
+        }
+      ]
+    },
+    {
+      "id": "videos",
+      "label": "Видео",
+      "path": "content/pages/videos.json",
+      "fields": [
+        {
+          "name": "seo_title",
+          "label": "Заголовок для поисковиков",
+          "widget": "string"
+        },
+        {
+          "name": "seo_description",
+          "label": "Описание для поисковиков",
+          "widget": "text"
+        },
+        {
+          "name": "label",
+          "label": "Надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "title",
+          "label": "Заголовок",
+          "widget": "text"
+        },
+        {
+          "name": "emphasis",
+          "label": "Акцент курсивом",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "label": "Вступительный текст",
+          "widget": "text"
+        },
+        {
+          "name": "items",
+          "label": "Видео ВКонтакте",
+          "widget": "list",
+          "required": false,
+          "summary": "{{fields.title}}",
+          "fields": [
+            {
+              "name": "title",
+              "label": "Название",
+              "widget": "string"
+            },
+            {
+              "name": "description",
+              "label": "Описание",
+              "widget": "text"
+            },
+            {
+              "name": "url",
+              "label": "Ссылка VK Видео или код iframe",
+              "widget": "text",
+              "hint": "Поддерживаются https://vk.com/video-123_456, https://vkvideo.ru/video-123_456 и код из «Поделиться → Экспортировать». Для закрытых видео нужен полный код с hash.",
+              "pattern": [
+                "^(https://(www\\.)?(vk\\.com|vkvideo\\.ru)/video(-?\\d+_\\d+/?|_ext\\.php\\?)[\\s\\S]*|<iframe\\s[\\s\\S]*)$",
+                "Вставьте HTTPS-ссылку VK Видео или код iframe."
+              ]
+            },
+            {
+              "name": "poster",
+              "label": "Обложка",
+              "widget": "image",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "empty_title",
+          "label": "Заголовок, если видео ещё нет",
+          "widget": "string"
+        },
+        {
+          "name": "empty_text",
+          "label": "Текст, если видео ещё нет",
+          "widget": "text"
+        },
+        {
+          "name": "cta",
+          "label": "Приглашение обсудить проект",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "label",
+              "label": "Надзаголовок",
+              "widget": "string"
+            },
+            {
+              "name": "title",
+              "label": "Заголовок приглашения",
+              "widget": "text"
+            },
+            {
+              "name": "emphasis",
+              "label": "Акцент курсивом",
+              "widget": "string"
+            },
+            {
+              "name": "intro",
+              "label": "Вступительный текст",
+              "widget": "text"
+            },
+            {
+              "name": "button",
+              "label": "Текст кнопки",
+              "widget": "string"
+            }
+          ],
+          "collapsed": true
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "label": "Контакты и форма",
+      "path": "content/pages/contact.json",
+      "fields": [
+        {
+          "name": "seo_title",
+          "label": "Заголовок для поисковиков",
+          "widget": "string"
+        },
+        {
+          "name": "seo_description",
+          "label": "Описание для поисковиков",
+          "widget": "text"
+        },
+        {
+          "name": "label",
+          "label": "Надзаголовок",
+          "widget": "string"
+        },
+        {
+          "name": "title",
+          "label": "Заголовок",
+          "widget": "text"
+        },
+        {
+          "name": "emphasis",
+          "label": "Акцент курсивом",
+          "widget": "string"
+        },
+        {
+          "name": "intro",
+          "label": "Вступительный текст",
+          "widget": "text"
+        },
+        {
+          "name": "form_title",
+          "label": "Заголовок формы",
+          "widget": "string"
+        },
+        {
+          "name": "form",
+          "label": "Подписи, кнопки и сообщения формы",
+          "widget": "object",
+          "collapsed": true,
+          "fields": [
+            {
+              "name": "name_label",
+              "label": "Подпись: имя",
+              "widget": "string"
+            },
+            {
+              "name": "name_placeholder",
+              "label": "Подсказка: имя",
+              "widget": "string"
+            },
+            {
+              "name": "contact_label",
+              "label": "Подпись: способ связи",
+              "widget": "string"
+            },
+            {
+              "name": "contact_placeholder",
+              "label": "Подсказка: способ связи",
+              "widget": "string"
+            },
+            {
+              "name": "message_label",
+              "label": "Подпись: о проекте",
+              "widget": "string"
+            },
+            {
+              "name": "message_placeholder",
+              "label": "Подсказка: о проекте",
+              "widget": "string"
+            },
+            {
+              "name": "submit",
+              "label": "Кнопка подготовки",
+              "widget": "string"
+            },
+            {
+              "name": "note",
+              "label": "Пояснение формы",
+              "widget": "text"
+            },
+            {
+              "name": "result",
+              "label": "Сообщение после подготовки",
+              "widget": "text"
+            },
+            {
+              "name": "copy",
+              "label": "Кнопка копирования",
+              "widget": "string"
+            },
+            {
+              "name": "copied",
+              "label": "Сообщение: скопировано",
+              "widget": "string"
+            },
+            {
+              "name": "copy_fallback",
+              "label": "Сообщение при ручном копировании",
+              "widget": "string"
+            },
+            {
+              "name": "email_button",
+              "label": "Кнопка почты",
+              "widget": "string"
+            },
+            {
+              "name": "subject",
+              "label": "Тема письма",
+              "widget": "string"
+            },
+            {
+              "name": "greeting",
+              "label": "Начало письма",
+              "widget": "string"
+            },
+            {
+              "name": "project_prefix",
+              "label": "Письмо: подпись проекта",
+              "widget": "string"
+            },
+            {
+              "name": "contact_prefix",
+              "label": "Письмо: подпись контакта",
+              "widget": "string"
+            },
+            {
+              "name": "whitespace_error",
+              "label": "Сообщение о незаполненном поле",
+              "widget": "string"
+            },
+            {
+              "name": "nojs_note",
+              "label": "Пояснение при отключённом JavaScript",
+              "widget": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "settings",
+      "label": "Общие настройки, контакты и навигация",
+      "path": "content/settings.json",
+      "fields": [
+        {
+          "name": "brand",
+          "label": "Название в логотипе",
+          "widget": "string"
+        },
+        {
+          "name": "brand_subtitle",
+          "label": "Подпись под логотипом",
+          "widget": "string"
+        },
+        {
+          "name": "footer_tagline",
+          "label": "Слоган в подвале",
+          "widget": "string"
+        },
+        {
+          "name": "footer_note",
+          "label": "Примечание в подвале",
+          "widget": "text"
+        },
+        {
+          "name": "contacts",
+          "label": "Контакты",
+          "widget": "object",
+          "fields": [
+            {
+              "name": "youtube",
+              "label": "YouTube",
+              "widget": "string",
+              "required": false,
+              "hint": "Полная ссылка https://www.youtube.com/@...",
+              "pattern": [
+                "^$|^https://(www\\.)?(youtube\\.com|youtu\\.be)/[^\\s]+$",
+                "Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка."
+              ]
+            },
+            {
+              "name": "telegram",
+              "label": "Telegram",
+              "widget": "string",
+              "required": false,
+              "hint": "Полная ссылка https://t.me/...",
+              "pattern": [
+                "^$|^https://t\\.me/[^\\s]+$",
+                "Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка."
+              ]
+            },
+            {
+              "name": "vk",
+              "label": "Группа ВКонтакте",
+              "widget": "string",
+              "required": false,
+              "hint": "Полная ссылка https://vk.com/...",
+              "pattern": [
+                "^$|^https://(www\\.)?(vk\\.com|vk\\.ru)/[^\\s]+$",
+                "Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка."
+              ]
+            },
+            {
+              "name": "email",
+              "label": "Email",
+              "widget": "string",
+              "required": false,
+              "hint": "Адрес почты без mailto:",
+              "pattern": [
+                "^$|^[^\\s@?&#]+@[^\\s@?&#]+\\.[^\\s@?&#]+$",
+                "Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "ui",
+          "label": "Навигация, ссылки и общие подписи",
+          "widget": "object",
+          "collapsed": true,
+          "fields": [
+            {
+              "name": "home",
+              "label": "Главная",
+              "widget": "string"
+            },
+            {
+              "name": "projects",
+              "label": "Проекты",
+              "widget": "string"
+            },
+            {
+              "name": "about",
+              "label": "О дизайнере",
+              "widget": "string"
+            },
+            {
+              "name": "services",
+              "label": "Услуги",
+              "widget": "string"
+            },
+            {
+              "name": "videos",
+              "label": "Видео",
+              "widget": "string"
+            },
+            {
+              "name": "contact",
+              "label": "Контакты",
+              "widget": "string"
+            },
+            {
+              "name": "discuss",
+              "label": "Обсудить проект",
+              "widget": "string"
+            },
+            {
+              "name": "all_projects",
+              "label": "Все проекты",
+              "widget": "string"
+            },
+            {
+              "name": "more_about",
+              "label": "Больше о подходе",
+              "widget": "string"
+            },
+            {
+              "name": "all_services",
+              "label": "Подробнее об услугах",
+              "widget": "string"
+            },
+            {
+              "name": "back_projects",
+              "label": "К портфолио",
+              "widget": "string"
+            },
+            {
+              "name": "next_project",
+              "label": "Следующий проект",
+              "widget": "string"
+            },
+            {
+              "name": "previous_project",
+              "label": "Предыдущий проект",
+              "widget": "string"
+            },
+            {
+              "name": "concept_label",
+              "label": "Концепция интерьера",
+              "widget": "string"
+            },
+            {
+              "name": "project_label",
+              "label": "Проект интерьера",
+              "widget": "string"
+            },
+            {
+              "name": "concept_note",
+              "label": "Иллюстрации созданы с помощью ИИ. Это концепция, а не реализованный объект.",
+              "widget": "text"
+            },
+            {
+              "name": "open_photo",
+              "label": "Посмотреть фотографию",
+              "widget": "string"
+            },
+            {
+              "name": "watch_video",
+              "label": "Смотреть видео",
+              "widget": "string"
+            },
+            {
+              "name": "open_vk",
+              "label": "Открыть во ВКонтакте",
+              "widget": "string"
+            },
+            {
+              "name": "video_unavailable",
+              "label": "Для этого видео пока не настроено встраивание.",
+              "widget": "string"
+            },
+            {
+              "name": "youtube",
+              "label": "YouTube",
+              "widget": "string"
+            },
+            {
+              "name": "telegram",
+              "label": "Написать в Telegram",
+              "widget": "string"
+            },
+            {
+              "name": "vk",
+              "label": "Группа ВКонтакте",
+              "widget": "string"
+            },
+            {
+              "name": "email",
+              "label": "Написать на почту",
+              "widget": "string"
+            },
+            {
+              "name": "top",
+              "label": "Наверх",
+              "widget": "string"
+            },
+            {
+              "name": "empty_projects",
+              "label": "Новые проекты скоро появятся.",
+              "widget": "string"
+            },
+            {
+              "name": "skip",
+              "label": "Перейти к содержимому",
+              "widget": "string"
+            },
+            {
+              "name": "menu",
+              "label": "Меню",
+              "widget": "string"
+            },
+            {
+              "name": "not_found_title",
+              "label": "Эта страница не найдена",
+              "widget": "string"
+            },
+            {
+              "name": "not_found_text",
+              "label": "Возможно, адрес изменился. Вернитесь на главную или посмотрите проекты.",
+              "widget": "text"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "projectFields": [
+    {
+      "name": "slug",
+      "label": "Адрес проекта (латиницей)",
+      "widget": "string",
+      "hint": "Например: warm-minimalism. Не меняйте после публикации, чтобы сохранить ссылки.",
+      "pattern": [
+        "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        "Только строчные латинские буквы, цифры и дефисы."
+      ]
+    },
+    {
+      "name": "order",
+      "label": "Порядок в портфолио",
+      "widget": "number",
+      "default": 10,
+      "value_type": "int",
+      "min": 0
+    },
+    {
+      "name": "published",
+      "label": "Опубликовать на сайте",
+      "widget": "boolean",
+      "default": true
+    },
+    {
+      "name": "title",
+      "label": "Название",
+      "widget": "string"
+    },
+    {
+      "name": "subtitle",
+      "label": "Короткая подпись",
+      "widget": "string"
+    },
+    {
+      "name": "description",
+      "label": "Описание",
+      "widget": "text"
+    },
+    {
+      "name": "image",
+      "label": "Обложка",
+      "widget": "image"
+    },
+    {
+      "name": "image_alt",
+      "label": "Описание обложки для доступности",
+      "widget": "string"
+    },
+    {
+      "name": "is_concept",
+      "label": "Это демонстрационная концепция",
+      "widget": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "images",
+      "label": "Дополнительные фотографии",
+      "widget": "list",
+      "required": false,
+      "fields": [
+        {
+          "name": "image",
+          "label": "Фотография",
+          "widget": "image"
+        },
+        {
+          "name": "alt",
+          "label": "Описание фотографии",
+          "widget": "string"
+        }
+      ]
+    },
+    {
+      "name": "seo_description",
+      "label": "Описание для поисковиков",
+      "widget": "text"
+    },
+    {
+      "name": "body",
+      "label": "Подробная история проекта: абзацы",
+      "widget": "list",
+      "required": false,
+      "field": {
+        "name": "paragraph",
+        "label": "Абзац",
+        "widget": "text"
+      }
+    },
+    {
+      "name": "location",
+      "label": "Город / местоположение",
+      "widget": "string",
+      "required": false
+    },
+    {
+      "name": "area",
+      "label": "Площадь",
+      "widget": "string",
+      "required": false,
+      "hint": "Например: 85 м²"
+    },
+    {
+      "name": "year",
+      "label": "Год",
+      "widget": "string",
+      "required": false
+    }
+  ]
+}
