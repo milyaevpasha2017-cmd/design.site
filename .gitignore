@@ -8,6 +8,7 @@ _site/
 __pycache__/
 
 _site-cloudflare/
+_site-vps/
 site-worker/generated/
 
 # Server credentials and live database/backup files never belong in source.

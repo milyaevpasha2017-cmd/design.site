@@ -1,0 +1,11 @@
+CREATE TABLE kv (
+  namespace TEXT NOT NULL,
+  key TEXT NOT NULL COLLATE BINARY,
+  value TEXT NOT NULL,
+  PRIMARY KEY (namespace, key)
+) WITHOUT ROWID;
+CREATE TABLE alarms (
+  namespace TEXT PRIMARY KEY,
+  expires INTEGER NOT NULL
+) WITHOUT ROWID;
+PRAGMA user_version = 1;

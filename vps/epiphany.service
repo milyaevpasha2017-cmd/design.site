@@ -1,0 +1,26 @@
+[Unit]
+Description=Epiphany Interior website and admin
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=epiphany
+Group=epiphany
+WorkingDirectory=/opt/epiphany/current
+EnvironmentFile=/etc/epiphany/server.env
+ExecStart=/usr/bin/node /opt/epiphany/current/vps/server.mjs
+Restart=on-failure
+RestartSec=3
+UMask=0077
+StateDirectory=epiphany
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/epiphany
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target
