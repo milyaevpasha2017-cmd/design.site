@@ -11,6 +11,8 @@
     const url = new URL(base);
     if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || url.pathname !== '/') throw new Error('В настройках нужен HTTPS-адрес сервиса авторизации без пути.');
     if (!window.CMS) throw new Error('Не удалось загрузить Decap CMS. Обновите страницу.');
+    const { enableSaveRefresh } = await import('./save-refresh.mjs');
+    enableSaveRefresh(window.CMS);
     document.querySelector('#setup').hidden = true;
     window.CMS.init({ config: { backend: { base_url: url.origin } } });
   } catch (error) { message.textContent = error.message || 'Ошибка загрузки админки. Обновите страницу.'; }
