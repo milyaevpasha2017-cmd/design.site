@@ -22,6 +22,11 @@ async function github(request){
     if(redirectProjects)return new Response(null,{status:302,headers:{Location:'https://untrusted.example/content'}});
     return Response.json([{type:'file',name:'sample-project.json',sha:'c'.repeat(40)}]);
   }
+  if(url.pathname.startsWith('/repos/owner/site/contents/assets/uploads/')){
+    assert.equal(request.method,'PUT');
+    const body=await request.json();assert.equal(body.branch,'main');assert.ok(body.content.startsWith('iVBORw'));
+    return Response.json({content:{sha:'e'.repeat(40)},commit:{sha:'f'.repeat(40)}});
+  }
   assert.equal(url.pathname,'/repos/owner/site/contents/content/pages/home.json');
   if(request.method==='GET')return Response.json({type:'file',sha:revision,content:Buffer.from(JSON.stringify(storedHome)).toString('base64')});
   assert.equal(request.method,'PUT');
@@ -30,7 +35,7 @@ async function github(request){
   assert.equal(body.sha,revision);
   storedHome=JSON.parse(Buffer.from(body.content,'base64').toString('utf8'));
   revision='b'.repeat(40);
-  return Response.json({content:{sha:revision}});
+  return Response.json({content:{sha:revision},commit:{sha:'d'.repeat(40)}});
 }
 
 const mf=new Miniflare(convertV4MiniflareOptions({workers:[{
@@ -40,7 +45,8 @@ const mf=new Miniflare(convertV4MiniflareOptions({workers:[{
   durableObjects:{ADMIN_STATE:{className:'AdminState',useSQLite:true}},
   bindings:{SITE_ORIGIN:origin,CONTENT_REPO:'owner/site',CONTENT_BRANCH:'main',ADMIN_USERNAME:'admin',ADMIN_PASSWORD_HASH:await passwordHash(),GITHUB_CONTENT_TOKEN:'test-only-do-not-use'},
   outboundService:github,
-}]}));
+  serviceBindings:{ASSETS:'asset-stub'},
+},{name:'asset-stub',modules:true,script:'export default {fetch(){return new Response("Not deployed yet",{status:404});}}',compatibilityDate:'2026-10-01'}]}));
 
 try{
   const response=await mf.dispatchFetch(origin+'/api/login',{
@@ -67,9 +73,26 @@ try{
     body:JSON.stringify(document),
   });
   assert.equal(save.status,200,await save.clone().text());
-  assert.equal((await save.json()).sha,revision);
+  const saved=await save.json();
+  assert.equal(saved.sha,revision);assert.equal(saved.published,true);
+  // The static bundle is deliberately unchanged: the very next public request
+  // must still contain the saved text, through the real SQLite DO instance.
+  const publicHome=await mf.dispatchFetch(origin+'/');
+  assert.equal(publicHome.status,200);
+  assert.ok((await publicHome.text()).includes(' проверка сохранения'));
   const reload=await mf.dispatchFetch(origin+'/api/pages/home',{headers:{Cookie:cookie}});
   assert.equal((await reload.json()).data.emphasis,document.data.emphasis);
+
+  const photoBytes=new Uint8Array(220000);photoBytes.set([137,80,78,71,13,10,26,10]);
+  const upload=await mf.dispatchFetch(origin+'/api/upload',{
+    method:'POST',headers:{Origin:origin,'Content-Type':'application/json',Cookie:cookie,'X-CSRF-Token':user.csrf},
+    body:JSON.stringify({content:Buffer.from(photoBytes).toString('base64')}),
+  });
+  assert.equal(upload.status,200,await upload.clone().text());
+  const uploaded=await upload.json();assert.equal(uploaded.published,true);
+  const photo=await mf.dispatchFetch(origin+'/'+uploaded.path);
+  assert.equal(photo.status,200);assert.equal(photo.headers.get('Content-Type'),'image/png');
+  assert.deepEqual(new Uint8Array(await photo.arrayBuffer()),photoBytes);
 
   redirectProjects=true;
   const before=upstreamRequests.length;
@@ -84,7 +107,7 @@ try{
   assert.equal(logout.status,200);
   const expired=await mf.dispatchFetch(origin+'/api/session',{headers:{Cookie:cookie}});
   assert.equal(expired.status,401);
-  console.log('PASS: native workerd + SQLite sessions, GitHub project/page loading, saving, redirect rejection and logout revocation.');
+  console.log('PASS: native workerd + SQLite sessions, immediate public text/photo publication, GitHub reads/saves, redirect rejection and logout revocation.');
 }finally{
   await mf.dispose();
 }

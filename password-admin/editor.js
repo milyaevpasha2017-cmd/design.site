@@ -126,14 +126,14 @@ $('#save').addEventListener('click',async()=>{
       $('#field-slug').readOnly=true;
       try{await projects();}catch(error){fail(error);}
     }
-    updateStatus(dirty()?'Сохранено. Есть новые несохранённые изменения.':'Сохранено. Обновление сайта начнётся автоматически и займёт некоторое время.');
+    updateStatus(dirty()?'Сохранено. Есть новые несохранённые изменения.':result.published?'Сохранено и опубликовано. Изменения уже доступны на сайте.':'Сохранено в репозитории. Быстрая публикация недоступна; сайт обновится после сборки.');
   }catch(error){fail(error);}finally{busy=false;$('#save').disabled=!dirty()||uploading>0;$('#save').textContent='Сохранить и опубликовать';}
 });
 $('#new-project').addEventListener('click',()=>openDocument('projects','',true));
 $('#delete-project').addEventListener('click',async()=>{
   if(!current||current.kind!=='projects'||busy||!confirm('Удалить проект и его страницу с сайта?'))return;
   busy=true;
-  try{await api(`projects/${current.id}`,{method:'DELETE',body:JSON.stringify({sha:current.sha})});current=null;baseline='';$('#editor').hidden=true;$('#delete-project').hidden=true;$('#editor-title').textContent='Проект удалён';updateStatus('Сайт обновится автоматически.');await projects();}catch(error){fail(error);}finally{busy=false;}
+  try{const result=await api(`projects/${current.id}`,{method:'DELETE',body:JSON.stringify({sha:current.sha})});current=null;baseline='';$('#editor').hidden=true;$('#delete-project').hidden=true;$('#editor-title').textContent='Проект удалён';updateStatus(result.published?'Проект удалён с сайта.':'Удаление сохранено. Сайт обновится после сборки.');await projects();}catch(error){fail(error);}finally{busy=false;}
 });
 $('#logout').addEventListener('click',async()=>{
   if(dirty()&&!confirm('Выйти без сохранения изменений?'))return;

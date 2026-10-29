@@ -1,9 +1,12 @@
+import {Publication} from './publication.mjs';
 // One Durable Object holds login throttles and revocable sessions. It is never
 // exposed as a public route. SQLite-backed storage works on Workers Free.
 export class AdminState {
-  constructor(ctx) {this.ctx=ctx;}
+  constructor(ctx) {this.ctx=ctx;this.publication=new Publication(ctx);}
   async fetch(request) {
-    const {action,...data}=await request.json();const now=Date.now();
+    const {action,...data}=await request.json();
+    if(action.startsWith('publish:'))return this.publication.fetch({action,...data});
+    const now=Date.now();
     let result;
     if(action==='attempt') {
       result=await this.ctx.storage.transaction(async storage=>{

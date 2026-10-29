@@ -8,7 +8,7 @@ import {fixture,TEST_PASSWORD} from '../helpers/password-site.mjs';
 const require=createRequire(import.meta.url);const {chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright');
 const f=await fixture();const root=path.resolve('_site-cloudflare');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.mjs':'text/javascript','.json':'application/json','.png':'image/png'};
-f.env.ASSETS.fetch=async request=>{const url=new URL(request.url);if(url.pathname==='/__credential-test')return new Response(await readFile('docs/create-admin-password.html'),{headers:{'Content-Type':'text/html'}});let file=decodeURIComponent(url.pathname).slice(1);if(file.endsWith('/'))file+='index.html';const target=path.resolve(root,file);if(!target.startsWith(root+path.sep))return new Response('Not found',{status:404});try{return new Response(await readFile(target),{headers:{'Content-Type':types[path.extname(target)]||'application/octet-stream'}});}catch{return new Response('Not found',{status:404});}};
+f.env.ASSETS.fetch=async request=>{const url=new URL(request.url);if(url.pathname==='/__credential-test.fixture')return new Response(await readFile('docs/create-admin-password.html'),{headers:{'Content-Type':'text/html'}});let file=decodeURIComponent(url.pathname).slice(1);if(file.endsWith('/'))file+='index.html';const target=path.resolve(root,file);if(!target.startsWith(root+path.sep))return new Response('Not found',{status:404});try{return new Response(await readFile(target),{headers:{'Content-Type':types[path.extname(target)]||'application/octet-stream'}});}catch{return new Response('Not found',{status:404});}};
 const temporary=await mkdtemp(path.join(tmpdir(),'epiphany-https-'));
 execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',temporary+'/key.pem','-out',temporary+'/cert.pem','-days','1','-subj','/CN=localhost','-addext','subjectAltName=DNS:localhost,IP:127.0.0.1'],{stdio:'ignore'});
 const cert=await readFile(temporary+'/cert.pem');
@@ -34,8 +34,10 @@ try{
  await page.getByLabel('Пароль',{exact:true}).fill(TEST_PASSWORD);await page.getByRole('button',{name:'Войти',exact:true}).click();await page.getByRole('heading',{name:'Главная',exact:true}).waitFor();
  const cookies=await context.cookies();assert.ok(cookies.some(cookie=>cookie.name==='__Host-epiphany-admin'&&cookie.httpOnly&&cookie.secure));
  const emphasis=page.locator('#field-emphasis');const original=await emphasis.inputValue();
- await emphasis.fill(original+' Дополнение.');await page.locator('#save').click();await page.getByText('Сохранено. Обновление сайта начнётся автоматически и займёт некоторое время.',{exact:true}).waitFor();
- await emphasis.fill(original);assert.equal(await page.locator('#save').isEnabled(),true);await page.locator('#save').click();await page.getByText('Сохранено. Обновление сайта начнётся автоматически и займёт некоторое время.',{exact:true}).waitFor();assert.equal(JSON.parse(f.files.get('content/pages/home.json').content).emphasis,original);
+ await emphasis.fill(original+' Дополнение.');await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();
+ const publicPage=await context.newPage();await publicPage.goto(f.env.SITE_ORIGIN+'/');assert.equal(await publicPage.locator('.hero-title h1 em').innerText(),original+' Дополнение.');
+ await emphasis.fill(original);assert.equal(await page.locator('#save').isEnabled(),true);await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();assert.equal(JSON.parse(f.files.get('content/pages/home.json').content).emphasis,original);
+ await publicPage.reload();assert.equal(await publicPage.locator('.hero-title h1 em').innerText(),original);
  // Navigation is guarded while a draft is dirty.
  await emphasis.fill(original+' Черновик');page.once('dialog',dialog=>dialog.dismiss());await page.locator('#page-list').getByRole('button',{name:'Видео',exact:true}).click();assert.equal(await page.locator('#editor-title').innerText(),'Главная');await emphasis.fill(original);
  await page.locator('#new-project').click();await page.getByRole('heading',{name:'Новый проект',exact:true}).waitFor();
@@ -45,12 +47,16 @@ try{
  await page.waitForFunction(()=>document.querySelector('#field-image').value.startsWith('assets/uploads/'));
  await page.locator('#save').click();await page.waitForFunction(()=>document.querySelector('#editor-title').textContent==='Проект из панели');
  assert.ok(f.files.has('content/projects/browser-project.json'));assert.ok(JSON.parse(f.files.get('content/projects/browser-project.json').content).image.startsWith('assets/uploads/'));
+ // A project and its uploaded photo must be usable before any build runs.
+ await publicPage.goto(f.env.SITE_ORIGIN+'/projects/browser-project/');assert.equal(await publicPage.locator('h1').innerText(),'Проект из панели');
+ await publicPage.locator('.project-cover img').evaluate(image=>image.decode());
  page.once('dialog',dialog=>dialog.accept());await page.locator('#delete-project').click();await page.getByRole('heading',{name:'Проект удалён',exact:true}).waitFor();assert.equal(f.files.has('content/projects/browser-project.json'),false);
+ assert.equal((await publicPage.reload()).status(),404);await publicPage.close();
  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
  await page.screenshot({path:'/tmp/password-admin-mobile.png',fullPage:true});
  await page.locator('#logout').click();await page.waitForURL('**/admin/login/');assert.equal((await page.evaluate(async()=>{const response=await fetch('/api/session');return response.status})),401);
  await page.screenshot({path:'/tmp/password-login.png',fullPage:true});assert.deepEqual(errors,[]);
- const helper=await browser.newPage();await helper.goto(f.env.SITE_ORIGIN+'/__credential-test');
+ const helper=await browser.newPage();await helper.goto(f.env.SITE_ORIGIN+'/__credential-test.fixture');
  await helper.locator('#password').fill(TEST_PASSWORD);await helper.locator('#repeat').fill(TEST_PASSWORD);await helper.getByRole('button',{name:'Подготовить хеш',exact:true}).click();await helper.locator('#hash').waitFor();const hash=await helper.locator('#hash').inputValue();assert.equal(await verifyPassword(TEST_PASSWORD,hash),true);assert.equal(await helper.locator('#password').inputValue(),'');await helper.close();
  console.log('PASS: password-only login/error, secure cookie, page save/delete-text/save, unsaved draft protection, image upload, create/delete project, mobile layout, logout/revocation. No external requests.');
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));await rm(temporary,{recursive:true,force:true});}

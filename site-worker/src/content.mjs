@@ -36,8 +36,8 @@ export function repository(env,fetcher) {
   return {
     async read(file){const result=await request(file);if(!result.content||result.type!=='file')throw Object.assign(new Error('Некорректный файл.'),{status:502});return {sha:result.sha,data:JSON.parse(decodeText(result.content))};},
     async list(){const files=await request('content/projects');if(!Array.isArray(files))return [];return files.filter(f=>f.type==='file'&&/^[a-z0-9]+(?:-[a-z0-9]+)*\.json$/.test(f.name)).map(f=>({id:f.name.slice(0,-5),sha:f.sha}));},
-    async save(file,data,sha){const result=await request(file,'PUT',{message:`Обновление контента: ${file}`,content:encodeText(JSON.stringify(data,null,2)+'\n'),...(sha?{sha}:{})});return {sha:result.content.sha};},
-    async upload(file,content){await request(file,'PUT',{message:'Добавлена фотография проекта',content});return {path:file};},
-    async remove(file,sha){await request(file,'DELETE',{message:`Удалён проект: ${file}`,sha});return {ok:true};}
+    async save(file,data,sha){const result=await request(file,'PUT',{message:`Обновление контента: ${file}`,content:encodeText(JSON.stringify(data,null,2)+'\n'),...(sha?{sha}:{})});return {sha:result.content.sha,commit:result.commit?.sha};},
+    async upload(file,content){const result=await request(file,'PUT',{message:'Добавлена фотография проекта',content});return {path:file,sha:result.content.sha,commit:result.commit?.sha};},
+    async remove(file,sha){const result=await request(file,'DELETE',{message:`Удалён проект: ${file}`,sha});return {ok:true,commit:result.commit?.sha};}
   };
 }

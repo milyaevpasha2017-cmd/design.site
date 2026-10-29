@@ -1,5 +1,7 @@
 import {COOKIE,cookie,SESSION_SECONDS,randomToken,digest,sessionId,verifyPassword,validPasswordHash,bodyJSON,imageExtension} from './security.mjs';
 import {schema,validate,repository,slugPattern} from './content.mjs';
+import {publication,currentContent} from './publication.mjs';
+import {Site} from './render.mjs';
 const privateHeaders={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','X-Frame-Options':'DENY'};
 const csp="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https: blob: data:; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
 const json=(body,status=200,extra={})=>Response.json(body,{status,headers:{...privateHeaders,...extra}});
@@ -18,11 +20,41 @@ async function asset(request,env,privatePage=false){
   const headers=new Headers(response.headers);for(const [k,v]of Object.entries(privateHeaders))headers.set(k,v);headers.set('Content-Security-Policy',csp);
   return new Response(response.body,{status:response.status,headers});
 }
+async function publicSite(request,env,path){
+  if(!env.SITE_CONTENT)return asset(request,env);
+  if(path.startsWith('/assets/uploads/')){
+    const built=await asset(request,env);
+    if(built.status!==404)return built;
+    await built.body?.cancel();
+    return publication(env,{action:'publish:photo',path:path.slice(1)});
+  }
+  if(path.split('/').at(-1).includes('.')&&!path.endsWith('.html')&&path!=='/sitemap.xml')return asset(request,env);
+  if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405});
+  try{
+    const response=await publication(env,{action:'publish:read'});
+    if(!response.ok)throw new Error('Publication unavailable');
+    const content=currentContent(env.SITE_CONTENT,await response.json());
+    const page=new Site(content,env.SITE_ORIGIN,env.SITE_CONTENT.icons).response(path);
+    return request.method==='HEAD'?new Response(null,{status:page.status,headers:page.headers}):page;
+  }catch{return new Response('Сайт временно недоступен. Обновите страницу через несколько секунд.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}});}
+}
+async function publish(env,result,data){
+  try{
+    if(!result.commit)throw new Error('Missing commit');
+    const response=await publication(env,{...data,commit:result.commit});
+    if(!response.ok)throw new Error('Publication unavailable');
+    return {...result,published:true};
+  }catch{
+    // The repository write already succeeded. Return its revision so another
+    // edit remains safe; the ordinary build will publish this recovery path.
+    return {...result,published:false};
+  }
+}
 export function createSiteWorker(fetcher=fetch){return {async fetch(request,env){
   const url=new URL(request.url);let route;
   try{route=decodeURIComponent(url.pathname);}catch{return json({error:'Некорректный адрес.'},400);}
   const privateRoute=route==='/admin'||route.startsWith('/admin/')||route.startsWith('/api/');
-  if(!privateRoute)return asset(request,env);
+  if(!privateRoute)return publicSite(request,env,route);
   if(url.protocol!=='https:')return json({error:'Для входа нужен HTTPS.'},400);
   if(env.SITE_ORIGIN && url.origin!==env.SITE_ORIGIN)return json({error:'Этот адрес не настроен для панели управления.'},403);
   const publicAdmin=['/admin/login/','/admin/login.html','/admin/admin.css','/admin/auth.js'];
@@ -64,7 +96,8 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
       let bytes;try{bytes=Uint8Array.from(atob(content),c=>c.charCodeAt(0));}catch{return json({error:'Некорректный файл.'},400);}
       if(bytes.length>5*1024*1024)return json({error:'Фотография должна быть не больше 5 МБ.'},413);
       const ext=imageExtension(bytes);if(!ext)return json({error:'Поддерживаются фотографии JPG, PNG и WebP.'},400);
-      return json(await repo.upload('assets/uploads/'+crypto.randomUUID()+'.'+ext,content));
+      const result=await repo.upload('assets/uploads/'+crypto.randomUUID()+'.'+ext,content);
+      return json(await publish(env,result,{action:'publish:upload',path:result.path,sha:result.sha,content,type:{png:'image/png',jpg:'image/jpeg',webp:'image/webp'}[ext]}));
     }
     const page=route.match(/^\/api\/pages\/([a-z]+)$/);const project=route.match(/^\/api\/projects\/([a-z0-9-]+)$/);
     const definition=page?schema.pages.find(p=>p.id===page[1]):null;
@@ -72,13 +105,14 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
     const file=definition?.path||`content/projects/${slug}.json`;const fields=definition?.fields||schema.projectFields;
     if(request.method==='GET')return json(await repo.read(file));
     const body=await bodyJSON(request);
-    if(request.method==='DELETE'&&project){if(!sha(body.sha))return json({error:'Сначала откройте проект заново.'},400);return json(await repo.remove(file,body.sha));}
+    if(request.method==='DELETE'&&project){if(!sha(body.sha))return json({error:'Сначала откройте проект заново.'},400);const result=await repo.remove(file,body.sha);return json(await publish(env,result,{action:'publish:update',file,data:null,sha:null,previousSha:body.sha}));}
     if(request.method!=='PUT')return json({error:'Метод не поддерживается.'},405);
     if(body.sha!=null&&!sha(body.sha))return json({error:'Некорректная версия записи.'},400);
     if(page&&!body.sha)return json({error:'Сначала загрузите страницу.'},409);
     try{validate(fields,body.data);}catch(error){return json({error:error.message},400);}
     if(project&&body.data.slug!==slug)return json({error:'Адрес существующего проекта менять нельзя.'},400);
-    return json(await repo.save(file,body.data,body.sha));
+    const result=await repo.save(file,body.data,body.sha);
+    return json(await publish(env,result,{action:'publish:update',file,data:body.data,sha:result.sha,previousSha:body.sha}));
   }catch(error){return json({error:error.status?error.message:'Не удалось выполнить действие. Повторите позже.'},error.status||500);}
 }};}
 export default createSiteWorker();

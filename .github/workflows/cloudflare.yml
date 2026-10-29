@@ -21,6 +21,8 @@ jobs:
       EPIPHANY_SITE_URL: ${{ vars.CLOUDFLARE_SITE_URL || 'https://epiphany-int.ru/' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

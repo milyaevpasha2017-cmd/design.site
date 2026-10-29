@@ -8,3 +8,4 @@ _site/
 __pycache__/
 
 _site-cloudflare/
+site-worker/generated/

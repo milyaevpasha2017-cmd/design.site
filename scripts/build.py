@@ -5,6 +5,7 @@ import html
 import json
 import re
 import shutil
+import subprocess
 from pathlib import Path
 from urllib.parse import urlsplit
 from xml.sax.saxutils import escape as xml_escape
@@ -17,6 +18,13 @@ def icon(name='arrow-up-right'): return f'<svg class="icon" aria-hidden="true"><
 def paragraphs(items, cls='body-copy'): return ''.join(f'<p class="{cls}">{e(item)}</p>' for item in (items or []))
 def heading(title, emphasis='', level=1): return f'<h{level}><span>{e(title)}</span>{"<br><em>"+e(emphasis)+"</em>" if emphasis else ""}</h{level}>'
 def safe_json(data): return json.dumps(data,ensure_ascii=False).replace('<','\\u003c').replace('&','\\u0026')
+
+def worker_snapshot(content, target):
+    content=Path(content)
+    files={'content/'+str(file.relative_to(content)):json.loads(file.read_text()) for file in content.rglob('*.json')}
+    commits=subprocess.run(['git','rev-list','HEAD'],cwd=ROOT,capture_output=True,text=True,check=True).stdout.splitlines()
+    target=Path(target);target.parent.mkdir(parents=True,exist_ok=True)
+    target.write_text(json.dumps(dict(content=files,commits=commits,icons=(ROOT/'templates/icons.svg').read_text()),ensure_ascii=False))
 
 class Site:
     def __init__(self, content, url):
@@ -172,3 +180,4 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--site-url',default=DEFAULT_URL);parser.add_argument('--output',default=str(ROOT/'_site'))
     parser.add_argument('--admin-mode',choices=['github','password'],default='github')
     args=parser.parse_args();build(ROOT/'content',args.output,args.site_url,args.admin_mode)
+    if args.admin_mode=='password':worker_snapshot(ROOT/'content',ROOT/'site-worker/generated/site.json')
