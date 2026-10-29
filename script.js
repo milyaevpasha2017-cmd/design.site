@@ -120,7 +120,7 @@ function render(data) {
   $('#steps').replaceChildren(...data.steps.map(step => { const article = node('article'); article.append(node('span', '', step.label), node('h3', '', step.title), node('p', '', step.description)); return article; }));
   renderVideos(data.videos || []);
   const contacts = $('#contact-links'); contacts.replaceChildren();
-  for (const [kind, label] of Object.entries({youtube: 'YouTube', telegram: 'Telegram', vk: 'ВКонтакте', email: 'Написать на почту'})) {
+  for (const [kind, label] of Object.entries({telegram: 'Написать в Telegram', email: 'Написать на почту', vk: 'Группа ВКонтакте', youtube: 'YouTube'})) {
     const url = contactURL(kind, data.contacts?.[kind]); if (!url) continue;
     const a = node('a', '', label); a.href = url; a.append(icon());
     if (kind !== 'email') { a.target = '_blank'; a.rel = 'noopener noreferrer'; }

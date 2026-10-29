@@ -33,7 +33,7 @@
     "contact_label": "НАЧНЁМ С РАЗГОВОРА",
     "contact_title": "Каким будет",
     "contact_emphasis": "ваш дом?",
-    "contact_intro": "Расскажите немного о своей задаче.\nПодготовьте краткое описание для первого знакомства.",
+    "contact_intro": "Напишите мне в Telegram или на почту.\nОбсудим вашу задачу и подходящий формат работы.",
     "footer_tagline": "Интерьеры с характером. Пространства с историей.",
     "footer_note": "© Epiphany Interior · Иллюстрации — концепции, созданные с помощью ИИ",
     "hero_cta": "Обсудить интерьер"
@@ -115,9 +115,9 @@
   ],
   "videos": [],
   "contacts": {
-    "youtube": "",
-    "telegram": "",
-    "vk": "",
-    "email": ""
+    "youtube": "https://www.youtube.com/@epiphany_interior",
+    "telegram": "https://t.me/paulinaepifanova",
+    "vk": "https://vk.ru/club224219192",
+    "email": "epifanovaps@yandex.ru"
   }
 }
