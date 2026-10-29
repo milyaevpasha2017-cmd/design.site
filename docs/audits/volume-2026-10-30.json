@@ -1,0 +1,22 @@
+{
+  "runtime": "local workerd + native SQLite Durable Object",
+  "syntheticProjects": 1005,
+  "measure": "wall time, six sequential local requests; not production CPU or regional network latency",
+  "timings": {
+    "/": {
+      "medianMs": 12.51,
+      "maxMs": 16.11,
+      "bytes": 10778
+    },
+    "/projects/": {
+      "medianMs": 21.87,
+      "maxMs": 23.29,
+      "bytes": 671891
+    },
+    "/api/projects?limit=100": {
+      "medianMs": 21.14,
+      "maxMs": 30.14,
+      "bytes": 11956
+    }
+  }
+}

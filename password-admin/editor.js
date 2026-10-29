@@ -1,7 +1,8 @@
 const $=selector=>document.querySelector(selector);
 const make=(tag,className,text)=>{const element=document.createElement(tag);if(className)element.className=className;if(text!==undefined)element.textContent=text;return element;};
 const copy=value=>JSON.parse(JSON.stringify(value));
-let schema,csrf='',current=null,baseline='',busy=false,uploading=0,loadNumber=0;
+let schema,csrf='',current=null,baseline='',busy=false,uploading=0,loadNumber=0,projectCursor=null,projectCount=0,projectTicket=0;
+let retryLoad=null;
 const previews=new Set();
 const dirty=()=>current && JSON.stringify(current.data)!==baseline;
 async function api(path,options={}){
@@ -16,6 +17,12 @@ function updateStatus(message){
   $('#status').textContent=message||(uploading?'Загружаем фотографию…':dirty()?'Есть несохранённые изменения':'Все изменения сохранены');
 }
 function fail(error){$('#error').textContent=error.message||String(error);}
+function loadError(error,retry){
+  retryLoad=retry;$('#loading').hidden=true;$('#load-error').hidden=false;$('#load-error-text').textContent=error.message||String(error);
+  $('#editor-title').textContent='Раздел недоступен';$('#editor').hidden=true;$('#delete-project').hidden=true;$('#save').disabled=true;
+  document.querySelector('.app-layout main').setAttribute('aria-busy','false');
+}
+$('#retry-load').addEventListener('click',()=>{if(retryLoad)retryLoad();});
 function defaults(fields){const data={};for(const f of fields){if(f.default!==undefined)data[f.name]=copy(f.default);else if(f.widget==='object')data[f.name]=defaults(f.fields);else if(f.widget==='list')data[f.name]=[];else if(f.widget==='boolean')data[f.name]=false;else if(f.widget==='number')data[f.name]=0;else data[f.name]='';}return data;}
 function assetURL(value){try{const url=new URL(value,location.origin+'/');return url.protocol==='https:' || url.origin===location.origin?url.href:'';}catch{return '';}}
 function renderFields(container,fields,data,path=''){
@@ -61,6 +68,7 @@ function renderFields(container,fields,data,path=''){
       if(field.widget==='number'){input.type='number';input.min='0';input.step='1';}
       else if(input.tagName==='INPUT')input.type='text';
       input.value=data[key]??'';input.maxLength=20000;
+      input.dir=field.widget==='image'||field.widget==='number'||field.name==='slug'?'ltr':'auto';
       if(field.name==='slug'&&current?.kind==='projects'&&!current.isNew)input.readOnly=true;
       input.addEventListener('input',()=>{data[key]=field.widget==='number'?Number(input.value):input.value;input.setCustomValidity('');updateStatus();});
       if(field.required!==false)input.required=true;
@@ -86,15 +94,37 @@ function renderFields(container,fields,data,path=''){
     container.append(group);
   }
 }
-async function projects(){
-  const result=await api('projects');const list=$('#project-list');list.replaceChildren();
-  for(const project of result.projects){const button=make('button','nav-item',project.id);button.type='button';button.addEventListener('click',()=>openDocument('projects',project.id));list.append(button);api(`projects/${project.id}`).then(record=>{if(button.isConnected)button.textContent=record.data.title||project.id;}).catch(()=>{});}
+async function projects(append=false){
+  const ticket=++projectTicket;$('#project-more').disabled=true;
+  try{
+    const result=await api('projects?limit=50'+(append&&projectCursor?'&cursor='+encodeURIComponent(projectCursor):''));
+    if(ticket!==projectTicket)return;
+    const list=$('#project-list');if(!append){list.replaceChildren();projectCount=0;}
+    const unknown=[];
+    for(const project of result.projects){
+      const button=make('button','nav-item',project.title||project.id);button.type='button';button.dir='auto';button.addEventListener('click',()=>openDocument('projects',project.id));list.append(button);
+      if(!project.title)unknown.push({project,button});
+    }
+    projectCount+=result.projects.length;projectCursor=result.nextCursor;
+    $('#project-count').textContent=result.total?'Показано '+projectCount+' из '+result.total:'';$('#project-empty').hidden=result.total!==0;
+    $('#project-more').hidden=!projectCursor;
+    // Usually titles are supplied from the current snapshot. When a title was
+    // edited outside the CMS, avoid issuing hundreds of simultaneous reads.
+    const fill=async()=>{while(unknown.length&&ticket===projectTicket){const {project,button}=unknown.shift();try{const record=await api(`projects/${project.id}`);if(button.isConnected)button.textContent=record.data.title||project.id;}catch{if(button.isConnected)button.title='Название не загружено. Нажмите, чтобы повторить загрузку проекта.';}}};
+    await Promise.all(Array.from({length:Math.min(4,unknown.length)},fill));
+  }finally{if(ticket===projectTicket)$('#project-more').disabled=false;}
 }
+$('#project-more').addEventListener('click',()=>projects(true).catch(fail));
+$('#export-content').addEventListener('click',async()=>{
+  const button=$('#export-content');button.disabled=true;
+  try{const data=await api('export');const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'}));const link=make('a');link.href=url;link.download='epiphany-content.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(error){fail(error);}finally{button.disabled=false;}
+});
 async function openDocument(kind,id,isNew=false){
   if(busy||uploading)return;
   if(dirty()&&!confirm('Есть несохранённые изменения. Перейти без сохранения?'))return;
   const ticket=++loadNumber;$('#editor').inert=true;
-  $('#error').textContent='';$('#loading').hidden=false;$('#loading').textContent='Загружаем запись…';
+  current=null;baseline='';$('#save').disabled=true;$('#editor').hidden=true;$('#delete-project').hidden=true;$('#editor-title').textContent='Загрузка…';
+  $('#error').textContent='';$('#load-error').hidden=true;$('#loading').hidden=false;$('#loading-text').textContent='Загружаем запись…';document.querySelector('.app-layout main').setAttribute('aria-busy','true');
   try{
     const definition=kind==='pages'?schema.pages.find(page=>page.id===id):null;
     const fields=definition?.fields||schema.projectFields;
@@ -106,7 +136,7 @@ async function openDocument(kind,id,isNew=false){
     $('#editor').replaceChildren();renderFields($('#editor'),fields,current.data);baseline=isNew?'':JSON.stringify(current.data);
     $('#editor').hidden=false;$('#delete-project').hidden=kind!=='projects'||isNew;updateStatus();
     $('#editor-title').scrollIntoView({block:'start'});
-  }catch(error){if(ticket===loadNumber)fail(error);}finally{if(ticket===loadNumber){$('#loading').hidden=true;$('#editor').inert=false;}}
+  }catch(error){if(ticket===loadNumber)loadError(error,()=>openDocument(kind,id,isNew));}finally{if(ticket===loadNumber){$('#loading').hidden=true;$('#editor').inert=false;document.querySelector('.app-layout main').setAttribute('aria-busy','false');}}
 }
 $('#editor').addEventListener('submit',event=>event.preventDefault());
 $('#save').addEventListener('click',async()=>{
@@ -140,8 +170,10 @@ $('#logout').addEventListener('click',async()=>{
   try{await api('logout',{method:'POST',body:'{}'});current=null;location.replace('/admin/login/');}catch(error){fail(error);}
 });
 addEventListener('beforeunload',event=>{if(dirty()){event.preventDefault();event.returnValue='';}});
-try{
+async function initialize(){try{
+  $('#load-error').hidden=true;$('#loading').hidden=false;$('#loading-text').textContent='Загружаем панель…';$('#page-list').replaceChildren();
   const user=await api('session');csrf=user.csrf;schema=await api('schema');
   for(const page of schema.pages){const button=make('button','nav-item',page.label);button.type='button';button.addEventListener('click',()=>openDocument('pages',page.id));$('#page-list').append(button);}
   await projects();await openDocument('pages','home');
-}catch(error){$('#loading').hidden=true;fail(error);}
+}catch(error){loadError(error,initialize);}}
+initialize();

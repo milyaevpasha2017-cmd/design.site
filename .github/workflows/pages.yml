@@ -24,6 +24,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -32,9 +34,11 @@ jobs:
           node-version: '24'
       - name: Validate and build pages
         run: |
+          python3 scripts/design-inventory.py --check
           node --test tests/*.test.mjs
           python3 -m unittest discover -s tests -p 'test_*.py'
           python3 scripts/build.py
+          python3 scripts/audit-secrets.py --frontend _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -38,6 +38,22 @@ try{
  const publicPage=await context.newPage();await publicPage.goto(f.env.SITE_ORIGIN+'/');assert.equal(await publicPage.locator('.hero-title h1 em').innerText(),original+' Дополнение.');
  await emphasis.fill(original);assert.equal(await page.locator('#save').isEnabled(),true);await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();assert.equal(JSON.parse(f.files.get('content/pages/home.json').content).emphasis,original);
  await publicPage.reload();assert.equal(await publicPage.locator('.hero-title h1 em').innerText(),original);
+ const unicode="O'Neil · O’Connor 👩🏽‍🎨 — שלום مرحبا";
+ await emphasis.fill('مرحبا بالعالم');assert.equal(await emphasis.evaluate(element=>getComputedStyle(element).direction),'rtl');
+ await emphasis.fill(unicode);assert.equal(await emphasis.getAttribute('dir'),'auto');await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();assert.equal(await emphasis.inputValue(),unicode);
+ const downloadPromise=page.waitForEvent('download');await page.locator('#export-content').click();const download=await downloadPromise;
+ const exported=JSON.parse(await readFile(await download.path(),'utf8'));assert.equal(exported.content['content/pages/home.json'].emphasis,unicode);assert.equal(exported.mediaIncluded,false);assert.ok(!JSON.stringify(exported).includes(f.env.GITHUB_CONTENT_TOKEN));
+ await emphasis.fill(original);await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();
+ // Delayed loading, a distinct failure view, safe retry, and an empty collection.
+ let release,intercepted;const seen=new Promise(resolve=>{intercepted=resolve;});
+ await page.route('**/api/pages/about',async route=>{intercepted();await new Promise(resolve=>{release=resolve;});await route.fulfill({status:502,contentType:'application/json',body:JSON.stringify({error:'Тестовая ошибка загрузки'})});});
+ await page.locator('#page-list').getByRole('button',{name:'О дизайнере',exact:true}).click();await seen;await page.locator('#loading').waitFor({state:'visible'});release();
+ await page.locator('#load-error').waitFor({state:'visible'});assert.equal(await page.locator('#save').isDisabled(),true);assert.equal(await page.locator('#editor').isVisible(),false);
+ await page.unroute('**/api/pages/about');await page.locator('#retry-load').click();await page.getByRole('heading',{name:'О дизайнере',exact:true}).waitFor();assert.equal(await page.locator('#load-error').isVisible(),false);
+ const projectBackup=f.files.get('content/projects/warm-minimalism.json');f.files.delete('content/projects/warm-minimalism.json');await page.reload();await page.locator('#project-empty').waitFor({state:'visible'});f.files.set('content/projects/warm-minimalism.json',projectBackup);
+ await page.route('**/api/projects?*',route=>{const cursor=new URL(route.request().url()).searchParams.get('cursor');const start=cursor?50:0;return route.fulfill({contentType:'application/json',body:JSON.stringify({projects:Array.from({length:50},(_,i)=>({id:'project-'+String(start+i).padStart(4,'0'),title:'Проект '+(start+i)})),total:1005,limit:50,nextCursor:'project-'+String(start+49).padStart(4,'0')})});});
+ await page.reload();await page.getByText('Показано 50 из 1005',{exact:true}).waitFor();await page.locator('#project-more').click();await page.getByText('Показано 100 из 1005',{exact:true}).waitFor();assert.equal(await page.locator('#project-list button').count(),100);
+ await page.unroute('**/api/projects?*');await page.reload();await page.getByRole('heading',{name:'Главная',exact:true}).waitFor();
  // Navigation is guarded while a draft is dirty.
  await emphasis.fill(original+' Черновик');page.once('dialog',dialog=>dialog.dismiss());await page.locator('#page-list').getByRole('button',{name:'Видео',exact:true}).click();assert.equal(await page.locator('#editor-title').innerText(),'Главная');await emphasis.fill(original);
  await page.locator('#new-project').click();await page.getByRole('heading',{name:'Новый проект',exact:true}).waitFor();

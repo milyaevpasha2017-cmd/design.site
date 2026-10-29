@@ -36,7 +36,10 @@ async function publicSite(request,env,path){
     const content=currentContent(env.SITE_CONTENT,await response.json());
     const page=new Site(content,env.SITE_ORIGIN,env.SITE_CONTENT.icons).response(path);
     return request.method==='HEAD'?new Response(null,{status:page.status,headers:page.headers}):page;
-  }catch{return new Response('Сайт временно недоступен. Обновите страницу через несколько секунд.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}});}
+  }catch{
+    const site=new Site(env.SITE_CONTENT.content,env.SITE_ORIGIN,env.SITE_CONTENT.icons);
+    return new Response(request.method==='HEAD'?null:site.failure(),{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','Retry-After':'30','X-Content-Type-Options':'nosniff'}});
+  }
 }
 async function publish(env,result,data){
   try{
@@ -85,10 +88,36 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
     if(route==='/api/session'&&request.method==='GET')return json({username:user.user,csrf:user.csrf});
     if(route==='/api/logout'&&request.method==='POST'){await state(env,{action:'delete',sid:user.sid});return json({ok:true},200,{'Set-Cookie':cookie('')});}
     if(route==='/api/schema'&&request.method==='GET')return json(schema);
+    if(route==='/api/export'&&request.method==='GET'){
+      if(!env.SITE_CONTENT)return json({error:'Экспорт пока недоступен. Обратитесь к владельцу сайта.'},503);
+      const response=await publication(env,{action:'publish:read'});
+      if(!response.ok)return json({error:'Не удалось подготовить экспорт. Повторите позже.'},503);
+      const content=currentContent(env.SITE_CONTENT,await response.json());
+      return json({format:'epiphany-content-v1',exportedAt:new Date().toISOString(),content,mediaIncluded:false,note:'JSON содержит тексты, настройки и ссылки на фотографии. Файлы фотографий в этот экспорт не входят.'},200,{'Content-Disposition':'attachment; filename="epiphany-content.json"'});
+    }
     const repo=repository(env,fetcher);
+    if(route==='/api/export/archive'&&request.method==='GET'){
+      const archive=await repo.archive();return new Response(archive.body,{headers:{...privateHeaders,'Content-Type':'application/zip','Content-Disposition':'attachment; filename="epiphany-content.zip"'}});
+    }
     if(route==='/api/projects'&&request.method==='GET'){
-      let files;try{files=await repo.list();}catch(error){if(error.status!==404)throw error;files=[];}
-      return json({projects:files});
+      const limit=Number(url.searchParams.get('limit')||50),cursor=url.searchParams.get('cursor')||'';
+      if(!Number.isSafeInteger(limit)||limit<1||limit>100||(cursor&&!slugPattern.test(cursor)))return json({error:'Некорректные параметры списка проектов.'},400);
+      const files=await repo.list();
+      files.sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
+      const start=cursor?files.findIndex(file=>file.id>cursor):0;
+      const selected=start<0?[]:files.slice(start,start+limit);
+      if(env.SITE_CONTENT&&selected.length){
+        const result=await publication(env,{action:'publish:read'});
+        if(result.ok){
+          const records=await result.json(),content=currentContent(env.SITE_CONTENT,records),included=new Set(env.SITE_CONTENT.commits);
+          for(const file of selected){
+            const key=`content/projects/${file.id}.json`,record=records[key];
+            const cachedSHA=record&&!included.has(record.commit)?record.sha:env.SITE_CONTENT.shas?.[key];
+            if(cachedSHA===file.sha&&content[key])file.title=content[key].title;
+          }
+        }
+      }
+      return json({projects:selected,total:files.length,limit,nextCursor:start>=0&&start+limit<files.length?selected.at(-1).id:null});
     }
     if(route==='/api/upload'&&request.method==='POST'){
       const {content}=await bodyJSON(request,7100000);

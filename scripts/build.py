@@ -2,6 +2,7 @@
 """Build all public HTML from CMS JSON; Python standard library only."""
 import argparse
 import html
+import hashlib
 import json
 import re
 import shutil
@@ -21,10 +22,13 @@ def safe_json(data): return json.dumps(data,ensure_ascii=False).replace('<','\\u
 
 def worker_snapshot(content, target):
     content=Path(content)
-    files={'content/'+str(file.relative_to(content)):json.loads(file.read_text()) for file in content.rglob('*.json')}
+    files={};shas={}
+    for file in content.rglob('*.json'):
+        key='content/'+str(file.relative_to(content));raw=file.read_bytes()
+        files[key]=json.loads(raw);shas[key]=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
     commits=subprocess.run(['git','rev-list','HEAD'],cwd=ROOT,capture_output=True,text=True,check=True).stdout.splitlines()
     target=Path(target);target.parent.mkdir(parents=True,exist_ok=True)
-    target.write_text(json.dumps(dict(content=files,commits=commits,icons=(ROOT/'templates/icons.svg').read_text()),ensure_ascii=False))
+    target.write_text(json.dumps(dict(content=files,shas=shas,commits=commits,icons=(ROOT/'templates/icons.svg').read_text()),ensure_ascii=False))
 
 class Site:
     def __init__(self, content, url):
@@ -115,7 +119,7 @@ class Site:
         f=p['form'];fields=''
         for name in ['name','contact','message']:
             label=f'{name}_label';placeholder=f'{name}_placeholder'
-            field=f'<textarea id="{name}" name="{name}" rows="3" required maxlength="3000" placeholder="{e(f[placeholder])}"></textarea>' if name=='message' else f'<input id="{name}" name="{name}" required maxlength="150" autocomplete="{"name" if name=="name" else "email"}" placeholder="{e(f[placeholder])}">'
+            field=f'<textarea dir="auto" id="{name}" name="{name}" rows="3" required maxlength="3000" placeholder="{e(f[placeholder])}"></textarea>' if name=='message' else f'<input dir="auto" id="{name}" name="{name}" required maxlength="150" autocomplete="{"name" if name=="name" else "email"}" placeholder="{e(f[placeholder])}">'
             fields+=f'<label for="{name}">{e(f[label])}</label>{field}'
         return f'<noscript><p class="body-copy">{e(f["nojs_note"])}</p></noscript><form id="brief-form" hidden><h2 class="form-title">{e(p["form_title"])}</h2>{fields}<button class="submit" type="submit">{e(f["submit"])}{icon()}</button><p class="form-note">{e(f["note"])}</p><div id="brief-result" hidden role="status"><p>{e(f["result"])}</p><textarea id="brief-text" readonly aria-label="Текст обращения" rows="6"></textarea><button type="button" id="copy-brief">{e(f["copy"])}</button><span id="copy-status" aria-live="polite"></span><a class="email-brief" id="email-brief" hidden>{e(f["email_button"])}{icon()}</a></div></form><script id="form-data" type="application/json">{safe_json(dict(form=f,email=self.settings["contacts"].get("email","")))}</script>'
     def standard_page(self,key):

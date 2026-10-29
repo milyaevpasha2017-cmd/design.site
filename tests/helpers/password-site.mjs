@@ -48,5 +48,5 @@ export async function fixture(){
  const worker=createSiteWorker(fetcher);
  const request=(route,{method='GET',cookie,csrf,body,origin=env.SITE_ORIGIN,ip='203.0.113.1',headers={}}={})=>worker.fetch(new Request(env.SITE_ORIGIN+route,{method,headers:{...(method!=='GET'?{Origin:origin,'Content-Type':'application/json'}:{}),...(cookie?{Cookie:cookie}:{}),...(csrf?{'X-CSRF-Token':csrf}:{}),'CF-Connecting-IP':ip,...headers},...(body!==undefined?{body:JSON.stringify(body)}:{})}),env);
  const login=async()=>{const response=await request('/api/login',{method:'POST',body:{username:'admin',password:TEST_PASSWORD}});const cookie=response.headers.get('Set-Cookie')?.split(';')[0];const user=await (await request('/api/session',{cookie})).json();return {response,cookie,csrf:user.csrf};};
- return {env,worker,request,login,files,requests,storage,state};
+ return {env,worker,request,login,files,requests,storage,state,fetcher};
 }

@@ -9,3 +9,15 @@ __pycache__/
 
 _site-cloudflare/
 site-worker/generated/
+
+# Server credentials and live database/backup files never belong in source.
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+backups/

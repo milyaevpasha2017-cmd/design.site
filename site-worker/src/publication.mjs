@@ -11,7 +11,7 @@ export class Publication {
           for(const [key,meta]of rows){
             const file=key.slice(8);
             const parts=await Promise.all(Array.from({length:meta.chunks},(_,i)=>storage.get('document:'+file+':'+i)));
-            records[file]={data:JSON.parse(parts.join('')),commit:meta.commit};cursor=key;
+            records[file]={data:JSON.parse(parts.join('')),commit:meta.commit,sha:meta.sha};cursor=key;
           }
           if(rows.size<500)break;
         }while(cursor);

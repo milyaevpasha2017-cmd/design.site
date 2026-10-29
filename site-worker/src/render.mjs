@@ -74,7 +74,7 @@ export class Site {
   form(p){
     const f=p.form;
     const fields=['name','contact','message'].map(name=>{
-      const field=name==='message'?`<textarea id="${name}" name="${name}" rows="3" required maxlength="3000" placeholder="${e(f[name+'_placeholder'])}"></textarea>`:`<input id="${name}" name="${name}" required maxlength="150" autocomplete="${name==='name'?'name':'email'}" placeholder="${e(f[name+'_placeholder'])}">`;
+      const field=name==='message'?`<textarea dir="auto" id="${name}" name="${name}" rows="3" required maxlength="3000" placeholder="${e(f[name+'_placeholder'])}"></textarea>`:`<input dir="auto" id="${name}" name="${name}" required maxlength="150" autocomplete="${name==='name'?'name':'email'}" placeholder="${e(f[name+'_placeholder'])}">`;
       return `<label for="${name}">${e(f[name+'_label'])}</label>${field}`;
     }).join('');
     return `<noscript><p class="body-copy">${e(f.nojs_note)}</p></noscript><form id="brief-form" hidden><h2 class="form-title">${e(p.form_title)}</h2>${fields}<button class="submit" type="submit">${e(f.submit)}${icon()}</button><p class="form-note">${e(f.note)}</p><div id="brief-result" hidden role="status"><p>${e(f.result)}</p><textarea id="brief-text" readonly aria-label="Текст обращения" rows="6"></textarea><button type="button" id="copy-brief">${e(f.copy)}</button><span id="copy-status" aria-live="polite"></span><a class="email-brief" id="email-brief" hidden>${e(f.email_button)}${icon()}</a></div></form><script id="form-data" type="application/json">${safeJSON({form:f,email:this.settings.contacts.email||''})}</script>`;
@@ -113,6 +113,7 @@ export class Site {
     return this.shell(p.title+' — Epiphany Interior',p.seo_description||p.description,body,'projects','projects/'+p.slug+'/',extra);
   }
   notFound(){const u=this.ui;return this.shell(u.not_found_title,u.not_found_text,`<section class="section page-heading"><p class="eyebrow">404</p>${heading(u.not_found_title)}<p class="page-intro">${e(u.not_found_text)}</p>${this.button('home',u.home)}</section>`,'');}
+  failure(){return this.shell('Сайт временно недоступен — Epiphany Interior','Не удалось загрузить актуальные данные.',`<section class="section page-heading state-page"><p class="eyebrow">ВРЕМЕННАЯ ОШИБКА</p>${heading('Не удалось загрузить страницу')}<p class="page-intro">Повторите загрузку через несколько секунд. Если вопрос срочный, напишите нам напрямую.</p><a class="text-link" href="">Повторить загрузку ${icon()}</a>${this.contacts()}</section>`,'');}
   sitemap(){return '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+[...Object.values(routes),...this.projects.map(p=>'projects/'+p.slug+'/')].map(path=>'<url><loc>'+e(this.url+path)+'</loc></url>').join('')+'</urlset>';}
   response(path){
     const headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Type':'text/html; charset=utf-8'};

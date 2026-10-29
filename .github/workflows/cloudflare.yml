@@ -29,9 +29,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - run: python3 scripts/design-inventory.py --check
       - run: node --test tests/*.test.mjs
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
       - run: python3 scripts/build.py --site-url "$EPIPHANY_SITE_URL" --output _site-cloudflare --admin-mode password
+      - run: python3 scripts/audit-secrets.py --frontend _site-cloudflare
       - run: npm ci --prefix site-worker --ignore-scripts
       - run: npm exec --prefix site-worker -- wrangler deploy --config site-worker/wrangler.toml --dry-run --outdir "$RUNNER_TEMP/epiphany-worker"
       - run: node tests/browser/workerd-auth.mjs "$RUNNER_TEMP/epiphany-worker/entry.js"
