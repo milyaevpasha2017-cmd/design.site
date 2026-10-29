@@ -14,6 +14,7 @@ menuButton.addEventListener('click', () => {
 });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(true); });
 document.addEventListener('click', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); });
+document.addEventListener('focusin', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); });
 matchMedia('(max-width: 900px)').addEventListener('change', () => closeMenu());
 navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
   closeMenu();
@@ -43,6 +44,21 @@ if (dialog) {
   }));
   $('#photo-previous').addEventListener('click', () => showPhoto(index - 1));
   $('#photo-next').addEventListener('click', () => showPhoto(index + 1));
+  // Leave vertical scrolling and pinch zoom to the browser; a clear horizontal
+  // swipe advances the photo without also activating the arrow controls.
+  const viewer = $('#project-viewer');
+  let swipe = null;
+  viewer.addEventListener('pointerdown', event => {
+    swipe = photos.length > 1 && event.isPrimary && event.pointerType !== 'mouse' && !event.target.closest('button')
+      ? {id:event.pointerId,x:event.clientX,y:event.clientY} : null;
+  });
+  viewer.addEventListener('pointerup', event => {
+    if (!swipe || swipe.id !== event.pointerId) return;
+    const dx = event.clientX - swipe.x, dy = event.clientY - swipe.y;
+    swipe = null;
+    if (Math.abs(dx) >= 48 && Math.abs(dy) < Math.abs(dx) * .65) showPhoto(index + (dx < 0 ? 1 : -1));
+  });
+  viewer.addEventListener('pointercancel', () => { swipe = null; });
   dialog.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || photos.length < 2) return;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); showPhoto(index + (event.key === 'ArrowLeft' ? -1 : 1)); }

@@ -56,11 +56,18 @@ class Site:
         # All CMS uploads are repository-root-relative, including legacy leading slashes.
         path=value.lstrip('/')
         if '..' in path.split('/') or not path.startswith('assets/'): return ''
+        if path=='assets/living.png':path='assets/living-1536.webp'
         return self.base+path
     def photo(self,value,alt,cls='',priority=False):
         src=self.image(value)
         if not src:return ''
-        return f'<img src="{e(src)}" alt="{e(alt)}" class="{cls}" decoding="async" {"fetchpriority=high" if priority else "loading=lazy"}>'
+        responsive=''
+        if value.lstrip('/')=='assets/living.png':
+            sizes='(max-width: 1600px) 90vw, 1440px' if priority else '(max-width: 600px) 88vw, (max-width: 1600px) 44vw, 704px'
+            if cls=='hero-photo':sizes='(max-width: 600px) 150vw, (max-width: 1600px) 90vw, 1440px'
+            srcset=', '.join(f'{self.base}assets/living-{width}.webp {width}w' for width in (480,960,1536))
+            responsive=f' width="1536" height="1024" srcset="{srcset}" sizes="{sizes}"'
+        return f'<img src="{e(src)}" alt="{e(alt)}" class="{cls}" decoding="async"{responsive} {"fetchpriority=high" if priority else "loading=lazy"}>'
     def button(self,key,label,cls='text-link'): return f'<a class="{cls}" href="{self.link(key)}">{e(label)}{icon()}</a>'
     def contacts(self):
         links=[]
@@ -81,7 +88,7 @@ class Site:
     def shell(self,title,description,body,current,path='',extra=''):
         s=self.settings;canonical=self.url+path
         logo=f'<a class="logo" href="{self.link("home")}"><span class="brand-name">{e(s["brand"])}</span><span>{e(s["brand_subtitle"])}</span></a>'
-        return f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{e(title)}</title><meta name="description" content="{e(description)}"><meta name="theme-color" content="#f5f3ee"><meta property="og:type" content="website"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}"><meta property="og:url" content="{e(canonical)}"><meta property="og:locale" content="ru_RU"><link rel="canonical" href="{e(canonical)}"><link rel="stylesheet" href="{self.base}style.css"><script type="module" src="{self.base}script.js"></script></head><body><a class="skip-link" href="#main-content">{e(self.ui['skip'])}</a>{(ROOT/'templates/icons.svg').read_text()}<header class="header">{logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">{e(self.ui['menu'])}{icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">{self.nav(current)}</nav></header><main id="main-content" tabindex="-1">{body}</main><footer>{logo}<p>{e(s['footer_tagline'])}</p><a href="#main-content">{e(self.ui['top'])} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">{self.nav(current)}</nav><p class="footer-note">{e(s['footer_note'])}</p></footer>{extra}</body></html>'''
+        return f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>{e(title)}</title><meta name="description" content="{e(description)}"><meta name="theme-color" content="#f5f3ee"><meta property="og:type" content="website"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}"><meta property="og:url" content="{e(canonical)}"><meta property="og:locale" content="ru_RU"><link rel="canonical" href="{e(canonical)}"><link rel="stylesheet" href="{self.base}style.css"><script type="module" src="{self.base}script.js"></script></head><body><a class="skip-link" href="#main-content">{e(self.ui['skip'])}</a>{(ROOT/'templates/icons.svg').read_text()}<header class="header">{logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">{e(self.ui['menu'])}{icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">{self.nav(current)}</nav></header><main id="main-content" tabindex="-1">{body}</main><footer>{logo}<p>{e(s['footer_tagline'])}</p><a href="#main-content">{e(self.ui['top'])} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">{self.nav(current)}</nav><p class="footer-note">{e(s['footer_note'])}</p></footer>{extra}</body></html>'''
     def page_head(self,p,current):
         return f'<section class="page-heading section"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span aria-hidden="true">/</span><span aria-current="page">{e(self.ui[current])}</span></nav><p class="eyebrow">{e(p["label"])}</p>{heading(p["title"],p["emphasis"])}<p class="page-intro">{e(p["intro"])}</p></section>'
     def cta(self,p):

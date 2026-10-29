@@ -102,3 +102,57 @@ h1 span,h2 span,.page-intro,.hero-intro-copy p,.body-copy,.small-note,.project-l
 @media(max-width:600px){.page-heading{padding-top:30px;padding-bottom:40px}.page-heading h1{font-size:44px;margin-top:28px}.page-intro{font-size:15px}.breadcrumbs{margin-bottom:30px;font-size:11px}.service-teasers{gap:20px}.service-teasers h3{font-size:23px;overflow-wrap:normal;hyphens:auto}.service-editorial article{gap:15px;grid-template-columns:24px 1fr}.service-editorial .body-copy{font-size:14px}.empty-video{padding:25px}.empty-video h2{font-size:34px}.project-heading h1{font-size:44px}.project-narrative{margin-top:30px}.project-lead{font-size:23px}.project-pagination .text-link{order:-1;width:100%;justify-content:center}.contact-page .contact-links a{font-size:25px}.footer-nav{gap:8px 20px}.home-services .text-link{margin-top:10px}}
 .project-title h2{font-family:Georgia,serif;font-size:25px;font-weight:400;letter-spacing:normal;line-height:1.3;margin-bottom:10px}
 @media(max-width:600px){.project-title h2{font-size:27px}}
+
+/* Phone and tablet navigation, touch targets and readable compact layouts. */
+.icon{pointer-events:none}
+@media(any-pointer:coarse){
+  .hero-cta,.hero-bottom .text-link,.text-link,footer>a:not(.logo),.footer-nav a{min-height:44px;display:inline-flex;align-items:center}
+  #navigation>a{min-height:44px;display:flex;align-items:center}
+}
+@media(max-width:900px){
+  html{scroll-padding-top:125px}
+  .header{position:sticky;top:0;z-index:30;background:var(--paper);padding-top:max(20px,env(safe-area-inset-top));padding-bottom:20px}
+  .menu-toggle{min-width:80px;justify-content:flex-end;touch-action:manipulation}
+  #navigation{max-height:calc(100dvh - 105px - env(safe-area-inset-top));overflow-y:auto;overscroll-behavior:contain}
+  #navigation a{touch-action:manipulation}
+  .hero-cta,.hero-bottom .text-link,.text-link,footer>a:not(.logo),.footer-nav a{min-height:44px;display:inline-flex;align-items:center}
+  .footer-nav{gap:4px 24px}
+  .contact-links a,.submit,.video-play{min-height:48px;touch-action:manipulation}
+  .project-card:hover .card-photo{transform:none}
+  .project-card:hover .project-arrow{transform:none}
+  .service-editorial article{scroll-margin-top:125px}
+}
+@media(max-width:600px){
+  .header,.hero,.section,footer{padding-left:max(6%,env(safe-area-inset-left));padding-right:max(6%,env(safe-area-inset-right))}
+  .header{gap:16px}
+  h1,h2,h3,.project-title{overflow-wrap:anywhere}
+  .hero-intro{gap:18px}.hero-intro-copy{min-width:0}.circle-link{flex:none}
+  .hero-intro-copy p{font-size:14px;line-height:1.75}
+  .hero-image{height:clamp(320px,100vw,390px)}
+  .hero-bottom{align-items:start;gap:20px}.hero-bottom p{margin:12px 0 0;max-width:45%}.hero-bottom .text-link{max-width:55%;justify-content:flex-end;gap:12px}
+  .page-heading h1,.project-heading h1{font-size:clamp(36px,10.8vw,44px);letter-spacing:-1.6px}
+  .page-intro,.body-copy,.contact p,.service-editorial .body-copy{font-size:15px;line-height:1.85}
+  .project-title{gap:16px;align-items:start}.project-title h2,.project-title h3{font-size:25px;line-height:1.25}.project-title>span{flex:none;padding-top:7px}
+  .project-image,.wide .project-image{height:auto;aspect-ratio:4/3}
+  .service-teasers{grid-template-columns:minmax(0,1fr);gap:0;margin:30px 0 20px}
+  .service-teasers a{display:grid;grid-template-columns:24px minmax(0,1fr)20px;align-items:start;gap:16px;padding:24px 0;min-height:80px}
+  .service-teasers .eyebrow{margin:5px 0 0}.service-teasers h3{font-size:25px;line-height:1.3;margin:0;max-width:none;overflow-wrap:anywhere}.service-teasers .icon{align-self:center}
+  .project-facts{gap:16px}.project-facts span{min-width:0;flex:1 1 85px}
+  .project-lead{font-size:clamp(21px,5.8vw,24px);line-height:1.6}
+  .project-pagination{align-items:stretch;gap:20px}.project-pagination>a:not(.text-link){flex:1 1 120px;min-width:0;min-height:52px;font-size:18px;line-height:1.35;gap:12px}
+  .contact-page .form-title{font-size:30px;margin-bottom:28px}.contact-page .contact-links a{font-size:clamp(22px,6.3vw,25px)}
+  input,textarea{scroll-margin-top:130px}.submit{gap:16px;line-height:1.5}
+  footer{padding-bottom:max(24px,env(safe-area-inset-bottom))}.footer-nav a{font-size:13px}
+}
+@media(max-width:700px),(max-height:500px) and (pointer:coarse){
+  dialog{position:fixed;inset:0;width:100%;max-width:none;height:100dvh;max-height:none;margin:0;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));scrollbar-gutter:auto}
+  dialog[open]{display:flex;flex-direction:column;gap:12px}
+  .dialog-toolbar{position:static;flex:none;padding:0;margin:0;gap:16px}
+  .dialog-toolbar #dialog-title{font:400 clamp(19px,5.8vw,26px)/1.3 Georgia,serif;letter-spacing:-.5px;margin:0;overflow-wrap:anywhere}
+  .project-viewer{flex:1;min-height:120px;aspect-ratio:auto;touch-action:pan-y pinch-zoom}
+  .viewer-controls{inset:auto 8px 8px auto;gap:8px}
+  .viewer-controls button,.dialog-close,.gallery-thumb{touch-action:manipulation}
+  .project-gallery{flex:none;margin:0;padding:4px 0 0;max-height:78px;overscroll-behavior-x:contain}
+  .project-gallery:empty{display:none}
+  .gallery-thumb{flex-basis:72px;min-height:60px}.gallery-thumb img{height:50px}
+}
