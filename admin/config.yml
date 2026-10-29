@@ -12,141 +12,148 @@ public_folder: assets/uploads
 editor:
   preview: false
 collections:
-- name: website
-  label: Сайт Epiphany Interior
+- name: pages
+  label: Страницы и настройки
   files:
-  - name: site
-    label: Контент сайта
-    file: content/site.json
+  - name: home
+    label: Главная
+    file: content/pages/home.json
     format: json
-    description: Измените поля и нажмите «Опубликовать». Обновление сайта займёт несколько минут. Пустые контакты
-      скрываются. Не размещайте здесь заявки клиентов и секретные данные.
     fields:
-    - name: texts
-      label: Тексты и заголовки
+    - name: seo_title
+      label: Заголовок для поисковиков
+      widget: string
+    - name: seo_description
+      label: Описание для поисковиков
+      widget: text
+    - name: label
+      label: Надзаголовок
+      widget: string
+    - name: availability
+      label: География работы
+      widget: string
+    - name: title
+      label: Заголовок
+      widget: text
+    - name: emphasis
+      label: Акцент курсивом
+      widget: string
+    - name: intro
+      label: Вступительный текст
+      widget: text
+    - name: image
+      label: Фотография
+      widget: image
+    - name: image_alt
+      label: Описание фотографии
+      widget: string
+    - name: caption
+      label: Подпись к фотографии
+      widget: string
+    - name: image_note
+      label: Примечание к фотографии
+      widget: string
+    - name: bottom
+      label: Подпись под первым экраном
+      widget: string
+    - name: button
+      label: Текст кнопки
+      widget: string
+    - name: explore
+      label: Ссылка на портфолио
+      widget: string
+    - name: projects_label
+      label: 'Проекты: надзаголовок'
+      widget: string
+    - name: projects_title
+      label: 'Проекты: заголовок'
+      widget: string
+    - name: projects_emphasis
+      label: 'Проекты: акцент'
+      widget: string
+    - name: projects_note
+      label: 'Проекты: примечание'
+      widget: text
+    - name: about_label
+      label: 'О дизайнере: надзаголовок'
+      widget: string
+    - name: about_title
+      label: 'О дизайнере: заголовок'
+      widget: text
+    - name: about_emphasis
+      label: 'О дизайнере: акцент'
+      widget: string
+    - name: about_intro
+      label: 'О дизайнере: короткий текст'
+      widget: text
+    - name: services_label
+      label: 'Услуги: надзаголовок'
+      widget: string
+    - name: services_title
+      label: 'Услуги: заголовок'
+      widget: string
+    - name: services_emphasis
+      label: 'Услуги: акцент'
+      widget: string
+    - name: cta
+      label: Приглашение обсудить проект
       widget: object
       fields:
-      - name: page_title
-        label: Заголовок вкладки браузера
+      - name: label
+        label: Надзаголовок
+        widget: string
+      - name: title
+        label: Заголовок приглашения
         widget: text
-      - name: description
-        label: Описание для поисковиков
+      - name: emphasis
+        label: Акцент курсивом
+        widget: string
+      - name: intro
+        label: Вступительный текст
         widget: text
-      - name: brand
-        label: Название в логотипе
+      - name: button
+        label: Текст кнопки
         widget: string
-      - name: brand_subtitle
-        label: Подпись под логотипом
-        widget: text
-      - name: hero_label
-        label: 'Первый экран: надзаголовок'
-        widget: string
-      - name: availability
-        label: География работы
-        widget: string
-      - name: hero_title
-        label: 'Первый экран: заголовок'
-        widget: text
-      - name: hero_emphasis
-        label: 'Первый экран: акцент курсивом'
-        widget: string
-      - name: hero_intro
-        label: 'Первый экран: краткое описание'
-        widget: text
-      - name: hero_caption
-        label: Подпись главной фотографии
-        widget: string
-      - name: hero_note
-        label: Примечание к главной фотографии
-        widget: string
-      - name: hero_bottom
-        label: Подпись под первым экраном
-        widget: string
-      - name: about_label
-        label: 'Обо мне: надзаголовок'
-        widget: string
-      - name: about_title
-        label: 'Обо мне: заголовок'
-        widget: text
-      - name: about_emphasis
-        label: 'Обо мне: акцент'
-        widget: string
-      - name: projects_label
-        label: 'Проекты: надзаголовок'
-        widget: string
-      - name: projects_title
-        label: 'Проекты: заголовок'
-        widget: text
-      - name: projects_emphasis
-        label: 'Проекты: акцент'
-        widget: string
-      - name: projects_note
-        label: 'Проекты: примечание'
-        widget: text
-      - name: services_label
-        label: 'Услуги: надзаголовок'
-        widget: string
-      - name: services_title
-        label: 'Услуги: заголовок'
-        widget: text
-      - name: services_emphasis
-        label: 'Услуги: акцент'
-        widget: string
-      - name: services_intro
-        label: 'Услуги: описание'
-        widget: text
-      - name: process_label
-        label: 'Этапы: надзаголовок'
-        widget: string
-      - name: process_title
-        label: 'Этапы: заголовок'
-        widget: text
-      - name: process_emphasis
-        label: 'Этапы: акцент'
-        widget: string
-      - name: video_label
-        label: 'Видео: надзаголовок'
-        widget: string
-      - name: video_title
-        label: 'Видео: заголовок'
-        widget: text
-      - name: video_emphasis
-        label: 'Видео: акцент'
-        widget: string
-      - name: video_intro
-        label: 'Видео: описание'
-        widget: string
-      - name: contact_label
-        label: 'Контакты: надзаголовок'
-        widget: string
-      - name: contact_title
-        label: 'Контакты: заголовок'
-        widget: text
-      - name: contact_emphasis
-        label: 'Контакты: акцент'
-        widget: string
-      - name: contact_intro
-        label: 'Контакты: описание'
-        widget: text
-      - name: footer_tagline
-        label: 'Подвал: слоган'
-        widget: string
-      - name: footer_note
-        label: 'Подвал: примечание'
-        widget: string
-      - name: hero_cta
-        label: 'Первый экран: текст кнопки обращения'
-        widget: string
-    - name: hero_image
-      label: Главная фотография
-      widget: image
-    - name: about
-      label: 'Обо мне: абзацы'
+      collapsed: true
+  - name: about
+    label: О дизайнере
+    file: content/pages/about.json
+    format: json
+    fields:
+    - name: seo_title
+      label: Заголовок для поисковиков
+      widget: string
+    - name: seo_description
+      label: Описание для поисковиков
+      widget: text
+    - name: label
+      label: Надзаголовок
+      widget: string
+    - name: title
+      label: Заголовок
+      widget: text
+    - name: emphasis
+      label: Акцент курсивом
+      widget: string
+    - name: intro
+      label: Вступительный текст
+      widget: text
+    - name: paragraphs
+      label: 'Текст обо мне: абзацы'
       widget: list
       field:
         name: paragraph
         label: Абзац
         widget: text
+    - name: image
+      label: Фотография
+      widget: image
+    - name: image_alt
+      label: Описание фотографии
+      widget: string
+    - name: principles_title
+      label: Заголовок принципов
+      widget: string
     - name: principles
       label: Принципы
       widget: list
@@ -154,43 +161,102 @@ collections:
         name: principle
         label: Принцип
         widget: string
-    - name: projects
-      label: Проекты
-      widget: list
-      summary: '{{fields.title}}'
+    - name: process_label
+      label: 'Этапы: надзаголовок'
+      widget: string
+    - name: process_title
+      label: 'Этапы: заголовок'
+      widget: string
+    - name: process_emphasis
+      label: 'Этапы: акцент'
+      widget: string
+    - name: cta
+      label: Приглашение обсудить проект
+      widget: object
       fields:
+      - name: label
+        label: Надзаголовок
+        widget: string
       - name: title
-        label: Название
-        widget: string
-      - name: subtitle
-        label: Короткая подпись
-        widget: string
-      - name: description
-        label: Описание
+        label: Заголовок приглашения
         widget: text
-      - name: image
-        label: Обложка
-        widget: image
-      - name: image_alt
-        label: Описание обложки для доступности
+      - name: emphasis
+        label: Акцент курсивом
         widget: string
-      - name: is_concept
-        label: Это демонстрационная концепция
-        widget: boolean
-        default: false
-        required: false
-      - name: images
-        label: Дополнительные фотографии
-        widget: list
-        required: false
-        fields:
-        - name: image
-          label: Фотография
-          widget: image
-        - name: alt
-          label: Описание фотографии
-          widget: string
-    - name: services
+      - name: intro
+        label: Вступительный текст
+        widget: text
+      - name: button
+        label: Текст кнопки
+        widget: string
+      collapsed: true
+  - name: projects
+    label: 'Портфолио: вступление'
+    file: content/pages/projects.json
+    format: json
+    fields:
+    - name: seo_title
+      label: Заголовок для поисковиков
+      widget: string
+    - name: seo_description
+      label: Описание для поисковиков
+      widget: text
+    - name: label
+      label: Надзаголовок
+      widget: string
+    - name: title
+      label: Заголовок
+      widget: text
+    - name: emphasis
+      label: Акцент курсивом
+      widget: string
+    - name: intro
+      label: Вступительный текст
+      widget: text
+    - name: cta
+      label: Приглашение обсудить проект
+      widget: object
+      fields:
+      - name: label
+        label: Надзаголовок
+        widget: string
+      - name: title
+        label: Заголовок приглашения
+        widget: text
+      - name: emphasis
+        label: Акцент курсивом
+        widget: string
+      - name: intro
+        label: Вступительный текст
+        widget: text
+      - name: button
+        label: Текст кнопки
+        widget: string
+      collapsed: true
+  - name: services
+    label: Услуги и этапы
+    file: content/pages/services.json
+    format: json
+    fields:
+    - name: seo_title
+      label: Заголовок для поисковиков
+      widget: string
+    - name: seo_description
+      label: Описание для поисковиков
+      widget: text
+    - name: label
+      label: Надзаголовок
+      widget: string
+    - name: title
+      label: Заголовок
+      widget: text
+    - name: emphasis
+      label: Акцент курсивом
+      widget: string
+    - name: intro
+      label: Вступительный текст
+      widget: text
+    - name: items
       label: Услуги
       widget: list
       summary: '{{fields.title}}'
@@ -201,6 +267,15 @@ collections:
       - name: description
         label: Описание
         widget: text
+    - name: process_label
+      label: 'Этапы: надзаголовок'
+      widget: string
+    - name: process_title
+      label: 'Этапы: заголовок'
+      widget: string
+    - name: process_emphasis
+      label: 'Этапы: акцент'
+      widget: string
     - name: steps
       label: Этапы работы
       widget: list
@@ -215,7 +290,50 @@ collections:
       - name: description
         label: Описание
         widget: text
-    - name: videos
+    - name: cta
+      label: Приглашение обсудить проект
+      widget: object
+      fields:
+      - name: label
+        label: Надзаголовок
+        widget: string
+      - name: title
+        label: Заголовок приглашения
+        widget: text
+      - name: emphasis
+        label: Акцент курсивом
+        widget: string
+      - name: intro
+        label: Вступительный текст
+        widget: text
+      - name: button
+        label: Текст кнопки
+        widget: string
+      collapsed: true
+  - name: videos
+    label: Видео
+    file: content/pages/videos.json
+    format: json
+    fields:
+    - name: seo_title
+      label: Заголовок для поисковиков
+      widget: string
+    - name: seo_description
+      label: Описание для поисковиков
+      widget: text
+    - name: label
+      label: Надзаголовок
+      widget: string
+    - name: title
+      label: Заголовок
+      widget: text
+    - name: emphasis
+      label: Акцент курсивом
+      widget: string
+    - name: intro
+      label: Вступительный текст
+      widget: text
+    - name: items
       label: Видео ВКонтакте
       widget: list
       required: false
@@ -239,6 +357,137 @@ collections:
         label: Обложка
         widget: image
         required: false
+    - name: empty_title
+      label: Заголовок, если видео ещё нет
+      widget: string
+    - name: empty_text
+      label: Текст, если видео ещё нет
+      widget: text
+    - name: cta
+      label: Приглашение обсудить проект
+      widget: object
+      fields:
+      - name: label
+        label: Надзаголовок
+        widget: string
+      - name: title
+        label: Заголовок приглашения
+        widget: text
+      - name: emphasis
+        label: Акцент курсивом
+        widget: string
+      - name: intro
+        label: Вступительный текст
+        widget: text
+      - name: button
+        label: Текст кнопки
+        widget: string
+      collapsed: true
+  - name: contact
+    label: Контакты и форма
+    file: content/pages/contact.json
+    format: json
+    fields:
+    - name: seo_title
+      label: Заголовок для поисковиков
+      widget: string
+    - name: seo_description
+      label: Описание для поисковиков
+      widget: text
+    - name: label
+      label: Надзаголовок
+      widget: string
+    - name: title
+      label: Заголовок
+      widget: text
+    - name: emphasis
+      label: Акцент курсивом
+      widget: string
+    - name: intro
+      label: Вступительный текст
+      widget: text
+    - name: form_title
+      label: Заголовок формы
+      widget: string
+    - name: form
+      label: Подписи, кнопки и сообщения формы
+      widget: object
+      collapsed: true
+      fields:
+      - name: name_label
+        label: 'Подпись: имя'
+        widget: string
+      - name: name_placeholder
+        label: 'Подсказка: имя'
+        widget: string
+      - name: contact_label
+        label: 'Подпись: способ связи'
+        widget: string
+      - name: contact_placeholder
+        label: 'Подсказка: способ связи'
+        widget: string
+      - name: message_label
+        label: 'Подпись: о проекте'
+        widget: string
+      - name: message_placeholder
+        label: 'Подсказка: о проекте'
+        widget: string
+      - name: submit
+        label: Кнопка подготовки
+        widget: string
+      - name: note
+        label: Пояснение формы
+        widget: text
+      - name: result
+        label: Сообщение после подготовки
+        widget: text
+      - name: copy
+        label: Кнопка копирования
+        widget: string
+      - name: copied
+        label: 'Сообщение: скопировано'
+        widget: string
+      - name: copy_fallback
+        label: Сообщение при ручном копировании
+        widget: string
+      - name: email_button
+        label: Кнопка почты
+        widget: string
+      - name: subject
+        label: Тема письма
+        widget: string
+      - name: greeting
+        label: Начало письма
+        widget: string
+      - name: project_prefix
+        label: 'Письмо: подпись проекта'
+        widget: string
+      - name: contact_prefix
+        label: 'Письмо: подпись контакта'
+        widget: string
+      - name: whitespace_error
+        label: Сообщение о незаполненном поле
+        widget: string
+      - name: nojs_note
+        label: Пояснение при отключённом JavaScript
+        widget: text
+  - name: settings
+    label: Общие настройки, контакты и навигация
+    file: content/settings.json
+    format: json
+    fields:
+    - name: brand
+      label: Название в логотипе
+      widget: string
+    - name: brand_subtitle
+      label: Подпись под логотипом
+      widget: string
+    - name: footer_tagline
+      label: Слоган в подвале
+      widget: string
+    - name: footer_note
+      label: Примечание в подвале
+      widget: text
     - name: contacts
       label: Контакты
       widget: object
@@ -275,3 +524,185 @@ collections:
         pattern:
         - ^$|^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$
         - Введите корректный адрес. Для соцсетей нужна полная HTTPS-ссылка.
+    - name: ui
+      label: Навигация, ссылки и общие подписи
+      widget: object
+      collapsed: true
+      fields:
+      - name: home
+        label: Главная
+        widget: string
+      - name: projects
+        label: Проекты
+        widget: string
+      - name: about
+        label: О дизайнере
+        widget: string
+      - name: services
+        label: Услуги
+        widget: string
+      - name: videos
+        label: Видео
+        widget: string
+      - name: contact
+        label: Контакты
+        widget: string
+      - name: discuss
+        label: Обсудить проект
+        widget: string
+      - name: all_projects
+        label: Все проекты
+        widget: string
+      - name: more_about
+        label: Больше о подходе
+        widget: string
+      - name: all_services
+        label: Подробнее об услугах
+        widget: string
+      - name: back_projects
+        label: К портфолио
+        widget: string
+      - name: next_project
+        label: Следующий проект
+        widget: string
+      - name: previous_project
+        label: Предыдущий проект
+        widget: string
+      - name: concept_label
+        label: Концепция интерьера
+        widget: string
+      - name: project_label
+        label: Проект интерьера
+        widget: string
+      - name: concept_note
+        label: Иллюстрации созданы с помощью ИИ. Это концепция, а не реализованный объект.
+        widget: text
+      - name: open_photo
+        label: Посмотреть фотографию
+        widget: string
+      - name: watch_video
+        label: Смотреть видео
+        widget: string
+      - name: open_vk
+        label: Открыть во ВКонтакте
+        widget: string
+      - name: video_unavailable
+        label: Для этого видео пока не настроено встраивание.
+        widget: string
+      - name: youtube
+        label: YouTube
+        widget: string
+      - name: telegram
+        label: Написать в Telegram
+        widget: string
+      - name: vk
+        label: Группа ВКонтакте
+        widget: string
+      - name: email
+        label: Написать на почту
+        widget: string
+      - name: top
+        label: Наверх
+        widget: string
+      - name: empty_projects
+        label: Новые проекты скоро появятся.
+        widget: string
+      - name: skip
+        label: Перейти к содержимому
+        widget: string
+      - name: menu
+        label: Меню
+        widget: string
+      - name: not_found_title
+        label: Эта страница не найдена
+        widget: string
+      - name: not_found_text
+        label: Возможно, адрес изменился. Вернитесь на главную или посмотрите проекты.
+        widget: text
+- name: projects
+  label: Проекты портфолио
+  label_singular: Проект
+  folder: content/projects
+  create: true
+  delete: true
+  extension: json
+  format: json
+  slug: '{{fields.slug}}'
+  identifier_field: title
+  summary: '{{title}} · {{slug}}'
+  sortable_fields:
+  - order
+  - title
+  fields:
+  - name: slug
+    label: Адрес проекта (латиницей)
+    widget: string
+    hint: 'Например: warm-minimalism. Не меняйте после публикации, чтобы сохранить ссылки.'
+    pattern:
+    - ^[a-z0-9]+(?:-[a-z0-9]+)*$
+    - Только строчные латинские буквы, цифры и дефисы.
+  - name: order
+    label: Порядок в портфолио
+    widget: number
+    default: 10
+    value_type: int
+    min: 0
+  - name: published
+    label: Опубликовать на сайте
+    widget: boolean
+    default: true
+  - name: title
+    label: Название
+    widget: string
+  - name: subtitle
+    label: Короткая подпись
+    widget: string
+  - name: description
+    label: Описание
+    widget: text
+  - name: image
+    label: Обложка
+    widget: image
+  - name: image_alt
+    label: Описание обложки для доступности
+    widget: string
+  - name: is_concept
+    label: Это демонстрационная концепция
+    widget: boolean
+    default: false
+    required: false
+  - name: images
+    label: Дополнительные фотографии
+    widget: list
+    required: false
+    fields:
+    - name: image
+      label: Фотография
+      widget: image
+    - name: alt
+      label: Описание фотографии
+      widget: string
+  - name: seo_description
+    label: Описание для поисковиков
+    widget: text
+  - name: body
+    label: 'Подробная история проекта: абзацы'
+    widget: list
+    required: false
+    field:
+      name: paragraph
+      label: Абзац
+      widget: text
+  - name: location
+    label: Город / местоположение
+    widget: string
+    required: false
+  - name: area
+    label: Площадь
+    widget: string
+    required: false
+    hint: 'Например: 85 м²'
+  - name: year
+    label: Год
+    widget: string
+    required: false

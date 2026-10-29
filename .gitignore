@@ -3,3 +3,6 @@ node_modules/
 .dev.vars
 .env
 .env.*
+
+_site/
+__pycache__/

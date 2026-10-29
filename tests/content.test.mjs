@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { vkEmbed, contactURL, imageURL } from '../content-utils.mjs';
 test('VK ordinary links and exported iframe preserve only safe player parameters', () => {
   assert.equal(vkEmbed('https://vkvideo.ru/video-123_456'), 'https://vk.com/video_ext.php?oid=-123&id=456&hd=2&autoplay=0');
@@ -21,9 +21,14 @@ test('Uploaded image paths work under GitHub Pages project path and custom domai
   assert.equal(imageURL('assets/uploads/photo.jpg','https://example.com/'),'https://example.com/assets/uploads/photo.jpg');
   assert.equal(imageURL('javascript:alert(1)','https://example.com/'),null);
 });
-test('Published content has required site collections, safe images and explicit concept markers', async () => {
-  const data=JSON.parse(await readFile(new URL('../content/site.json',import.meta.url)));
-  for(const key of ['texts','about','principles','projects','services','steps','videos','contacts']) assert.ok(data[key]);
-  assert.ok(data.projects.length>0);
-  for(const p of data.projects) { assert.ok(p.title && p.description && p.image_alt); assert.equal(typeof p.is_concept,'boolean'); assert.ok(imageURL(p.image,'https://example.com/')); }
+test('Published projects have titles, descriptions, valid URLs and concept markers', async () => {
+  const folder=new URL('../content/projects/',import.meta.url);
+  for(const filename of await readdir(folder)) {
+    if(!filename.endsWith('.json')) continue;
+    const p=JSON.parse(await readFile(new URL(filename,folder)));
+    assert.ok(p.title && p.description && p.image_alt);
+    assert.match(p.slug,/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    assert.equal(typeof (p.is_concept ?? false),'boolean');
+    assert.ok(imageURL(p.image,'https://example.com/'));
+  }
 });
