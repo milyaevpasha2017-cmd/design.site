@@ -18,6 +18,8 @@ test('VPS: real HTTP, trusted HTTPS proxy, login, publication, restart and backu
   try{
     const f=await fixture(),assets=join(dir,'public');await mkdir(join(assets,'admin/login'),{recursive:true});
     await writeFile(join(assets,'admin/login/index.html'),'LOGIN');await writeFile(join(assets,'admin/index.html'),'EDITOR');
+    await writeFile(join(assets,'admin/formatting.mjs'),'export const formatting = true;');
+    await writeFile(join(assets,'rich-text.mjs'),'export const richText = true;');
     await writeFile(join(dir,'secret.txt'),'private');await symlink(join(dir,'secret.txt'),join(assets,'outside.txt'));
     const snapshot=join(dir,'snapshot.json');await writeFile(snapshot,JSON.stringify(f.env.SITE_CONTENT));
     const config={...f.env,DATABASE_PATH:join(dir,'state.sqlite'),ASSETS_PATH:assets,SNAPSHOT_PATH:snapshot};
@@ -38,6 +40,11 @@ test('VPS: real HTTP, trusted HTTPS proxy, login, publication, restart and backu
     const login=await request('/api/login',{method:'POST',headers:{Origin:config.SITE_ORIGIN,'Content-Type':'application/json'},body:JSON.stringify({username:'admin',password:TEST_PASSWORD})});
     assert.equal(login.status,200);assert.match(login.headers.get('set-cookie'),/Secure; HttpOnly; SameSite=Strict/);
     const cookie=login.headers.get('set-cookie').split(';')[0];
+    for(const path of ['/admin/formatting.mjs','/rich-text.mjs']){
+      const module=await request(path,{headers:{Cookie:cookie}});
+      assert.equal(module.status,200);assert.match(module.headers.get('content-type'),/^text\/javascript\b/);
+      assert.equal(module.headers.get('x-content-type-options'),'nosniff');assert.match(await module.text(),/^export const/);
+    }
     const session=await(await request('/api/session',{headers:{Cookie:cookie}})).json();
     const record=await(await request('/api/pages/home',{headers:{Cookie:cookie}})).json();
     const title="VPS · O'Neil 👩🏽‍🎨 שלום";record.data.title=title;

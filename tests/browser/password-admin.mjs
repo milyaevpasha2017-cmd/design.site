@@ -5,11 +5,14 @@ import {plainText} from '../../rich-text.mjs';
 import {createRequire} from 'node:module';import {readFile} from 'node:fs/promises';import path from 'node:path';import assert from 'node:assert/strict';
 import https from 'node:https';import {mkdtemp,rm} from 'node:fs/promises';import {tmpdir} from 'node:os';import {execFileSync} from 'node:child_process';import {createHash,createPublicKey} from 'node:crypto';
 import {verifyPassword} from '../../site-worker/src/security.mjs';
+import {staticAssets} from '../../vps/assets.mjs';
 import {fixture,TEST_PASSWORD} from '../helpers/password-site.mjs';
 const require=createRequire(import.meta.url);const {chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright');
 const f=await fixture();const root=path.resolve('_site-cloudflare');
-const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.mjs':'text/javascript','.json':'application/json','.png':'image/png'};
-f.env.ASSETS.fetch=async request=>{const url=new URL(request.url);if(url.pathname==='/__credential-test.fixture')return new Response(await readFile('docs/create-admin-password.html'),{headers:{'Content-Type':'text/html'}});let file=decodeURIComponent(url.pathname).slice(1);if(file.endsWith('/'))file+='index.html';const target=path.resolve(root,file);if(!target.startsWith(root+path.sep))return new Response('Not found',{status:404});try{return new Response(await readFile(target),{headers:{'Content-Type':types[path.extname(target)]||'application/octet-stream'}});}catch{return new Response('Not found',{status:404});}};
+// Exercise production MIME types rather than a separate, more permissive map:
+// ES modules must be served as JavaScript for the browser to start the editor.
+const assets=await staticAssets(root);
+f.env.ASSETS.fetch=async request=>{if(new URL(request.url).pathname==='/__credential-test.fixture')return new Response(await readFile('docs/create-admin-password.html'),{headers:{'Content-Type':'text/html'}});return assets.fetch(request);};
 const temporary=await mkdtemp(path.join(tmpdir(),'epiphany-https-'));
 execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',temporary+'/key.pem','-out',temporary+'/cert.pem','-days','1','-subj','/CN=localhost','-addext','subjectAltName=DNS:localhost,IP:127.0.0.1'],{stdio:'ignore'});
 const cert=await readFile(temporary+'/cert.pem');
