@@ -1,0 +1,19 @@
+[
+  ["Обычный текст & <script>alert(1)</script>","Обычный текст &amp; &lt;script&gt;alert(1)&lt;/script&gt;"],
+  ["**Жирный** и *курсив*, __подчёркнутый__", "<strong>Жирный</strong> и <em>курсив</em>, <u>подчёркнутый</u>"],
+  ["**Жирный *курсив***", "<strong>Жирный <em>курсив</em></strong>"],
+  ["*Курсив **жирный***", "<em>Курсив <strong>жирный</strong></em>"],
+  ["***Акцент***", "<strong><em>Акцент</em></strong>"],
+  ["Новая\nстрока\n\n• пункт", "Новая<br>строка<br><br>• пункт"],
+  ["[Написать](https://t.me/epiphany)", "<a class=\"rich-link\" href=\"https://t.me/epiphany\">Написать</a>"],
+  ["[**Подробности**](/about/)", "<a class=\"rich-link\" href=\"/about/\"><strong>Подробности</strong></a>"],
+  ["[Почта](mailto:hello@example.com)", "<a class=\"rich-link\" href=\"mailto:hello@example.com\">Почта</a>"],
+  ["[X](javascript:alert(1))", "[X](javascript:alert(1))"],
+  ["[X](//evil.example/)", "[X](//evil.example/)"],
+  ["[X](data:text/html,evil)", "[X](data:text/html,evil)"],
+  ["[X](https://example.com/\" onmouseover=\"evil)", "[X](https://example.com/&quot; onmouseover=&quot;evil)"],
+  ["\\*буквальные звёздочки\\*", "*буквальные звёздочки*"],
+  ["<img src=x onerror=evil> **безопасно**", "&lt;img src=x onerror=evil&gt; <strong>безопасно</strong>"],
+  ["*Незавершённое выделение", "*Незавершённое выделение"],
+  ["O’Neil 👩🏽‍🎨 שלום مرحبا", "O’Neil 👩🏽‍🎨 שלום مرحبا"]
+]

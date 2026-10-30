@@ -1,3 +1,4 @@
+import {plainText} from '../../rich-text.mjs';
 // Isolated end-to-end test: uses the real Worker handler, real DOM forms and
 // HttpOnly cookies, with GitHub storage and Cloudflare DO storage replaced by
 // local fixtures. No credentials or writes reach external services.
@@ -33,16 +34,16 @@ try{
  await page.getByLabel('Логин',{exact:true}).fill('admin');await page.getByLabel('Пароль',{exact:true}).fill('wrong');await page.getByRole('button',{name:'Войти',exact:true}).click();await page.getByText('Неверный логин или пароль.',{exact:true}).waitFor();
  await page.getByLabel('Пароль',{exact:true}).fill(TEST_PASSWORD);await page.getByRole('button',{name:'Войти',exact:true}).click();await page.getByRole('heading',{name:'Главная',exact:true}).waitFor();
  const cookies=await context.cookies();assert.ok(cookies.some(cookie=>cookie.name==='__Host-epiphany-admin'&&cookie.httpOnly&&cookie.secure));
- const emphasis=page.locator('#field-emphasis');const original=await emphasis.inputValue();
+ const emphasis=page.locator('#field-title');const original=await emphasis.inputValue();
  await emphasis.fill(original+' Дополнение.');await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();
- const publicPage=await context.newPage();await publicPage.goto(f.env.SITE_ORIGIN+'/');assert.equal(await publicPage.locator('.hero-title h1 em').innerText(),original+' Дополнение.');
- await emphasis.fill(original);assert.equal(await page.locator('#save').isEnabled(),true);await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();assert.equal(JSON.parse(f.files.get('content/pages/home.json').content).emphasis,original);
- await publicPage.reload();assert.equal(await publicPage.locator('.hero-title h1 em').innerText(),original);
+ const publicPage=await context.newPage();await publicPage.goto(f.env.SITE_ORIGIN+'/');assert.equal(await publicPage.locator('.hero-title h1 span').innerText(),plainText(original+' Дополнение.'));
+ await emphasis.fill(original);assert.equal(await page.locator('#save').isEnabled(),true);await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();assert.equal(JSON.parse(f.files.get('content/pages/home.json').content).title,original);
+ await publicPage.reload();assert.equal(await publicPage.locator('.hero-title h1 span').innerText(),plainText(original));
  const unicode="O'Neil · O’Connor 👩🏽‍🎨 — שלום مرحبا";
  await emphasis.fill('مرحبا بالعالم');assert.equal(await emphasis.evaluate(element=>getComputedStyle(element).direction),'rtl');
  await emphasis.fill(unicode);assert.equal(await emphasis.getAttribute('dir'),'auto');await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();assert.equal(await emphasis.inputValue(),unicode);
  const downloadPromise=page.waitForEvent('download');await page.locator('#export-content').click();const download=await downloadPromise;
- const exported=JSON.parse(await readFile(await download.path(),'utf8'));assert.equal(exported.content['content/pages/home.json'].emphasis,unicode);assert.equal(exported.mediaIncluded,false);assert.ok(!JSON.stringify(exported).includes(f.env.GITHUB_CONTENT_TOKEN));
+ const exported=JSON.parse(await readFile(await download.path(),'utf8'));assert.equal(exported.content['content/pages/home.json'].title,unicode);assert.equal(exported.mediaIncluded,false);assert.ok(!JSON.stringify(exported).includes(f.env.GITHUB_CONTENT_TOKEN));
  await emphasis.fill(original);await page.locator('#save').click();await page.getByText('Сохранено и опубликовано. Изменения уже доступны на сайте.',{exact:true}).waitFor();
  // Delayed loading, a distinct failure view, safe retry, and an empty collection.
  let release,intercepted;const seen=new Promise(resolve=>{intercepted=resolve;});

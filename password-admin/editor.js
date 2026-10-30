@@ -1,3 +1,5 @@
+import {plainText} from '../rich-text.mjs';
+import {combineHeadings,combinedValue,addFormatting} from './formatting.mjs';
 const $=selector=>document.querySelector(selector);
 const make=(tag,className,text)=>{const element=document.createElement(tag);if(className)element.className=className;if(text!==undefined)element.textContent=text;return element;};
 const copy=value=>JSON.parse(JSON.stringify(value));
@@ -26,7 +28,7 @@ $('#retry-load').addEventListener('click',()=>{if(retryLoad)retryLoad();});
 function defaults(fields){const data={};for(const f of fields){if(f.default!==undefined)data[f.name]=copy(f.default);else if(f.widget==='object')data[f.name]=defaults(f.fields);else if(f.widget==='list')data[f.name]=[];else if(f.widget==='boolean')data[f.name]=false;else if(f.widget==='number')data[f.name]=0;else data[f.name]='';}return data;}
 function assetURL(value){try{const url=new URL(value,location.origin+'/');return url.protocol==='https:' || url.origin===location.origin?url.href:'';}catch{return '';}}
 function renderFields(container,fields,data,path=''){
-  for(const field of fields){
+  for(const field of combineHeadings(fields)){
     const key=field.name,id='field-'+(path+key).replaceAll(/[^a-zA-Z0-9_-]/g,'-');
     const group=make('div','field');const optional=field.required===false?' · необязательно':'';
     if(field.widget==='object'){
@@ -63,18 +65,19 @@ function renderFields(container,fields,data,path=''){
       input=make('input','toggle');input.type='checkbox';input.checked=Boolean(data[key]);
       input.addEventListener('change',()=>{data[key]=input.checked;updateStatus();});
     }else{
-      input=make(field.widget==='text'?'textarea':'input');
-      if(field.widget==='text')input.rows=4;
+      input=make(field.widget==='text'||field.rich?'textarea':'input');
+      if(input.tagName==='TEXTAREA')input.rows=field.emphasisName?3:4;
       if(field.widget==='number'){input.type='number';input.min='0';input.step='1';}
       else if(input.tagName==='INPUT')input.type='text';
-      input.value=data[key]??'';input.maxLength=20000;
+      input.value=combinedValue(field,data,current?.id==='home'&&!path&&key==='title');input.maxLength=20000;
       input.dir=field.widget==='image'||field.widget==='number'||field.name==='slug'?'ltr':'auto';
       if(field.name==='slug'&&current?.kind==='projects'&&!current.isNew)input.readOnly=true;
-      input.addEventListener('input',()=>{data[key]=field.widget==='number'?Number(input.value):input.value;input.setCustomValidity('');updateStatus();});
+      input.addEventListener('input',()=>{data[key]=field.widget==='number'?Number(input.value):input.value;if(field.emphasisName)data[field.emphasisName]='';input.setCustomValidity('');updateStatus();});
       if(field.required!==false)input.required=true;
       if(field.pattern)input.addEventListener('change',()=>{input.setCustomValidity(input.value&&!new RegExp(field.pattern[0]).test(input.value)?field.pattern[1]:'');});
     }
     input.id=id;group.append(input);
+    if(field.rich)addFormatting(group,input,field);
     if(field.widget==='image'){
       const preview=make('img','image-preview');preview.alt='Предпросмотр фотографии';preview.hidden=!assetURL(input.value);if(!preview.hidden)preview.src=assetURL(input.value);
       input.addEventListener('input',()=>{const url=assetURL(input.value);preview.hidden=!url;if(url)preview.src=url;});
@@ -94,6 +97,23 @@ function renderFields(container,fields,data,path=''){
     container.append(group);
   }
 }
+function renderSections(container,fields,data,sections){
+  if(!sections?.length){renderFields(container,fields,data);return;}
+  const navigation=make('nav','section-nav');navigation.setAttribute('aria-label','Блоки страницы');
+  const description=make('p','editor-help','Блоки расположены в порядке страницы. Заголовки редактируются целиком; форматирование видно в предпросмотре под текстом.');
+  container.append(description,navigation);
+  const used=new Set();
+  sections.forEach((section,index)=>{
+    const selected=section.fields.map(name=>fields.find(field=>field.name===name)).filter(Boolean);if(!selected.length)return;
+    selected.forEach(field=>used.add(field.name));
+    const card=make(section.collapsed?'details':'section','editor-section');card.id='editor-section-'+index;
+    const title=make(section.collapsed?'summary':'h2','section-title',String(index+1).padStart(2,'0')+' / '+section.label);card.append(title);
+    const inner=make('div','section-fields');if(section.hint)inner.append(make('p','section-hint',section.hint));renderFields(inner,selected,data);card.append(inner);container.append(card);
+    const link=make('a','',section.label);link.href='#'+card.id;link.addEventListener('click',()=>{if(card.tagName==='DETAILS')card.open=true;});navigation.append(link);
+  });
+  const other=fields.filter(field=>!used.has(field.name));if(other.length)renderFields(container,other,data);
+}
+
 async function projects(append=false){
   const ticket=++projectTicket;$('#project-more').disabled=true;
   try{
@@ -102,7 +122,7 @@ async function projects(append=false){
     const list=$('#project-list');if(!append){list.replaceChildren();projectCount=0;}
     const unknown=[];
     for(const project of result.projects){
-      const button=make('button','nav-item',project.title||project.id);button.type='button';button.dir='auto';button.addEventListener('click',()=>openDocument('projects',project.id));list.append(button);
+      const button=make('button','nav-item',plainText(project.title||project.id));button.type='button';button.dir='auto';button.dataset.kind='projects';button.dataset.id=project.id;button.addEventListener('click',()=>openDocument('projects',project.id));list.append(button);
       if(!project.title)unknown.push({project,button});
     }
     projectCount+=result.projects.length;projectCursor=result.nextCursor;
@@ -110,7 +130,7 @@ async function projects(append=false){
     $('#project-more').hidden=!projectCursor;
     // Usually titles are supplied from the current snapshot. When a title was
     // edited outside the CMS, avoid issuing hundreds of simultaneous reads.
-    const fill=async()=>{while(unknown.length&&ticket===projectTicket){const {project,button}=unknown.shift();try{const record=await api(`projects/${project.id}`);if(button.isConnected)button.textContent=record.data.title||project.id;}catch{if(button.isConnected)button.title='Название не загружено. Нажмите, чтобы повторить загрузку проекта.';}}};
+    const fill=async()=>{while(unknown.length&&ticket===projectTicket){const {project,button}=unknown.shift();try{const record=await api(`projects/${project.id}`);if(button.isConnected)button.textContent=plainText(record.data.title||project.id);}catch{if(button.isConnected)button.title='Название не загружено. Нажмите, чтобы повторить загрузку проекта.';}}};
     await Promise.all(Array.from({length:Math.min(4,unknown.length)},fill));
   }finally{if(ticket===projectTicket)$('#project-more').disabled=false;}
 }
@@ -132,15 +152,19 @@ async function openDocument(kind,id,isNew=false){
     if(ticket!==loadNumber)return;
     for(const url of previews)URL.revokeObjectURL(url);previews.clear();
     current={kind,id,sha:result.sha,data:result.data,isNew};
-    $('#editor-title').textContent=definition?.label||(isNew?'Новый проект':result.data.title||id);
-    $('#editor').replaceChildren();renderFields($('#editor'),fields,current.data);baseline=isNew?'':JSON.stringify(current.data);
+    document.querySelectorAll('.nav-item').forEach(button=>{const active=button.dataset.kind===kind&&button.dataset.id===id;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
+    $('#editor-title').textContent=definition?.label||(isNew?'Новый проект':plainText(result.data.title||id));
+    $('#editor').replaceChildren();renderSections($('#editor'),fields,current.data,definition?.sections||schema.projectSections);baseline=isNew?'':JSON.stringify(current.data);
     $('#editor').hidden=false;$('#delete-project').hidden=kind!=='projects'||isNew;updateStatus();
     $('#editor-title').scrollIntoView({block:'start'});
   }catch(error){if(ticket===loadNumber)loadError(error,()=>openDocument(kind,id,isNew));}finally{if(ticket===loadNumber){$('#loading').hidden=true;$('#editor').inert=false;document.querySelector('.app-layout main').setAttribute('aria-busy','false');}}
 }
 $('#editor').addEventListener('submit',event=>event.preventDefault());
 $('#save').addEventListener('click',async()=>{
-  if(!current||busy||uploading||!$('#editor').reportValidity())return;
+  if(!current||busy||uploading)return;
+  const invalid=$('#editor').querySelector('input:invalid,textarea:invalid');
+  if(invalid)for(let parent=invalid.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;
+  if(!$('#editor').reportValidity())return;
   const target=current;const saved=copy(target.data);
   const id=target.kind==='projects'?saved.slug:target.id;
   if(target.kind==='projects'&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id||'')){fail(new Error('Укажите адрес проекта латиницей, цифрами и дефисами.'));return;}
@@ -152,7 +176,7 @@ $('#save').addEventListener('click',async()=>{
     // becomes the baseline; every subsequent deletion is compared to it.
     $('#delete-project').hidden=target.kind!=='projects';
     if(target.kind==='projects'){
-      $('#editor-title').textContent=target.data.title;
+      $('#editor-title').textContent=plainText(target.data.title);
       $('#field-slug').readOnly=true;
       try{await projects();}catch(error){fail(error);}
     }
@@ -173,7 +197,7 @@ addEventListener('beforeunload',event=>{if(dirty()){event.preventDefault();event
 async function initialize(){try{
   $('#load-error').hidden=true;$('#loading').hidden=false;$('#loading-text').textContent='Загружаем панель…';$('#page-list').replaceChildren();
   const user=await api('session');csrf=user.csrf;schema=await api('schema');
-  for(const page of schema.pages){const button=make('button','nav-item',page.label);button.type='button';button.addEventListener('click',()=>openDocument('pages',page.id));$('#page-list').append(button);}
+  for(const page of schema.pages){const button=make('button','nav-item',page.label);button.type='button';button.dataset.kind='pages';button.dataset.id=page.id;button.addEventListener('click',()=>openDocument('pages',page.id));$('#page-list').append(button);}
   await projects();await openDocument('pages','home');
 }catch(error){loadError(error,initialize);}}
 initialize();

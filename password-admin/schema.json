@@ -28,17 +28,22 @@
         {
           "name": "title",
           "label": "Заголовок",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "emphasis",
           "label": "Акцент курсивом",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "intro",
           "label": "Вступительный текст",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "image",
@@ -53,17 +58,23 @@
         {
           "name": "caption",
           "label": "Подпись к фотографии",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "image_note",
           "label": "Примечание к фотографии",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "bottom",
           "label": "Подпись под первым экраном",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "button",
@@ -83,17 +94,22 @@
         {
           "name": "projects_title",
           "label": "Проекты: заголовок",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "projects_emphasis",
           "label": "Проекты: акцент",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "projects_note",
           "label": "Проекты: примечание",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "about_label",
@@ -103,17 +119,22 @@
         {
           "name": "about_title",
           "label": "О дизайнере: заголовок",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "about_emphasis",
           "label": "О дизайнере: акцент",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "about_intro",
           "label": "О дизайнере: короткий текст",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "services_label",
@@ -123,12 +144,15 @@
         {
           "name": "services_title",
           "label": "Услуги: заголовок",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "services_emphasis",
           "label": "Услуги: акцент",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "cta",
@@ -143,17 +167,22 @@
             {
               "name": "title",
               "label": "Заголовок приглашения",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "emphasis",
               "label": "Акцент курсивом",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "intro",
               "label": "Вступительный текст",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             },
             {
               "name": "button",
@@ -161,6 +190,83 @@
               "widget": "string"
             }
           ],
+          "collapsed": true
+        }
+      ],
+      "sections": [
+        {
+          "label": "Первый экран",
+          "fields": [
+            "label",
+            "availability",
+            "title",
+            "emphasis",
+            "intro",
+            "button",
+            "explore",
+            "bottom"
+          ],
+          "hint": "Заголовок, вступление и ссылки в верхней части главной.",
+          "collapsed": false
+        },
+        {
+          "label": "Фотография первого экрана",
+          "fields": [
+            "image",
+            "image_alt",
+            "caption",
+            "image_note"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Избранные проекты",
+          "fields": [
+            "projects_label",
+            "projects_title",
+            "projects_emphasis",
+            "projects_note"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "О дизайнере",
+          "fields": [
+            "about_label",
+            "about_title",
+            "about_emphasis",
+            "about_intro"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Услуги",
+          "fields": [
+            "services_label",
+            "services_title",
+            "services_emphasis"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Приглашение к разговору",
+          "fields": [
+            "cta"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Поисковые системы",
+          "fields": [
+            "seo_title",
+            "seo_description"
+          ],
+          "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
         }
       ]
@@ -188,17 +294,22 @@
         {
           "name": "title",
           "label": "Заголовок",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "emphasis",
           "label": "Акцент курсивом",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "intro",
           "label": "Вступительный текст",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "paragraphs",
@@ -207,7 +318,9 @@
           "field": {
             "name": "paragraph",
             "label": "Абзац",
-            "widget": "text"
+            "widget": "text",
+            "rich": true,
+            "richLinks": true
           }
         },
         {
@@ -223,7 +336,9 @@
         {
           "name": "principles_title",
           "label": "Заголовок принципов",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "principles",
@@ -243,12 +358,15 @@
         {
           "name": "process_title",
           "label": "Этапы: заголовок",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "process_emphasis",
           "label": "Этапы: акцент",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "cta",
@@ -263,17 +381,22 @@
             {
               "name": "title",
               "label": "Заголовок приглашения",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "emphasis",
               "label": "Акцент курсивом",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "intro",
               "label": "Вступительный текст",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             },
             {
               "name": "button",
@@ -281,6 +404,65 @@
               "widget": "string"
             }
           ],
+          "collapsed": true
+        }
+      ],
+      "sections": [
+        {
+          "label": "Первый экран",
+          "fields": [
+            "label",
+            "title",
+            "emphasis",
+            "intro"
+          ],
+          "hint": "Заголовок страницы и вводный текст.",
+          "collapsed": false
+        },
+        {
+          "label": "История и фотография",
+          "fields": [
+            "image",
+            "image_alt",
+            "paragraphs"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Принципы работы",
+          "fields": [
+            "principles_title",
+            "principles"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Этапы работы",
+          "fields": [
+            "process_label",
+            "process_title",
+            "process_emphasis"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Приглашение к разговору",
+          "fields": [
+            "cta"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Поисковые системы",
+          "fields": [
+            "seo_title",
+            "seo_description"
+          ],
+          "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
         }
       ]
@@ -308,17 +490,22 @@
         {
           "name": "title",
           "label": "Заголовок",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "emphasis",
           "label": "Акцент курсивом",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "intro",
           "label": "Вступительный текст",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "cta",
@@ -333,17 +520,22 @@
             {
               "name": "title",
               "label": "Заголовок приглашения",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "emphasis",
               "label": "Акцент курсивом",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "intro",
               "label": "Вступительный текст",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             },
             {
               "name": "button",
@@ -351,6 +543,36 @@
               "widget": "string"
             }
           ],
+          "collapsed": true
+        }
+      ],
+      "sections": [
+        {
+          "label": "Первый экран",
+          "fields": [
+            "label",
+            "title",
+            "emphasis",
+            "intro"
+          ],
+          "hint": "Заголовок страницы и вводный текст.",
+          "collapsed": false
+        },
+        {
+          "label": "Приглашение к разговору",
+          "fields": [
+            "cta"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Поисковые системы",
+          "fields": [
+            "seo_title",
+            "seo_description"
+          ],
+          "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
         }
       ]
@@ -378,17 +600,22 @@
         {
           "name": "title",
           "label": "Заголовок",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "emphasis",
           "label": "Акцент курсивом",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "intro",
           "label": "Вступительный текст",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "items",
@@ -399,12 +626,16 @@
             {
               "name": "title",
               "label": "Название",
-              "widget": "string"
+              "widget": "string",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "description",
               "label": "Описание",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             }
           ]
         },
@@ -416,12 +647,15 @@
         {
           "name": "process_title",
           "label": "Этапы: заголовок",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "process_emphasis",
           "label": "Этапы: акцент",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "steps",
@@ -437,12 +671,16 @@
             {
               "name": "title",
               "label": "Заголовок",
-              "widget": "string"
+              "widget": "string",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "description",
               "label": "Описание",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             }
           ]
         },
@@ -459,17 +697,22 @@
             {
               "name": "title",
               "label": "Заголовок приглашения",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "emphasis",
               "label": "Акцент курсивом",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "intro",
               "label": "Вступительный текст",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             },
             {
               "name": "button",
@@ -477,6 +720,55 @@
               "widget": "string"
             }
           ],
+          "collapsed": true
+        }
+      ],
+      "sections": [
+        {
+          "label": "Первый экран",
+          "fields": [
+            "label",
+            "title",
+            "emphasis",
+            "intro"
+          ],
+          "hint": "Заголовок страницы и вводный текст.",
+          "collapsed": false
+        },
+        {
+          "label": "Услуги",
+          "fields": [
+            "items"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Этапы работы",
+          "fields": [
+            "process_label",
+            "process_title",
+            "process_emphasis",
+            "steps"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Приглашение к разговору",
+          "fields": [
+            "cta"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Поисковые системы",
+          "fields": [
+            "seo_title",
+            "seo_description"
+          ],
+          "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
         }
       ]
@@ -504,17 +796,22 @@
         {
           "name": "title",
           "label": "Заголовок",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "emphasis",
           "label": "Акцент курсивом",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "intro",
           "label": "Вступительный текст",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "items",
@@ -526,12 +823,16 @@
             {
               "name": "title",
               "label": "Название",
-              "widget": "string"
+              "widget": "string",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "description",
               "label": "Описание",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             },
             {
               "name": "url",
@@ -554,12 +855,16 @@
         {
           "name": "empty_title",
           "label": "Заголовок, если видео ещё нет",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "empty_text",
           "label": "Текст, если видео ещё нет",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "cta",
@@ -574,17 +879,22 @@
             {
               "name": "title",
               "label": "Заголовок приглашения",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": false
             },
             {
               "name": "emphasis",
               "label": "Акцент курсивом",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "intro",
               "label": "Вступительный текст",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             },
             {
               "name": "button",
@@ -592,6 +902,53 @@
               "widget": "string"
             }
           ],
+          "collapsed": true
+        }
+      ],
+      "sections": [
+        {
+          "label": "Первый экран",
+          "fields": [
+            "label",
+            "title",
+            "emphasis",
+            "intro"
+          ],
+          "hint": "Заголовок страницы и вводный текст.",
+          "collapsed": false
+        },
+        {
+          "label": "Видеозаписи",
+          "fields": [
+            "items"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Если видео пока нет",
+          "fields": [
+            "empty_title",
+            "empty_text"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Приглашение к разговору",
+          "fields": [
+            "cta"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Поисковые системы",
+          "fields": [
+            "seo_title",
+            "seo_description"
+          ],
+          "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
         }
       ]
@@ -619,22 +976,29 @@
         {
           "name": "title",
           "label": "Заголовок",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "emphasis",
           "label": "Акцент курсивом",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "intro",
           "label": "Вступительный текст",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "form_title",
           "label": "Заголовок формы",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": false
         },
         {
           "name": "form",
@@ -680,7 +1044,9 @@
             {
               "name": "note",
               "label": "Пояснение формы",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             },
             {
               "name": "result",
@@ -735,9 +1101,42 @@
             {
               "name": "nojs_note",
               "label": "Пояснение при отключённом JavaScript",
-              "widget": "text"
+              "widget": "text",
+              "rich": true,
+              "richLinks": true
             }
           ]
+        }
+      ],
+      "sections": [
+        {
+          "label": "Первый экран",
+          "fields": [
+            "label",
+            "title",
+            "emphasis",
+            "intro"
+          ],
+          "hint": "Заголовок страницы и вводный текст.",
+          "collapsed": false
+        },
+        {
+          "label": "Форма обращения",
+          "fields": [
+            "form_title",
+            "form"
+          ],
+          "hint": "Подписи полей и тексты, которые видит посетитель.",
+          "collapsed": false
+        },
+        {
+          "label": "Поисковые системы",
+          "fields": [
+            "seo_title",
+            "seo_description"
+          ],
+          "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
+          "collapsed": true
         }
       ]
     },
@@ -759,12 +1158,16 @@
         {
           "name": "footer_tagline",
           "label": "Слоган в подвале",
-          "widget": "string"
+          "widget": "string",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "footer_note",
           "label": "Примечание в подвале",
-          "widget": "text"
+          "widget": "text",
+          "rich": true,
+          "richLinks": true
         },
         {
           "name": "contacts",
@@ -975,6 +1378,35 @@
             }
           ]
         }
+      ],
+      "sections": [
+        {
+          "label": "Название и контакты",
+          "fields": [
+            "brand",
+            "brand_subtitle",
+            "contacts"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Подвал сайта",
+          "fields": [
+            "footer_tagline",
+            "footer_note"
+          ],
+          "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Навигация и служебные сообщения",
+          "fields": [
+            "ui"
+          ],
+          "hint": "Подписи ссылок, меню и сообщения сайта.",
+          "collapsed": true
+        }
       ]
     }
   ],
@@ -1007,17 +1439,23 @@
     {
       "name": "title",
       "label": "Название",
-      "widget": "string"
+      "widget": "string",
+      "rich": true,
+      "richLinks": false
     },
     {
       "name": "subtitle",
       "label": "Короткая подпись",
-      "widget": "string"
+      "widget": "string",
+      "rich": true,
+      "richLinks": false
     },
     {
       "name": "description",
       "label": "Описание",
-      "widget": "text"
+      "widget": "text",
+      "rich": true,
+      "richLinks": true
     },
     {
       "name": "image",
@@ -1067,7 +1505,9 @@
       "field": {
         "name": "paragraph",
         "label": "Абзац",
-        "widget": "text"
+        "widget": "text",
+        "rich": true,
+        "richLinks": true
       }
     },
     {
@@ -1088,6 +1528,58 @@
       "label": "Год",
       "widget": "string",
       "required": false
+    }
+  ],
+  "projectSections": [
+    {
+      "label": "Описание проекта",
+      "fields": [
+        "title",
+        "subtitle",
+        "description",
+        "body"
+      ],
+      "hint": "",
+      "collapsed": false
+    },
+    {
+      "label": "Обложка и фотографии",
+      "fields": [
+        "image",
+        "image_alt",
+        "images"
+      ],
+      "hint": "",
+      "collapsed": false
+    },
+    {
+      "label": "Сведения об объекте",
+      "fields": [
+        "location",
+        "area",
+        "year",
+        "is_concept"
+      ],
+      "hint": "",
+      "collapsed": false
+    },
+    {
+      "label": "Публикация и адрес",
+      "fields": [
+        "published",
+        "order",
+        "slug"
+      ],
+      "hint": "",
+      "collapsed": false
+    },
+    {
+      "label": "Поисковые системы",
+      "fields": [
+        "seo_description"
+      ],
+      "hint": "Описание страницы в поисковой выдаче.",
+      "collapsed": true
     }
   ]
 }

@@ -157,3 +157,7 @@ h1 span,h2 span,.page-intro,.hero-intro-copy p,.body-copy,.small-note,.project-l
   .project-gallery:empty{display:none}
   .gallery-thumb{flex-basis:72px;min-height:60px}.gallery-thumb img{height:50px}
 }
+
+/* Inline formatting from the content editor. */
+.rich-link{text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+strong{font-weight:700}u{text-underline-offset:3px}
