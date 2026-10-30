@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Epiphany database backup schedule
+
+[Timer]
+OnCalendar=*-*-* 02:15:00 UTC
+RandomizedDelaySec=10m
+Persistent=true
+Unit=epiphany-backup.service
+
+[Install]
+WantedBy=timers.target
