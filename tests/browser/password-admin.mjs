@@ -58,6 +58,7 @@ try{
  // Navigation is guarded while a draft is dirty.
  await emphasis.fill(original+' Черновик');page.once('dialog',dialog=>dialog.dismiss());await page.locator('#page-list').getByRole('button',{name:'Видео',exact:true}).click();assert.equal(await page.locator('#editor-title').innerText(),'Главная');await emphasis.fill(original);
  await page.locator('#new-project').click();await page.getByRole('heading',{name:'Новый проект',exact:true}).waitFor();
+ await page.locator('#editor-section-4 > summary').click();
  for(const [id,value]of Object.entries({slug:'browser-project',title:'Проект из панели',subtitle:'Квартира',description:'История проекта',image_alt:'Обложка',seo_description:'Описание для поиска'}))await page.locator('#field-'+id).fill(value);
  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64');
  await page.getByLabel('Загрузить фотографию: Обложка',{exact:true}).setInputFiles({name:'cover.png',mimeType:'image/png',buffer:png});
