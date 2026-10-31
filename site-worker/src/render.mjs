@@ -77,10 +77,10 @@ export class Site {
   form(p){
     const f=p.form;
     const fields=['name','contact','message'].map(name=>{
-      const field=name==='message'?`<textarea dir="auto" id="${name}" name="${name}" rows="3" required maxlength="3000" placeholder="${e(f[name+'_placeholder'])}"></textarea>`:`<input dir="auto" id="${name}" name="${name}" required maxlength="150" autocomplete="${name==='name'?'name':'email'}" placeholder="${e(f[name+'_placeholder'])}">`;
+      const field=name==='message'?`<textarea dir="auto" id="${name}" name="${name}" rows="4" maxlength="3000" placeholder="${e(f[name+'_placeholder'])}"></textarea>`:`<input dir="auto" id="${name}" name="${name}" required maxlength="${name==='name'?100:150}" autocomplete="${name==='name'?'name':'off'}" placeholder="${e(f[name+'_placeholder'])}">`;
       return `<label for="${name}">${e(f[name+'_label'])}</label>${field}`;
     }).join('');
-    return `<noscript><p class="body-copy">${r(f.nojs_note)}</p></noscript><form id="brief-form" hidden><h2 class="form-title">${inline(p.form_title)}</h2>${fields}<button class="submit" type="submit">${e(f.submit)}${icon()}</button><p class="form-note">${r(f.note)}</p><div id="brief-result" hidden role="status"><p>${e(f.result)}</p><textarea id="brief-text" readonly aria-label="Текст обращения" rows="6"></textarea><button type="button" id="copy-brief">${e(f.copy)}</button><span id="copy-status" aria-live="polite"></span><a class="email-brief" id="email-brief" hidden>${e(f.email_button)}${icon()}</a></div></form><script id="form-data" type="application/json">${safeJSON({form:f,email:this.settings.contacts.email||''})}</script>`;
+    return `<noscript><p class="body-copy">${r(f.nojs_note)}</p></noscript><form id="brief-form" hidden><h2 class="form-title">${inline(p.form_title)}</h2>${fields}<div class="form-trap" aria-hidden="true"><label for="website">Ваш сайт</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div><button class="submit" type="submit">${e(f.submit)}${icon()}</button><p class="form-note">${r(f.note)}</p><p id="brief-status" role="status" aria-live="polite" tabindex="-1"></p><p id="brief-error" role="alert" tabindex="-1" hidden></p></form><script id="form-data" type="application/json">${safeJSON({form:f})}</script>`;
   }
   standardPage(key){
     const p=this.pages[key];let body=this.pageHead(p,key);

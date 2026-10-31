@@ -31,6 +31,11 @@ test('VPS: real HTTP, trusted HTTPS proxy, login, publication, restart and backu
       });req.on('error',reject);req.end(options.body);
     });
     assert.equal((await request('/healthz')).status,200);
+    const leadId=crypto.randomUUID();
+    const receipt=await request('/api/leads',{method:'POST',headers:{Origin:config.SITE_ORIGIN,'Content-Type':'application/json'},body:JSON.stringify({id:leadId,name:'Synthetic client',contact:'@test_contact',message:''})});
+    assert.equal(receipt.status,201);assert.equal((await receipt.json()).id,leadId);
+    assert.equal((await request('/api/leads')).status,401);
+
     assert.equal((await request('/api/session',{headers:{Host:'attacker.example'}})).status,400);
     assert.equal((await request('/api/session',{headers:{'X-Forwarded-Proto':'http'}})).status,400);
     assert.equal((await request('/api/schema')).status,401);
@@ -46,6 +51,7 @@ test('VPS: real HTTP, trusted HTTPS proxy, login, publication, restart and backu
       assert.equal(module.headers.get('x-content-type-options'),'nosniff');assert.match(await module.text(),/^export const/);
     }
     const session=await(await request('/api/session',{headers:{Cookie:cookie}})).json();
+    assert.equal((await(await request('/api/leads',{headers:{Cookie:cookie}})).json()).leads[0].id,leadId);
     const record=await(await request('/api/pages/home',{headers:{Cookie:cookie}})).json();
     const title="VPS · O'Neil 👩🏽‍🎨 שלום";record.data.title=title;
     const saved=await request('/api/pages/home',{method:'PUT',headers:{Cookie:cookie,Origin:config.SITE_ORIGIN,'X-CSRF-Token':session.csrf,'Content-Type':'application/json'},body:JSON.stringify(record)});
@@ -63,6 +69,7 @@ test('VPS: real HTTP, trusted HTTPS proxy, login, publication, restart and backu
     server.closeAllConnections();await new Promise(resolve=>server.close(resolve));server=null;await app.namespace.close();app=null;
     const restored=await application({...config,DATABASE_PATH:backup},{fetcher:f.fetcher});app=restored;
     const get=(path)=>app.fetch(new Request(config.SITE_ORIGIN+path,{headers:{Cookie:cookie}}));
+    assert.equal((await(await get('/api/leads')).json()).leads[0].id,leadId);
     assert.equal((await get('/api/session')).status,200);
     assert.equal((await(await get('/api/export')).json()).content['content/pages/home.json'].title,title);
     assert.equal(Buffer.from(await(await get('/assets/uploads/test.png')).arrayBuffer()).toString('base64'),photo);

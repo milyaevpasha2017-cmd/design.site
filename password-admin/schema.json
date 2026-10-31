@@ -1038,7 +1038,7 @@
             },
             {
               "name": "submit",
-              "label": "Кнопка подготовки",
+              "label": "Кнопка отправки",
               "widget": "string"
             },
             {
@@ -1050,48 +1050,8 @@
             },
             {
               "name": "result",
-              "label": "Сообщение после подготовки",
+              "label": "Сообщение после успешной отправки",
               "widget": "text"
-            },
-            {
-              "name": "copy",
-              "label": "Кнопка копирования",
-              "widget": "string"
-            },
-            {
-              "name": "copied",
-              "label": "Сообщение: скопировано",
-              "widget": "string"
-            },
-            {
-              "name": "copy_fallback",
-              "label": "Сообщение при ручном копировании",
-              "widget": "string"
-            },
-            {
-              "name": "email_button",
-              "label": "Кнопка почты",
-              "widget": "string"
-            },
-            {
-              "name": "subject",
-              "label": "Тема письма",
-              "widget": "string"
-            },
-            {
-              "name": "greeting",
-              "label": "Начало письма",
-              "widget": "string"
-            },
-            {
-              "name": "project_prefix",
-              "label": "Письмо: подпись проекта",
-              "widget": "string"
-            },
-            {
-              "name": "contact_prefix",
-              "label": "Письмо: подпись контакта",
-              "widget": "string"
             },
             {
               "name": "whitespace_error",
@@ -1104,6 +1064,11 @@
               "widget": "text",
               "rich": true,
               "richLinks": true
+            },
+            {
+              "name": "sending",
+              "label": "Сообщение во время отправки",
+              "widget": "string"
             }
           ]
         }

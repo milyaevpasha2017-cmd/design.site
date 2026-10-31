@@ -8,6 +8,8 @@ import {createSiteWorker} from '../site-worker/src/worker.mjs';
 import {validPasswordHash} from '../site-worker/src/security.mjs';
 import {SQLiteNamespace} from './storage.mjs';
 import {staticAssets} from './assets.mjs';
+import {LeadInbox} from './leads.mjs';
+import {currentContacts} from './contacts.mjs';
 
 export async function application(config,{fetcher=fetch}={}){
   const origin=new URL(config.SITE_ORIGIN);
@@ -15,9 +17,11 @@ export async function application(config,{fetcher=fetch}={}){
   if(!config.ADMIN_USERNAME||!validPasswordHash(config.ADMIN_PASSWORD_HASH)||!config.GITHUB_CONTENT_TOKEN||!/^\w[\w.-]*\/[\w.-]+$/.test(config.CONTENT_REPO||''))throw new Error('Missing or invalid server configuration');
   const namespace=new SQLiteNamespace(config.DATABASE_PATH);
   try{
-    const env={...config,ADMIN_STATE:namespace,ASSETS:await staticAssets(config.ASSETS_PATH),SITE_CONTENT:JSON.parse(await readFile(config.SNAPSHOT_PATH,'utf8'))};
+    const inbox=new LeadInbox(namespace.storage('epiphany-leads'),config,fetcher);
+    const env={...config,LEADS:inbox,ADMIN_STATE:namespace,ASSETS:await staticAssets(config.ASSETS_PATH),SITE_CONTENT:JSON.parse(await readFile(config.SNAPSHOT_PATH,'utf8'))};
+    inbox.getContacts=()=>currentContacts(namespace,env.SITE_CONTENT);
     const worker=createSiteWorker(fetcher);
-    return {namespace,fetch:request=>worker.fetch(request,env),origin:origin.origin};
+    return {namespace,inbox,fetch:request=>worker.fetch(request,env),origin:origin.origin};
   }catch(error){await namespace.close();throw error;}
 }
 
@@ -50,7 +54,7 @@ if(process.argv[1]&&await realpath(process.argv[1])===fileURLToPath(import.meta.
   process.umask(0o077);
   const root=fileURLToPath(new URL('../',import.meta.url));
   const app=await application({...process.env,DATABASE_PATH:process.env.DATABASE_PATH||'/var/lib/epiphany/state.sqlite',ASSETS_PATH:resolve(root,'_site-vps'),SNAPSHOT_PATH:resolve(root,'site-worker/generated/site.json')});
-  const server=httpServer(app),timer=setInterval(()=>app.namespace.sweep().catch(()=>console.error('Session cleanup failed')),60000);timer.unref();
+  const server=httpServer(app),timer=setInterval(()=>Promise.all([app.namespace.sweep(),app.inbox.sweep(),app.inbox.notify()]).catch(()=>console.error('Background maintenance failed')),30000);timer.unref();
   const port=Number(process.env.PORT||3000);
   if(!Number.isSafeInteger(port)||port<1024||port>65535)throw new Error('Invalid port');
   server.listen(port,'127.0.0.1',()=>console.log('Epiphany is listening on loopback port '+port));

@@ -168,3 +168,8 @@ strong{font-weight:700}u{text-underline-offset:3px}
 .logo .brand-wordmark{display:block;font:inherit;letter-spacing:inherit;line-height:inherit;margin:0;white-space:nowrap}
 @media(max-width:600px){.logo-with-mark{gap:10px}.logo .brand-mark{width:30px;height:35px}}
 @media(max-width:380px){.logo-with-mark{gap:8px}.logo .brand-mark{width:26px;height:30px}.logo .brand-name{font-size:30px}.logo .brand-subtitle{font-size:6px;letter-spacing:1.3px}.header{gap:12px}}
+
+/* Contact request form */
+.form-trap{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+#brief-status:empty{display:none}#brief-status{padding:16px;border:1px solid var(--accent);margin-top:20px;color:var(--ink)}
+#brief-error{color:#8a2f28;font-size:14px;line-height:1.6;margin-top:16px}.submit:disabled{opacity:.65;cursor:default}

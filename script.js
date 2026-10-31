@@ -89,26 +89,37 @@ document.querySelectorAll('[data-video-url]').forEach(card => {
 const form = $('#brief-form');
 if (form) {
   form.hidden = false;
-  const settings = JSON.parse($('#form-data').textContent); const copy = settings.form;
-  const email = contactURL('email', settings.email);
-  form.querySelectorAll('input, textarea:not([readonly])').forEach(field => field.addEventListener('input', () => field.setCustomValidity('')));
-  form.addEventListener('submit', event => {
-    event.preventDefault();
+  const copy = JSON.parse($('#form-data').textContent).form;
+  const status = $('#brief-status'), error = $('#brief-error'), button = form.querySelector('[type="submit"]');
+  let sending = false, accepted = false, requestId = crypto.randomUUID();
+  form.addEventListener('input', event => {
+    event.target.setCustomValidity?.('');
+    if (accepted) { accepted = false; requestId = crypto.randomUUID(); status.textContent = ''; button.disabled = false; }
+  });
+  form.addEventListener('submit', async event => {
+    event.preventDefault(); if (sending || accepted) return;
     for (const field of form.querySelectorAll('[required]')) {
       field.setCustomValidity(field.value.trim() ? '' : copy.whitespace_error);
       if (!field.reportValidity()) return;
     }
     const values = new FormData(form);
-    const text = `${copy.greeting} ${values.get('name').trim()}.\n\n${copy.project_prefix} ${values.get('message').trim()}\n\n${copy.contact_prefix} ${values.get('contact').trim()}`;
-    $('#brief-text').value = text; $('#brief-result').hidden = false; $('#copy-status').textContent = '';
-    const emailButton = $('#email-brief'); emailButton.hidden = !email;
-    if (email) emailButton.href = `${email}?subject=${encodeURIComponent(copy.subject)}&body=${encodeURIComponent(text)}`;
-    $('#brief-result').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'nearest'});
-  });
-  $('#copy-brief').addEventListener('click', async () => {
-    const field = $('#brief-text');
-    try { await navigator.clipboard.writeText(field.value); $('#copy-status').textContent = copy.copied; }
-    catch { field.focus(); field.select(); $('#copy-status').textContent = copy.copy_fallback; }
+    const fields = [...form.querySelectorAll('input, textarea')];
+    sending = true; button.disabled = true; fields.forEach(field => field.readOnly = true);
+    error.hidden = true; status.textContent = copy.sending || 'Отправляем заявку…';
+    form.setAttribute('aria-busy', 'true');
+    try {
+      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message: values.get('message'), website: values.get('website') }) });
+      let data; try { data = await response.json(); } catch { throw new Error('Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.'); }
+      if (!response.ok || !data.ok || data.id !== requestId) throw new Error(data.error || 'Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.');
+      accepted = true; form.reset(); status.textContent = copy.result; status.focus();
+    } catch (failure) {
+      status.textContent = ''; error.hidden = false;
+      error.textContent = failure.name === 'TimeoutError' || failure instanceof TypeError ? 'Не удалось подтвердить отправку. Проверьте интернет и повторите: повторная попытка не создаст копию заявки.' : failure.message;
+      error.focus();
+    } finally {
+      sending = false; fields.forEach(field => field.readOnly = false); button.disabled = accepted;
+      form.removeAttribute('aria-busy');
+    }
   });
 }
 

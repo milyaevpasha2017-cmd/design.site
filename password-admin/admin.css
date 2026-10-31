@@ -29,3 +29,7 @@ details[open]>summary.section-title::after{content:' −'}
 .nav-item.active{color:var(--ink);background:#e8e9df;box-shadow:inset 3px 0 var(--accent);padding-left:12px;font-weight:600}
 .object-group{border-radius:6px}.list-item{border-radius:6px}.object-fields .object-group{background:#fdfcf9}
 @media(max-width:700px){.section-title{padding:18px;font-size:23px}.section-fields{padding:6px 16px}.section-nav{gap:6px}.section-nav a{padding:8px 12px}.heading-preview{font-size:28px}.format-button{padding:6px 10px}.app-layout main{padding-left:16px;padding-right:16px}.editor-toolbar #save{width:100%}}
+
+/* Client inbox */
+.leads-main{max-width:1100px;padding:35px 5%}.lead-card{border:1px solid #d9d9ce;padding:24px;margin:20px 0;border-radius:12px;background:#fff}
+.lead-card:target{outline:2px solid #737b60}.lead-heading,.lead-controls{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}.lead-heading h2{margin:0;font-size:24px}.lead-message,.lead-contact{white-space:pre-wrap;overflow-wrap:anywhere}.lead-contact{font-weight:600;margin-top:20px}.lead-controls select{display:block;padding:10px;margin-top:6px}.lead-controls label{margin:0}.leads-main button{cursor:pointer}#leads-error{color:#8a2f28}

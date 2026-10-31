@@ -68,6 +68,12 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
     if(route.startsWith('/api/') && !['GET','POST','PUT','DELETE'].includes(request.method))return json({error:'Метод не поддерживается.'},405);
     // A session cookie alone is never enough to authorize a cross-site write.
     if(route.startsWith('/api/') && request.method!=='GET' && request.headers.get('Origin')!==env.SITE_ORIGIN)return json({error:'Недопустимый источник запроса.'},403);
+    if(route==='/api/leads'&&request.method==='POST'){
+      if(!env.LEADS)return json({error:'Форма временно недоступна. Напишите мне напрямую по контактам на странице.'},503);
+      const data=await bodyJSON(request,16000);
+      const result=await env.LEADS.submit(data,request.headers.get('CF-Connecting-IP')||'unknown');
+      return json({ok:true,id:result.id},201);
+    }
     if(route==='/api/login'){
       if(request.method!=='POST')return json({error:'Метод не поддерживается.'},405);
       const attempt=await state(env,{action:'attempt',key:await digest(request.headers.get('CF-Connecting-IP')||'unknown')});
@@ -88,6 +94,18 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
     if(route==='/api/session'&&request.method==='GET')return json({username:user.user,csrf:user.csrf});
     if(route==='/api/logout'&&request.method==='POST'){await state(env,{action:'delete',sid:user.sid});return json({ok:true},200,{'Set-Cookie':cookie('')});}
     if(route==='/api/schema'&&request.method==='GET')return json(schema);
+    if(route==='/api/leads'&&request.method==='GET'){
+      if(!env.LEADS)return json({error:'Заявки доступны на основном сервере сайта.'},503);
+      return json(await env.LEADS.list({cursor:url.searchParams.get('cursor')||'',limit:Number(url.searchParams.get('limit')||30)}));
+    }
+    const lead=route.match(/^\/api\/leads\/([0-9a-f-]+)$/);
+    if(lead&&['PUT','DELETE'].includes(request.method)){
+      if(!env.LEADS)return json({error:'Заявки недоступны.'},503);
+      if(request.method==='DELETE')return json(await env.LEADS.remove(lead[1]));
+      const body=await bodyJSON(request,1000);
+      return json(body.retryNotification===true?await env.LEADS.retry(lead[1]):await env.LEADS.update(lead[1],body.status));
+    }
+
     if(route==='/api/export'&&request.method==='GET'){
       if(!env.SITE_CONTENT)return json({error:'Экспорт пока недоступен. Обратитесь к владельцу сайта.'},503);
       const response=await publication(env,{action:'publish:read'});
