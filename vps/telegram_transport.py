@@ -1,40 +1,32 @@
-"""Telegram HTTPS over IPv4; hostname and certificate verification stay enabled."""
-import http.client
-import socket
-import urllib.request
+"""Telegram API via the server's curl: IPv4, verified HTTPS, credentials on stdin."""
+import json
+import subprocess
 
 
-def ipv4_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT, source_address=None):
-    host, port = address
-    last_error = None
-    for family, kind, protocol, _, target in socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM):
-        connection = socket.socket(family, kind, protocol)
-        try:
-            if timeout is not socket._GLOBAL_DEFAULT_TIMEOUT:
-                connection.settimeout(timeout)
-            if source_address:
-                connection.bind(source_address)
-            connection.connect(target)
-            return connection
-        except OSError as error:
-            last_error = error
-            connection.close()
-    if last_error:
-        raise last_error
-    raise OSError('No IPv4 address available')
+def curl_config(url, payload):
+    if not url.startswith('https://api.telegram.org/bot') or any(c in url for c in '\r\n'):
+        raise ValueError('Unexpected Telegram endpoint')
+    quote = lambda value: json.dumps(value, ensure_ascii=False)
+    return 'url = ' + quote(url) + '\nrequest = "POST"\nheader = "Content-Type: application/json"\ndata = ' + quote(json.dumps(payload, ensure_ascii=False)) + '\n'
 
 
-class IPv4HTTPSConnection(http.client.HTTPSConnection):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._create_connection = ipv4_connection
-
-
-class IPv4HTTPSHandler(urllib.request.HTTPSHandler):
-    def https_open(self, request):
-        return self.do_open(IPv4HTTPSConnection, request, context=self._context)
-
-
-def open_telegram(request, timeout=15):
-    # No proxy environment lookup; connect directly with the original TLS hostname.
-    return urllib.request.build_opener(urllib.request.ProxyHandler({}), IPv4HTTPSHandler()).open(request, timeout=timeout)
+def telegram_request(url, payload, timeout=20):
+    # Token URL and JSON body are in stdin, never argv/environment or diagnostics.
+    args = ['/usr/bin/curl', '--disable', '-4', '--silent', '--show-error',
+            '--connect-timeout', '10', '--max-time', str(timeout),
+            '--max-filesize', '1048576', '--proto', '=https',
+            '--config', '-', '--write-out', '\n%{http_code}']
+    try:
+        response = subprocess.run(args, input=curl_config(url, payload),
+            text=True, capture_output=True, timeout=timeout + 3, check=False,
+            env={'PATH': '/usr/bin:/bin', 'LANG': 'C.UTF-8'})
+    except Exception:
+        raise RuntimeError('Telegram connection failed') from None
+    if response.returncode:
+        # curl codes are safe diagnostics; stderr may contain the token URL.
+        raise RuntimeError('Telegram connection failed (curl code ' + str(response.returncode) + ')')
+    try:
+        body, status = response.stdout.rsplit('\n', 1)
+        return int(status), json.loads(body)
+    except Exception:
+        raise RuntimeError('Telegram returned an unreadable response') from None

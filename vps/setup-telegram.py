@@ -4,35 +4,25 @@ import getpass
 import json
 import os
 import re
-import urllib.request
-import urllib.error
 import time
 from urllib.parse import urlsplit
 from notification_config import contacts, save
-from telegram_transport import open_telegram
+from telegram_transport import telegram_request
 
 
 def telegram_call(token, method, payload):
     # Retry only read-only API calls; sendMessage may have been accepted already.
     attempts = 3 if method in ('getMe', 'getWebhookInfo', 'getUpdates') else 1
     for attempt in range(attempts):
-        request = urllib.request.Request('https://api.telegram.org/bot' + token + '/' + method,
-            data=json.dumps(payload).encode(), headers={'Content-Type': 'application/json'})
         try:
-            with open_telegram(request, timeout=15) as response:
-                result = json.load(response)
-        except urllib.error.HTTPError as failure:
-            try: result = json.loads(failure.read(4096))
-            except Exception: result = {}
-            code = failure.code
-        except Exception:
+            code, result = telegram_request('https://api.telegram.org/bot' + token + '/' + method, payload)
+        except RuntimeError as failure:
             if attempt + 1 < attempts:
                 time.sleep(1)
                 continue
-            raise RuntimeError(method + ': connection failed or timed out. Token was not printed; settings unchanged') from None
-        else:
-            if result.get('ok') is True: return result['result']
-            code = result.get('error_code', 'unknown')
+            raise RuntimeError(method + ': ' + str(failure) + '. Settings unchanged') from None
+        if result.get('ok') is True: return result['result']
+        code = result.get('error_code', code)
         # Report API reason, never URLs or raw exceptions containing the token.
         description = str(result.get('description', 'Telegram rejected the request')).replace(token, '[hidden]')
         description = re.sub(r'https?://\S+', '[URL hidden]', description)
