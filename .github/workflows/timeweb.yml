@@ -1,0 +1,58 @@
+name: Publish Timeweb site
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: timeweb-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' && vars.TIMEWEB_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: python3 scripts/design-inventory.py --check
+      - run: node --test tests/*.test.mjs
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - run: python3 scripts/build.py --site-url https://epiphany-int.ru/ --output _site-vps --admin-mode password
+      - run: python3 scripts/audit-secrets.py --frontend _site-vps
+      - run: python3 scripts/package-vps.py "$RUNNER_TEMP/epiphany-release.tar.gz"
+      - name: Skip an obsolete queued commit
+        id: latest
+        run: |
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" = "$GITHUB_SHA" ]; then
+            echo 'deploy=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'A newer commit exists; its workflow will deploy instead.'
+          fi
+      - name: Install release over restricted SSH connection
+        if: steps.latest.outputs.deploy == 'true'
+        env:
+          DEPLOY_KEY: ${{ secrets.TIMEWEB_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.TIMEWEB_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          test -n "$DEPLOY_KEY" && test -n "$KNOWN_HOSTS"
+          umask 077
+          key="$RUNNER_TEMP/timeweb-key"
+          hosts="$RUNNER_TEMP/timeweb-known-hosts"
+          trap 'rm -f "$key" "$hosts"' EXIT
+          printf '%s\n' "$DEPLOY_KEY" > "$key"
+          printf '%s\n' "$KNOWN_HOSTS" > "$hosts"
+          ssh -T -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=15 \
+            -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
+            -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$hosts" \
+            -i "$key" epiphany-deploy@83.217.202.208 < "$RUNNER_TEMP/epiphany-release.tar.gz"

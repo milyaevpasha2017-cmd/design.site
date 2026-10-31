@@ -22,3 +22,6 @@ id_ed25519
 *.db-wal
 *.db-shm
 backups/
+
+# CI release metadata generated during packaging.
+/release.json
