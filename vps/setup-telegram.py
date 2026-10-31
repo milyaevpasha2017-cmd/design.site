@@ -9,6 +9,7 @@ import urllib.error
 import time
 from urllib.parse import urlsplit
 from notification_config import contacts, save
+from telegram_transport import open_telegram
 
 
 def telegram_call(token, method, payload):
@@ -18,7 +19,7 @@ def telegram_call(token, method, payload):
         request = urllib.request.Request('https://api.telegram.org/bot' + token + '/' + method,
             data=json.dumps(payload).encode(), headers={'Content-Type': 'application/json'})
         try:
-            with urllib.request.urlopen(request, timeout=15) as response:
+            with open_telegram(request, timeout=15) as response:
                 result = json.load(response)
         except urllib.error.HTTPError as failure:
             try: result = json.loads(failure.read(4096))

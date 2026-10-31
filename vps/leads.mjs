@@ -1,3 +1,4 @@
+import {telegramFetch} from './telegram.mjs';
 import {mailConfigured,sendMail} from './mail.mjs';
 import {digest} from '../site-worker/src/security.mjs';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -5,7 +6,7 @@ const error=(message,status=400)=>Object.assign(new Error(message),{status});
 const statuses=['new','contacted','closed'];
 const publicRecord=({fingerprint,...record})=>record;
 export class LeadInbox{
-  constructor(storage,config,fetcher=fetch,mailer=sendMail){this.mailer=mailer;this.storage=storage;this.config=config;this.fetcher=fetcher;this.running=false;}
+  constructor(storage,config,fetcher=telegramFetch,mailer=sendMail){this.mailer=mailer;this.storage=storage;this.config=config;this.fetcher=fetcher;this.running=false;}
   async submit(data,ip){
     if(!data||typeof data!=='object'||Array.isArray(data))throw error('Некорректная заявка.');
     if(!uuid.test(data.id||''))throw error('Обновите страницу и повторите отправку.');

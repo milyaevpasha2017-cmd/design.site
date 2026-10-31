@@ -10,14 +10,15 @@ import {SQLiteNamespace} from './storage.mjs';
 import {staticAssets} from './assets.mjs';
 import {LeadInbox} from './leads.mjs';
 import {currentContacts} from './contacts.mjs';
+import {telegramFetch} from './telegram.mjs';
 
-export async function application(config,{fetcher=fetch}={}){
+export async function application(config,{fetcher=fetch,telegramFetcher=telegramFetch}={}){
   const origin=new URL(config.SITE_ORIGIN);
   if(origin.protocol!=='https:'||origin.origin!==config.SITE_ORIGIN||origin.username||origin.password)throw new Error('SITE_ORIGIN must be an HTTPS origin without a trailing slash');
   if(!config.ADMIN_USERNAME||!validPasswordHash(config.ADMIN_PASSWORD_HASH)||!config.GITHUB_CONTENT_TOKEN||!/^\w[\w.-]*\/[\w.-]+$/.test(config.CONTENT_REPO||''))throw new Error('Missing or invalid server configuration');
   const namespace=new SQLiteNamespace(config.DATABASE_PATH);
   try{
-    const inbox=new LeadInbox(namespace.storage('epiphany-leads'),config,fetcher);
+    const inbox=new LeadInbox(namespace.storage('epiphany-leads'),config,telegramFetcher);
     const env={...config,LEADS:inbox,ADMIN_STATE:namespace,ASSETS:await staticAssets(config.ASSETS_PATH),SITE_CONTENT:JSON.parse(await readFile(config.SNAPSHOT_PATH,'utf8'))};
     inbox.getContacts=()=>currentContacts(namespace,env.SITE_CONTENT);
     const worker=createSiteWorker(fetcher);
