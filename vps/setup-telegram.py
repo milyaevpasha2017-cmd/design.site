@@ -5,8 +5,39 @@ import json
 import os
 import re
 import urllib.request
+import urllib.error
+import time
 from urllib.parse import urlsplit
 from notification_config import contacts, save
+
+
+def telegram_call(token, method, payload):
+    # Retry only read-only API calls; sendMessage may have been accepted already.
+    attempts = 3 if method in ('getMe', 'getWebhookInfo', 'getUpdates') else 1
+    for attempt in range(attempts):
+        request = urllib.request.Request('https://api.telegram.org/bot' + token + '/' + method,
+            data=json.dumps(payload).encode(), headers={'Content-Type': 'application/json'})
+        try:
+            with urllib.request.urlopen(request, timeout=15) as response:
+                result = json.load(response)
+        except urllib.error.HTTPError as failure:
+            try: result = json.loads(failure.read(4096))
+            except Exception: result = {}
+            code = failure.code
+        except Exception:
+            if attempt + 1 < attempts:
+                time.sleep(1)
+                continue
+            raise RuntimeError(method + ': connection failed or timed out. Token was not printed; settings unchanged') from None
+        else:
+            if result.get('ok') is True: return result['result']
+            code = result.get('error_code', 'unknown')
+        # Report API reason, never URLs or raw exceptions containing the token.
+        description = str(result.get('description', 'Telegram rejected the request')).replace(token, '[hidden]')
+        description = re.sub(r'https?://\S+', '[URL hidden]', description)
+        description = re.sub(r'\b[0-9]{5,15}:[A-Za-z0-9_-]{20,}', '[hidden]', description)
+        description = ' '.join(description.split())[:240]
+        raise RuntimeError(method + ': HTTP ' + str(code) + '. ' + description + '. Settings unchanged') from None
 
 
 def main():
@@ -18,19 +49,11 @@ def main():
     token = getpass.getpass('Bot token (hidden): ').strip()
     if not re.fullmatch(r'[0-9]{5,15}:[A-Za-z0-9_-]{25,100}', token):
         raise RuntimeError('Invalid token format; nothing changed')
-    def call(method, payload):
-        request = urllib.request.Request('https://api.telegram.org/bot' + token + '/' + method,
-            data=json.dumps(payload).encode(), headers={'Content-Type': 'application/json'})
-        try:
-            with urllib.request.urlopen(request, timeout=15) as response:
-                result = json.load(response)
-            if result.get('ok') is not True:
-                raise ValueError()
-            return result['result']
-        except Exception:
-            raise RuntimeError('Telegram request failed. Check token, bot access and connection; nothing changed') from None
+    call = lambda method, payload: telegram_call(token, method, payload)
     bot = call('getMe', {})
     print('Bot: @' + bot['username'])
+    if call('getWebhookInfo', {}).get('url'):
+        raise RuntimeError('This bot already has a webhook from another service. It was NOT changed. Use a dedicated bot or review the existing integration')
     print('Ask the DESIGNER @' + expected + ' to open this bot and send: /start')
     input('Then press Enter here: ')
     updates = call('getUpdates', {'allowed_updates': ['message'], 'limit': 100, 'timeout': 0})
