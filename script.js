@@ -111,7 +111,10 @@ if (form) {
       const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message: values.get('message'), website: values.get('website') }) });
       let data; try { data = await response.json(); } catch { throw new Error('Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.'); }
       if (!response.ok || !data.ok || data.id !== requestId) throw new Error(data.error || 'Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.');
-      accepted = true; form.reset(); status.textContent = copy.result; status.focus();
+      accepted = true;
+      // Count only server-confirmed acceptance; analytics must never break the form.
+      try { window.ym?.(113965901, 'reachGoal', 'lead_submitted'); } catch {}
+      form.reset(); status.textContent = copy.result; status.focus();
     } catch (failure) {
       status.textContent = ''; error.hidden = false;
       error.textContent = failure.name === 'TimeoutError' || failure instanceof TypeError ? 'Не удалось подтвердить отправку. Проверьте интернет и повторите: повторная попытка не создаст копию заявки.' : failure.message;
