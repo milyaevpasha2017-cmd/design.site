@@ -54,10 +54,29 @@ export class Site {
     return links.length?'<div class="contact-links">'+links.join('')+'</div>':'';
   }
   nav(current){return ['projects','about','services','videos','contact'].map(key=>`<a href="${this.link(key)}"${current===key?' aria-current="page"':''}>${e(this.ui[key])}</a>`).join('');}
+  indexable(key){return Boolean(key)&&(key!=='videos'||Boolean(this.pages.videos.items?.length));}
+  robots(){return 'User-agent: *\nDisallow: /api/\nDisallow: /deployment.json\n\nSitemap: '+this.url+'sitemap.xml\n';}
+  structured(title,description,current,path){
+    const canonical=this.url+path;
+    const org={'@type':'Organization','@id':this.url+'#organization',name:'Epiphany Interior',url:this.url,logo:this.url+'assets/branding/icon-192.png',email:this.settings.contacts.email||'',sameAs:Object.entries(this.settings.contacts).filter(([k,v])=>k!=='email'&&v.startsWith('https://')).map(([,v])=>v)};
+    const website={'@type':'WebSite','@id':this.url+'#website',url:this.url,name:'Epiphany Interior',inLanguage:'ru-RU',publisher:{'@id':org['@id']}};
+    const page={'@type':({about:'AboutPage',contact:'ContactPage',projects:'CollectionPage',videos:'CollectionPage'})[current]||'WebPage','@id':canonical+'#webpage',url:canonical,name:plainText(title),description:plainText(description),inLanguage:'ru-RU',isPartOf:{'@id':website['@id']}};
+    const graph=[org,website,page],crumbs=[[this.ui.home,this.url]];
+    if(path.startsWith('projects/')&&path!=='projects/'){
+      const project=this.projects.find(p=>path==='projects/'+p.slug+'/');
+      if(project){crumbs.push([this.ui.projects,this.url+'projects/'],[plainText(project.title),canonical]);page['@type']='WebPage';page.primaryImageOfPage={'@type':'ImageObject',url:new URL(this.image(project.image),this.url).href};}
+    }else if(current!=='home')crumbs.push([this.ui[current],canonical]);
+    if(crumbs.length>1){graph.push({'@type':'BreadcrumbList','@id':canonical+'#breadcrumb',itemListElement:crumbs.map(([name,item],i)=>({'@type':'ListItem',position:i+1,name,item}))});page.breadcrumb={'@id':canonical+'#breadcrumb'};}
+    return '<script type="application/ld+json">'+safeJSON({'@context':'https://schema.org','@graph':graph})+'</script>';
+  }
   shell(title,description,body,current,path='',extra=''){
-    const s=this.settings,canonical=this.url+path;
+    title=plainText(title);description=plainText(description);
+    const s=this.settings,canonical=this.url+path,indexable=this.indexable(current);
+    const project=this.projects.find(p=>path==='projects/'+p.slug+'/');
+    const shareImage=new URL(this.image((project||this.pages[current])?.image||this.pages.home.image),this.url).href;
+    const seo=(current?`<link rel="canonical" href="${e(canonical)}">`:'')+(indexable?'<meta name="robots" content="index,follow,max-image-preview:large">'+this.structured(title,description,current,path):'<meta name="robots" content="noindex,follow">');
     const logo=`<a class="logo logo-with-mark" href="/"><img class="brand-mark" src="/assets/branding/logo-mark.png" width="64" height="74" alt="" aria-hidden="true"><span class="brand-wordmark"><span class="brand-name">${e(s.brand)}</span><span class="brand-subtitle">${e(s.brand_subtitle)}</span></span></a>`;
-    return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>${e(title)}</title><meta name="description" content="${e(description)}"><meta name="theme-color" content="#f5f3ee"><link rel="icon" type="image/x-icon" href="/favicon.ico?v=epiphany-1"><link rel="icon" type="image/png" sizes="32x32" href="/assets/branding/icon-32.png?v=epiphany-1"><link rel="icon" type="image/png" sizes="192x192" href="/assets/branding/icon-192.png?v=epiphany-1"><link rel="apple-touch-icon" sizes="180x180" href="/assets/branding/icon-180.png?v=epiphany-1"><meta property="og:type" content="website"><meta property="og:title" content="${e(title)}"><meta property="og:description" content="${e(description)}"><meta property="og:url" content="${e(canonical)}"><meta property="og:locale" content="ru_RU"><link rel="canonical" href="${e(canonical)}"><link rel="stylesheet" href="/style.css"><script defer src="/metrika.js"></script><script type="module" src="/script.js"></script></head><body><noscript><div><img src="https://mc.yandex.ru/watch/113965901" style="position:absolute; left:-9999px;" alt=""></div></noscript><a class="skip-link" href="#main-content">${e(this.ui.skip)}</a>${this.icons}<header class="header">${logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">${e(this.ui.menu)}${icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">${this.nav(current)}</nav></header><main id="main-content" tabindex="-1">${body}</main><footer>${logo}<p>${r(s.footer_tagline)}</p><a href="#main-content">${e(this.ui.top)} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">${this.nav(current)}</nav><p class="footer-note">${r(s.footer_note)}</p></footer>${extra}</body></html>`;
+    return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>${e(title)}</title><meta name="description" content="${e(description)}"><meta name="theme-color" content="#f5f3ee"><link rel="icon" type="image/x-icon" href="/favicon.ico?v=epiphany-1"><link rel="icon" type="image/png" sizes="32x32" href="/assets/branding/icon-32.png?v=epiphany-1"><link rel="icon" type="image/png" sizes="192x192" href="/assets/branding/icon-192.png?v=epiphany-1"><link rel="apple-touch-icon" sizes="180x180" href="/assets/branding/icon-180.png?v=epiphany-1"><meta property="og:type" content="website"><meta property="og:site_name" content="Epiphany Interior"><meta property="og:image" content="${e(shareImage)}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="${e(title)}"><meta property="og:description" content="${e(description)}"><meta property="og:url" content="${e(canonical)}"><meta property="og:locale" content="ru_RU">${seo}<link rel="stylesheet" href="/style.css"><script defer src="/metrika.js"></script><script type="module" src="/script.js"></script></head><body><noscript><div><img src="https://mc.yandex.ru/watch/113965901" style="position:absolute; left:-9999px;" alt=""></div></noscript><a class="skip-link" href="#main-content">${e(this.ui.skip)}</a>${this.icons}<header class="header">${logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">${e(this.ui.menu)}${icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">${this.nav(current)}</nav></header><main id="main-content" tabindex="-1">${body}</main><footer>${logo}<p>${r(s.footer_tagline)}</p><a href="#main-content">${e(this.ui.top)} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">${this.nav(current)}</nav><p class="footer-note">${r(s.footer_note)}</p></footer>${extra}</body></html>`;
   }
   pageHead(p,current){return `<section class="page-heading section"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="/">${e(this.ui.home)}</a><span aria-hidden="true">/</span><span aria-current="page">${e(this.ui[current])}</span></nav><p class="eyebrow">${e(p.label)}</p>${heading(p.title,p.emphasis)}<p class="page-intro">${r(p.intro)}</p></section>`;}
   cta(p){return `<section class="contact section page-cta"><div><p class="eyebrow">${e(p.label)}</p>${heading(p.title,p.emphasis,2)}<p>${r(p.intro)}</p></div><div>${this.button('contact',p.button,'submit')}${this.contacts()}</div></section>`;}
@@ -113,13 +132,14 @@ export class Site {
     if(index+1<this.projects.length)body+=`<a href="${this.projectLink(this.projects[index+1])}"><span><small>${e(this.ui.next_project)}</small>${inline(this.projects[index+1].title)}</span>${icon()}</a>`;
     body+='</nav>'+this.cta(this.pages.projects.cta);
     const extra=this.galleryDialog()+`<script id="gallery-data" type="application/json">${safeJSON({title:plainText(p.title),photos})}</script>`;
-    return this.shell(plainText(p.title)+' — Epiphany Interior',p.seo_description||p.description,body,'projects','projects/'+p.slug+'/',extra);
+    return this.shell(plainText(p.title)+(p.is_concept?' — концепция интерьера':' — дизайн интерьера')+' — Epiphany Interior',p.seo_description||p.description,body,'projects','projects/'+p.slug+'/',extra);
   }
   notFound(){const u=this.ui;return this.shell(u.not_found_title,u.not_found_text,`<section class="section page-heading"><p class="eyebrow">404</p>${heading(u.not_found_title)}<p class="page-intro">${e(u.not_found_text)}</p>${this.button('home',u.home)}</section>`,'');}
   failure(){return this.shell('Сайт временно недоступен — Epiphany Interior','Не удалось загрузить актуальные данные.',`<section class="section page-heading state-page"><p class="eyebrow">ВРЕМЕННАЯ ОШИБКА</p>${heading('Не удалось загрузить страницу')}<p class="page-intro">Повторите загрузку через несколько секунд. Если вопрос срочный, напишите нам напрямую.</p><a class="text-link" href="">Повторить загрузку ${icon()}</a>${this.contacts()}</section>`,'');}
-  sitemap(){return '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+[...Object.values(routes),...this.projects.map(p=>'projects/'+p.slug+'/')].map(path=>'<url><loc>'+e(this.url+path)+'</loc></url>').join('')+'</urlset>';}
+  sitemap(){return '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+[...Object.entries(routes).filter(([key])=>this.indexable(key)).map(([,path])=>path),...this.projects.map(p=>'projects/'+p.slug+'/')].map(path=>'<url><loc>'+e(this.url+path)+'</loc></url>').join('')+'</urlset>';}
   response(path){
     const headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Type':'text/html; charset=utf-8'};
+    if(path==='/robots.txt')return new Response(this.robots(),{headers:{...headers,'Content-Type':'text/plain; charset=utf-8'}});
     if(path==='/sitemap.xml')return new Response(this.sitemap(),{headers:{...headers,'Content-Type':'application/xml; charset=utf-8'}});
     if(path.endsWith('/index.html'))return new Response(null,{status:301,headers:{...headers,Location:path.slice(0,-10)}});
     const key=Object.keys(routes).find(key=>'/'+routes[key]===path);
@@ -128,6 +148,6 @@ export class Site {
     const index=match?this.projects.findIndex(p=>p.slug===match[1]):-1;
     if(index>=0)return new Response(this.projectPage(this.projects[index],index),{headers});
     if(!path.endsWith('/')&&(Object.values(routes).includes(path.slice(1)+'/')||this.projects.some(p=>path==='/projects/'+p.slug)))return new Response(null,{status:301,headers:{...headers,Location:path+'/'}});
-    return new Response(this.notFound(),{status:404,headers});
+    return new Response(this.notFound(),{status:404,headers:{...headers,'X-Robots-Tag':'noindex, follow'}});
   }
 }

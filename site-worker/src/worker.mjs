@@ -2,7 +2,7 @@ import {COOKIE,cookie,SESSION_SECONDS,randomToken,digest,sessionId,verifyPasswor
 import {schema,validate,repository,slugPattern} from './content.mjs';
 import {publication,currentContent} from './publication.mjs';
 import {Site} from './render.mjs';
-const privateHeaders={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','X-Frame-Options':'DENY'};
+const privateHeaders={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','X-Frame-Options':'DENY','X-Robots-Tag':'noindex, nofollow'};
 const csp="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https: blob: data:; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
 const json=(body,status=200,extra={})=>Response.json(body,{status,headers:{...privateHeaders,...extra}});
 function configured(env){return env.ADMIN_USERNAME && validPasswordHash(env.ADMIN_PASSWORD_HASH) && env.GITHUB_CONTENT_TOKEN && /^[\w.-]+\/[\w.-]+$/.test(env.CONTENT_REPO||'') && env.SITE_ORIGIN && env.ADMIN_STATE;}
@@ -28,7 +28,7 @@ async function publicSite(request,env,path){
     await built.body?.cancel();
     return publication(env,{action:'publish:photo',path:path.slice(1)});
   }
-  if(path.split('/').at(-1).includes('.')&&!path.endsWith('.html')&&path!=='/sitemap.xml')return asset(request,env);
+  if(path.split('/').at(-1).includes('.')&&!path.endsWith('.html')&&!['/sitemap.xml','/robots.txt'].includes(path))return asset(request,env);
   if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405});
   try{
     const response=await publication(env,{action:'publish:read'});
@@ -38,7 +38,7 @@ async function publicSite(request,env,path){
     return request.method==='HEAD'?new Response(null,{status:page.status,headers:page.headers}):page;
   }catch{
     const site=new Site(env.SITE_CONTENT.content,env.SITE_ORIGIN,env.SITE_CONTENT.icons);
-    return new Response(request.method==='HEAD'?null:site.failure(),{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','Retry-After':'30','X-Content-Type-Options':'nosniff'}});
+    return new Response(request.method==='HEAD'?null:site.failure(),{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','Retry-After':'30','X-Robots-Tag':'noindex, follow','X-Content-Type-Options':'nosniff'}});
   }
 }
 async function publish(env,result,data){

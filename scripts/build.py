@@ -11,7 +11,7 @@ from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from rich_text import rich_text as r, plain_text
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urljoin
 from xml.sax.saxutils import escape as xml_escape
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,11 +35,13 @@ def worker_snapshot(content, target):
     target.write_text(json.dumps(dict(content=files,shas=shas,commits=commits,icons=(ROOT/'templates/icons.svg').read_text()),ensure_ascii=False))
 
 class Site:
-    def __init__(self, content, url):
+    def __init__(self, content, url, canonical_url=None):
         self.content = Path(content)
         parsed = urlsplit(url)
         if parsed.scheme not in ('https','http') or not parsed.netloc or parsed.query or parsed.fragment: raise ValueError('Invalid site URL')
-        self.url = url.rstrip('/')+'/'
+        self.url = (canonical_url or url).rstrip('/')+'/'
+        canonical=urlsplit(self.url)
+        if canonical.scheme not in ('http','https') or not canonical.netloc or canonical.query or canonical.fragment: raise ValueError('Invalid canonical URL')
         self.base = parsed.path.rstrip('/')+'/'
         self.settings = self.load('settings.json')
         self.ui = self.settings['ui']
@@ -93,10 +95,38 @@ class Site:
         return '<div class="contact-links">'+''.join(links)+'</div>' if links else ''
     def nav(self,current):
         return ''.join(f'<a href="{self.link(key)}"'+(' aria-current="page"' if current==key else '')+f'>{e(self.ui[key])}</a>' for key in ['projects','about','services','videos','contact'])
+    def indexable(self,key):
+        return bool(key) and (key!='videos' or bool(self.pages['videos'].get('items')))
+    def robots(self):
+        return 'User-agent: *\nDisallow: '+self.base+'api/\nDisallow: '+self.base+'deployment.json\n\nSitemap: '+self.url+'sitemap.xml\n'
+    def structured(self,title,description,current,path):
+        canonical=self.url+path
+        org={'@type':'Organization','@id':self.url+'#organization','name':'Epiphany Interior','url':self.url,'logo':self.url+'assets/branding/icon-192.png','email':self.settings['contacts'].get('email',''),'sameAs':[v for k,v in self.settings['contacts'].items() if k!='email' and v.startswith('https://')]}
+        website={'@type':'WebSite','@id':self.url+'#website','url':self.url,'name':'Epiphany Interior','inLanguage':'ru-RU','publisher':{'@id':org['@id']}}
+        page={'@type':{'about':'AboutPage','contact':'ContactPage','projects':'CollectionPage','videos':'CollectionPage'}.get(current,'WebPage'),'@id':canonical+'#webpage','url':canonical,'name':plain_text(title),'description':plain_text(description),'inLanguage':'ru-RU','isPartOf':{'@id':website['@id']}}
+        graph=[org,website,page]
+        crumbs=[(self.ui['home'],self.url)]
+        if path.startswith('projects/') and path!='projects/':
+            project=next((p for p in self.projects if path=='projects/'+p['slug']+'/'),None)
+            if project:
+                crumbs.extend([(self.ui['projects'],self.url+'projects/'),(plain_text(project['title']),canonical)])
+                page['@type']='WebPage'
+                image=self.image(project['image'])
+                page['primaryImageOfPage']={'@type':'ImageObject','url':urljoin(self.url,image.removeprefix(self.base))}
+        elif current!='home':crumbs.append((self.ui[current],canonical))
+        if len(crumbs)>1:
+            graph.append({'@type':'BreadcrumbList','@id':canonical+'#breadcrumb','itemListElement':[{'@type':'ListItem','position':i+1,'name':name,'item':url} for i,(name,url) in enumerate(crumbs)]})
+            page['breadcrumb']={'@id':canonical+'#breadcrumb'}
+        return '<script type="application/ld+json">'+json.dumps({'@context':'https://schema.org','@graph':graph},ensure_ascii=False,separators=(',',':')).replace('<','\\u003c').replace('&','\\u0026')+'</script>'
     def shell(self,title,description,body,current,path='',extra=''):
-        s=self.settings;canonical=self.url+path
+        s=self.settings;canonical=self.url+path;indexable=self.indexable(current)
+        title=plain_text(title);description=plain_text(description)
+        project=next((p for p in self.projects if path=='projects/'+p['slug']+'/'),None)
+        image_source=(project or self.pages.get(current,{}) or {}).get('image') or self.pages['home']['image']
+        share_image=urljoin(self.url,self.image(image_source).removeprefix(self.base))
+        seo=(f'<link rel="canonical" href="{e(canonical)}">' if current else '')+('<meta name="robots" content="index,follow,max-image-preview:large">'+self.structured(title,description,current,path) if indexable else '<meta name="robots" content="noindex,follow">')
         logo=f'<a class="logo logo-with-mark" href="{self.link("home")}"><img class="brand-mark" src="{self.base}assets/branding/logo-mark.png" width="64" height="74" alt="" aria-hidden="true"><span class="brand-wordmark"><span class="brand-name">{e(s["brand"])}</span><span class="brand-subtitle">{e(s["brand_subtitle"])}</span></span></a>'
-        return f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>{e(title)}</title><meta name="description" content="{e(description)}"><meta name="theme-color" content="#f5f3ee"><link rel="icon" type="image/x-icon" href="{self.base}favicon.ico?v=epiphany-1"><link rel="icon" type="image/png" sizes="32x32" href="{self.base}assets/branding/icon-32.png?v=epiphany-1"><link rel="icon" type="image/png" sizes="192x192" href="{self.base}assets/branding/icon-192.png?v=epiphany-1"><link rel="apple-touch-icon" sizes="180x180" href="{self.base}assets/branding/icon-180.png?v=epiphany-1"><meta property="og:type" content="website"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}"><meta property="og:url" content="{e(canonical)}"><meta property="og:locale" content="ru_RU"><link rel="canonical" href="{e(canonical)}"><link rel="stylesheet" href="{self.base}style.css"><script defer src="{self.base}metrika.js"></script><script type="module" src="{self.base}script.js"></script></head><body><noscript><div><img src="https://mc.yandex.ru/watch/113965901" style="position:absolute; left:-9999px;" alt=""></div></noscript><a class="skip-link" href="#main-content">{e(self.ui['skip'])}</a>{(ROOT/'templates/icons.svg').read_text()}<header class="header">{logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">{e(self.ui['menu'])}{icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">{self.nav(current)}</nav></header><main id="main-content" tabindex="-1">{body}</main><footer>{logo}<p>{r(s['footer_tagline'])}</p><a href="#main-content">{e(self.ui['top'])} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">{self.nav(current)}</nav><p class="footer-note">{r(s['footer_note'])}</p></footer>{extra}</body></html>'''
+        return f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>{e(title)}</title><meta name="description" content="{e(description)}"><meta name="theme-color" content="#f5f3ee"><link rel="icon" type="image/x-icon" href="{self.base}favicon.ico?v=epiphany-1"><link rel="icon" type="image/png" sizes="32x32" href="{self.base}assets/branding/icon-32.png?v=epiphany-1"><link rel="icon" type="image/png" sizes="192x192" href="{self.base}assets/branding/icon-192.png?v=epiphany-1"><link rel="apple-touch-icon" sizes="180x180" href="{self.base}assets/branding/icon-180.png?v=epiphany-1"><meta property="og:type" content="website"><meta property="og:site_name" content="Epiphany Interior"><meta property="og:image" content="{e(share_image)}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}"><meta property="og:url" content="{e(canonical)}"><meta property="og:locale" content="ru_RU">{seo}<link rel="stylesheet" href="{self.base}style.css"><script defer src="{self.base}metrika.js"></script><script type="module" src="{self.base}script.js"></script></head><body><noscript><div><img src="https://mc.yandex.ru/watch/113965901" style="position:absolute; left:-9999px;" alt=""></div></noscript><a class="skip-link" href="#main-content">{e(self.ui['skip'])}</a>{(ROOT/'templates/icons.svg').read_text()}<header class="header">{logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">{e(self.ui['menu'])}{icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">{self.nav(current)}</nav></header><main id="main-content" tabindex="-1">{body}</main><footer>{logo}<p>{r(s['footer_tagline'])}</p><a href="#main-content">{e(self.ui['top'])} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">{self.nav(current)}</nav><p class="footer-note">{r(s['footer_note'])}</p></footer>{extra}</body></html>'''
     def page_head(self,p,current):
         return f'<section class="page-heading section"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span aria-hidden="true">/</span><span aria-current="page">{e(self.ui[current])}</span></nav><p class="eyebrow">{e(p["label"])}</p>{heading(p["title"],p["emphasis"])}<p class="page-intro">{r(p["intro"])}</p></section>'
     def cta(self,p):
@@ -163,10 +193,10 @@ class Site:
         if index+1<len(self.projects):body+=f'<a href="{self.project_link(self.projects[index+1])}"><span><small>{e(self.ui["next_project"])}</small>{inline(self.projects[index+1]["title"])}</span>{icon()}</a>'
         body+='</nav>'+self.cta(self.pages['projects']['cta'])
         extra=self.gallery_dialog()+f'<script id="gallery-data" type="application/json">{safe_json(dict(title=plain_text(p["title"]),photos=photos))}</script>'
-        return self.shell(plain_text(p['title'])+' — Epiphany Interior',p.get('seo_description') or p['description'],body,'projects','projects/'+p['slug']+'/',extra)
+        return self.shell(plain_text(p['title'])+(' — концепция интерьера' if p.get('is_concept') else ' — дизайн интерьера')+' — Epiphany Interior',p.get('seo_description') or p['description'],body,'projects','projects/'+p['slug']+'/',extra)
 
-def build(content,output,url=DEFAULT_URL,admin_mode="github"):
-    site=Site(content,url);output=Path(output)
+def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None):
+    site=Site(content,url,canonical_url);output=Path(output)
     if output.resolve() in (ROOT.resolve(),Path(content).resolve()) or ROOT.resolve().is_relative_to(output.resolve()): raise ValueError('Unsafe output directory')
     if output.exists():shutil.rmtree(output)
     output.mkdir(parents=True)
@@ -188,12 +218,14 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github"):
     else: raise ValueError('Unknown admin mode')
     for file in ['style.css','script.js','metrika.js','content-utils.mjs','rich-text.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
     # Formatted source JSON is private to the build/CMS, never needed by site visitors.
-    urls=[site.url+(path.removesuffix('index.html')) for path in pages if path!='404.html']
+    urls=[site.url+(path.removesuffix('index.html')) for path in pages if path!='404.html' and (path!='videos/index.html' or site.indexable('videos'))]
     (output/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+xml_escape(url)+'</loc></url>' for url in urls)+'</urlset>')
+    (output/'robots.txt').write_text(site.robots())
     print(f'Built {len(pages)} HTML pages in {output}')
     return pages
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--site-url',default=DEFAULT_URL);parser.add_argument('--output',default=str(ROOT/'_site'))
+    parser.add_argument('--canonical-url',default=None)
     parser.add_argument('--admin-mode',choices=['github','password'],default='github')
-    args=parser.parse_args();build(ROOT/'content',args.output,args.site_url,args.admin_mode)
+    args=parser.parse_args();build(ROOT/'content',args.output,args.site_url,args.admin_mode,args.canonical_url)
     if args.admin_mode=='password':worker_snapshot(ROOT/'content',ROOT/'site-worker/generated/site.json')

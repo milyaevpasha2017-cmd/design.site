@@ -70,6 +70,17 @@ class BuildTests(unittest.TestCase):
         github=self.build()
         self.assertTrue((self.root/'public/admin/vendor').exists())
 
+    def test_mirror_uses_production_canonical_without_breaking_asset_paths(self):
+        output=self.root/'mirror'
+        pages=module.build(self.content,output,'https://example.test/design.site/',canonical_url='https://epiphany-int.ru/')
+        self.assertIn('href="/design.site/style.css"',pages['index.html'])
+        self.assertIn('rel="canonical" href="https://epiphany-int.ru/"',pages['index.html'])
+        self.assertIn('https://epiphany-int.ru/assets/living-1536.webp',pages['index.html'])
+        self.assertNotIn('example.test',(output/'sitemap.xml').read_text())
+        self.assertNotIn('/videos/',(output/'sitemap.xml').read_text())
+        self.assertIn('Sitemap: https://epiphany-int.ru/sitemap.xml',(output/'robots.txt').read_text())
+        self.assertNotIn('rel="canonical"',pages['404.html'])
+
     def test_invalid_and_duplicate_project_urls_fail_build(self):
         p=self.content/'projects/warm-minimalism.json';d=json.loads(p.read_text());d['slug']='../escape';p.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'Invalid project slug'):self.build()
