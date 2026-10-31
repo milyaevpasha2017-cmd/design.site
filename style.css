@@ -161,3 +161,10 @@ h1 span,h2 span,.page-intro,.hero-intro-copy p,.body-copy,.small-note,.project-l
 /* Inline formatting from the content editor. */
 .rich-link{text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 strong{font-weight:700}u{text-underline-offset:3px}
+
+/* Epiphany's supplied mark accompanies the existing editable wordmark. */
+.logo-with-mark{display:inline-flex;align-items:center;gap:14px;flex:none}
+.logo .brand-mark{display:block;width:44px;height:52px;object-fit:contain;flex:none}
+.logo .brand-wordmark{display:block;font:inherit;letter-spacing:inherit;line-height:inherit;margin:0;white-space:nowrap}
+@media(max-width:600px){.logo-with-mark{gap:10px}.logo .brand-mark{width:30px;height:35px}}
+@media(max-width:380px){.logo-with-mark{gap:8px}.logo .brand-mark{width:26px;height:30px}.logo .brand-name{font-size:30px}.logo .brand-subtitle{font-size:6px;letter-spacing:1.3px}.header{gap:12px}}
