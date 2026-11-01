@@ -10,7 +10,7 @@ export function initQuiz() {
     steps.forEach((field, i) => { field.hidden = i !== step; });
     $('#quiz-count').textContent = `Шаг ${step + 1} из ${steps.length}`;
     $('#quiz-progress').value = step + 1;
-    next.textContent = step === steps.length - 1 ? 'Показать результат →' : 'Далее →';
+    next.textContent = step === steps.length - 1 ? 'Показать результат' : 'Далее';
     back.disabled = step === 0; error.hidden = true;
     const legend = steps[step].querySelector('legend'); legend.tabIndex = -1;
     legend.focus({preventScroll:true}); $('#interior-quiz').scrollIntoView({block:'start'});
