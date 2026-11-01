@@ -6,24 +6,24 @@
 
 | Роль | Значение | Назначение |
 |---|---|---|
-| `--paper` | `#f5f3ee` | Основной фон |
-| `--ink` | `#34392f` | Текст, кнопки |
-| `--muted` | `#63685c` | Вторичный текст |
-| `--accent` | `#687254` | Акцент, фокус, активная навигация |
-| `--line` | `#d9d9ce` | Разделители и границы |
-| Контактная секция | `#e8e9df` | Выделение контактов |
+| `--paper` | `#f5f4ef` | Основной фон |
+| `--ink` | `#242b25` | Текст, кнопки |
+| `--muted` | `#626b61` | Вторичный текст |
+| `--accent` | `#697858` | Акцент, фокус, активная навигация |
+| `--line` | `#d7dbd1` | Разделители и границы |
+| Контактная секция | `#e9ede3` | Выделение контактов |
 | Ошибка | `#9b3026` на `#fff0ea` | Ошибки формы и загрузки |
 
-Сдержанная тёплая палитра, тонкие границы, минимум декоративных эффектов. Цвет не должен быть единственным признаком ошибки: используется текст с описанием и действием.
+Публичный слой `design.css` использует тёплый светлый фон, графитовые секции и оливковые акценты. Админка сохраняет свою прежнюю палитру; реестр учитывает оба интерфейса. Цвет не должен быть единственным признаком ошибки: используется текст с описанием и действием.
 
 ## Типографика и сетка
 
-- Заголовки и бренд: Georgia с системным serif fallback. Основной текст и элементы управления: Arial/Helvetica, sans-serif. Внешние шрифты не загружаются.
+- Публичный сайт: Cormorant Garamond 500 для заголовков и бренда, Manrope для основного текста и управления; fallback — Georgia и Arial. WOFF2-файлы размещены в `assets/fonts`, лицензии OFL включены. Подключений к Google Fonts при посещении нет. Админка использует прежние системные шрифты.
 - Ввод на телефоне: минимум 16 px; основной читаемый текст — 15–16 px. Подписи могут быть меньше, их значения перечислены в реестре.
 - Заголовки масштабируются `clamp()`. Осмысленные переносы из CMS сохраняются; для длинных слов действует перенос без горизонтальной прокрутки.
-- Максимальная ширина сайта 1600 px, панели 1500 px. Боковые поля сайта 5–6%, с учётом safe area.
+- Максимальная ширина сайта 1680 px, панели 1500 px. Боковые поля сайта 5–6%, с учётом safe area.
 - Брейкпоинты существующих макетов: 600, 700, 800, 900, 1000, 1150 и 1600 px, а для галереи также высота 500 px и тип указателя. Литералы медиазапросов остаются в CSS: переменные CSS в условиях `@media` не подставляются.
-- Нажимаемые элементы на сенсорных экранах — не менее 44 px, основные кнопки — 48 px. Галерея на телефоне использует `dvh`, учитывает вырезы и нижнюю системную панель.
+- Кнопки и элементы основной навигации на сенсорных экранах — не менее 44 px, основные кнопки — 48 px. Галерея на телефоне использует `dvh`, учитывает вырезы и нижнюю системную панель.
 
 ## Состояния
 
@@ -33,39 +33,48 @@
 
 Проверка: `python3 scripts/design-inventory.py --check`. Пересоздание реестра после согласованного изменения: `python3 scripts/design-inventory.py`. Цветовые роли уже выражены переменными, но в старых правилах есть литералы и дубли. Этот документ делает их видимыми; он не означает, что весь CSS уже переведён на семантические токены. Такая унификация остаётся отдельной работой.
 
+## Публичные взаимодействия
+
+- Портфолио переключается между асимметричной галереей и компактным списком. Переключатель появляется после запуска JS, сообщает состояние через aria-pressed и не меняет состав/адреса проектов. Выбор не записывается в хранилище браузера.
+- Описания услуг используют нативные details/summary. Первая услуга открыта; прямой якорь автоматически раскрывает нужную услугу. Доступность текста в исходном HTML сохранена.
+- Индикатор прокрутки не перехватывает ввод. Появления карточек запускаются при входе в видимую область; вне анимации контент изначально виден. Предпочтение reduced-motion отключает анимации и плавную прокрутку.
+- Оформление формы и cookie обновлено в той же системе. Путь к заявке, серверная валидация согласия и отложенная аналитика сохранены.
+
+Визуальные ориентиры: Norm Architects (normcph.com), YODEZEEN (yodezeen.com), Studia 54 (studia-54.com). Фотографии и тексты этих студий не использовались в содержимом Epiphany. На сайте используются его существующие изображения, подписи и настоящие контакты.
+
 <!-- style-inventory:start -->
-Проверяемые файлы: `style.css`, `password-admin/admin.css`. Сторонняя тема прежнего Decap и локальный генератор пароля в этот контракт не входят.
+Проверяемые файлы: `style.css`, `design.css`, `password-admin/admin.css`. Сторонняя тема прежнего Decap и локальный генератор пароля в этот контракт не входят.
 
 Цветовые литералы (включая прозрачные варианты и старые переопределяемые правила):
 
-`#0006`, `#20251d30`, `#20251dd1`, `#34392f`, `#34392f0a`, `#4c5442`, `#4e5844`, `#63685c`, `#687254`, `#737b60`, `#777b70`, `#7b7d73`, `#818771`, `#8a2f28`, `#9b3026`, `#b5b8a9`, `#b7bbaa`, `#bfc2b5`, `#c6bda9`, `#d9d9ce`, `#e5e4dc`, `#e8e9df`, `#eceee5`, `#f5f3ee`, `#fdfcf9`, `#fff`, `#fff0ea`, `currentColor`, `rgba(24,29,21,.85)`, `transparent`, `white`
+`#0006`, `#17201626`, `#172016b3`, `#1d241e`, `#1d241e12`, `#20251d30`, `#20251dd1`, `#20282025`, `#242b25`, `#34392f`, `#34392f0a`, `#46583e`, `#4c5442`, `#4e5844`, `#52614d`, `#626b61`, `#63685c`, `#67765f`, `#687254`, `#697858`, `#737b60`, `#777b70`, `#7b7d73`, `#818771`, `#85947a`, `#8a2f28`, `#9b3026`, `#acb5a4`, `#adb7a4`, `#b5b8a9`, `#b7bbaa`, `#bfc2b5`, `#c3cebd`, `#c4cfba`, `#c6bda9`, `#c7d0bd`, `#d1d8cb`, `#d1d9c8`, `#d7dbd1`, `#d9d9ce`, `#dddccd`, `#e4e4d8`, `#e5e4dc`, `#e8e9df`, `#e8ece2`, `#e9ede3`, `#eceee5`, `#eceee6`, `#f5f3ee`, `#f5f4ef`, `#f5f4efeb`, `#fdfcf9`, `#fff`, `#fff0ea`, `#ffffff80`, `currentColor`, `rgba(24,29,21,.85)`, `rgba(245,244,239,.92)`, `rgba(245,244,239,.96)`, `transparent`, `white`
 
 | Свойство | Допустимые значения текущей версии |
 |---|---|
-| `bottom` | `0`, `10px`, `18px`, `5px` |
-| `column-gap` | `30px`, `clamp(36px,6vw,90px)` |
-| `font` | `10px Arial,sans-serif`, `11px Arial,sans-serif`, `11px/1.7 Arial,sans-serif`, `13px Arial,sans-serif`, `14px/1.5 Arial,sans-serif`, `15px/1.6 Arial,Helvetica,sans-serif`, `400 22px Georgia,serif`, `400 24px/1.35 Georgia,serif`, `400 25px Georgia,serif`, `400 25px/1.4 Georgia,serif`, `400 26px Georgia,serif`, `400 26px/1.65 Georgia,serif`, `400 27px Georgia,serif`, `400 32px/1.2 Georgia,serif`, `400 clamp(19px,5.8vw,26px)/1.3 Georgia,serif`, `40px/.85 Georgia,serif`, `8px/1.5 Arial,sans-serif`, `inherit` |
-| `font-family` | `Arial,Helvetica,sans-serif`, `Arial,sans-serif`, `Georgia,'Times New Roman',serif`, `Georgia,serif` |
-| `font-size` | `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `18px`, `19px`, `20px`, `22px`, `23px`, `24px`, `25px`, `26px`, `27px`, `28px`, `29px`, `30px`, `32px`, `34px`, `36px`, `38px`, `40px`, `42px`, `44px`, `48px`, `5.5px`, `51px`, `5px`, `6px`, `7px`, `8px`, `9px`, `clamp(21px,5.8vw,24px)`, `clamp(22px,6.3vw,25px)`, `clamp(32px,4vw,54px)`, `clamp(34px,5vw,64px)`, `clamp(36px,10.8vw,44px)`, `clamp(37px,4vw,60px)`, `clamp(42px,11.8vw,58px)`, `clamp(46px,5.2vw,72px)`, `clamp(48px,6.3vw,96px)`, `clamp(48px,6.5vw,88px)`, `clamp(48px,7.5vw,66px)`, `clamp(50px,5.5vw,80px)`, `clamp(54px,6.3vw,75px)` |
-| `gap` | `0`, `10px`, `12px`, `12px 18px`, `12px 20px`, `12px 28px`, `14px`, `14px 24px`, `15px`, `16px`, `18px`, `20px`, `22px`, `24px`, `25px`, `26px`, `28px`, `30px`, `34px`, `35px`, `36px 28px`, `42px`, `45px 28px`, `4px`, `4px 24px`, `50px`, `60px`, `6px`, `7%`, `7px`, `8px`, `8px 20px`, `9px` |
-| `inset` | `0`, `auto 10px 10px auto`, `auto 16px 16px auto`, `auto 8px 8px auto` |
-| `left` | `0`, `10px`, `12px`, `18px` |
-| `letter-spacing` | `-.4px`, `-.5px`, `-.7px`, `-.8px`, `-1.4px`, `-1.6px`, `-1.7px`, `-1.8px`, `-1px`, `-2.5px`, `-2px`, `-3px`, `.8px`, `1.3px`, `1px`, `2.3px`, `2px`, `inherit`, `normal` |
-| `line-height` | `.8`, `1`, `1.08`, `1.12`, `1.2`, `1.25`, `1.3`, `1.35`, `1.5`, `1.6`, `1.7`, `1.75`, `1.8`, `1.85`, `1.9`, `inherit` |
-| `margin` | `-1px`, `0`, `0 0 12px`, `0 0 15px`, `0 0 18px`, `0 0 20px`, `0 0 24px`, `0 0 26px`, `0 0 28px`, `0 0 7px`, `0 0 8px`, `0 auto`, `10px 0 0`, `12px 0 0`, `16px 0`, `16px 0 8px`, `18px 0 25px`, `20px 0`, `20px 0 12px`, `20px 0 18px`, `20px auto 40px`, `24px 0`, `24px 0 30px`, `25px 0`, `26px 0 12px`, `28px 0 20px`, `30px 0 20px`, `30px 0 25px`, `32px 0 12px`, `32px 0 42px`, `35px 0`, `38px 0 15px`, `45px 0 25px`, `45px 0 28px`, `55px auto 35px`, `5px 0 0`, `7px 0`, `8px 0 0`, `8px 0 24px`, `auto` |
-| `margin-bottom` | `0`, `10px`, `12px`, `14px`, `20px`, `22px`, `24px`, `25px`, `28px`, `30px`, `34px`, `35px`, `40px`, `45px`, `48px`, `7px` |
+| `bottom` | `0`, `10px`, `14px`, `18px`, `5px`, `6px` |
+| `column-gap` | `30px`, `34px`, `7vw`, `clamp(36px,6vw,90px)` |
+| `font` | `10px Arial,sans-serif`, `11px Arial,sans-serif`, `11px/1.7 Arial,sans-serif`, `13px Arial,sans-serif`, `14px/1.5 Arial,sans-serif`, `15px/1.6 Arial,Helvetica,sans-serif`, `300 26px/1 var(--font-body)`, `400 22px Georgia,serif`, `400 24px/1.35 Georgia,serif`, `400 25px Georgia,serif`, `400 25px/1.4 Georgia,serif`, `400 26px Georgia,serif`, `400 26px/1.65 Georgia,serif`, `400 27px Georgia,serif`, `400 32px/1.2 Georgia,serif`, `400 clamp(19px,5.8vw,26px)/1.3 Georgia,serif`, `40px/.85 Georgia,serif`, `8px/1.5 Arial,sans-serif`, `inherit` |
+| `font-family` | `'Cormorant Garamond'`, `Arial,Helvetica,sans-serif`, `Arial,sans-serif`, `Georgia,'Times New Roman',serif`, `Georgia,serif`, `Manrope`, `var(--font-body)`, `var(--font-display)` |
+| `font-size` | `10px`, `11px`, `11px!important`, `12px`, `13px`, `14px`, `15px`, `16px`, `18px`, `19px`, `20px`, `22px`, `23px`, `24px`, `25px`, `26px`, `27px`, `28px`, `29px`, `30px`, `31px`, `32px`, `33px`, `34px`, `35px`, `36px`, `38px`, `4.7px`, `40px`, `42px`, `44px`, `46px`, `48px`, `49px`, `5.5px`, `50px`, `51px`, `52px`, `56px`, `58px`, `5px`, `6.5px`, `62px`, `64px`, `68px`, `6px`, `6px!important`, `7px`, `82px`, `8px`, `9px`, `clamp(21px,5.8vw,24px)`, `clamp(22px,6.3vw,25px)`, `clamp(28px,2.7vw,42px)`, `clamp(28px,3vw,44px)`, `clamp(32px,4vw,54px)`, `clamp(34px,4vw,56px)`, `clamp(34px,5vw,64px)`, `clamp(36px,10.8vw,44px)`, `clamp(37px,4vw,60px)`, `clamp(40px,5vw,68px)`, `clamp(42px,11.8vw,58px)`, `clamp(42px,8vw,58px)`, `clamp(44px,4.3vw,70px)`, `clamp(44px,4.5vw,70px)`, `clamp(46px,4.8vw,76px)`, `clamp(46px,5.2vw,72px)`, `clamp(48px,6.3vw,96px)`, `clamp(48px,6.5vw,88px)`, `clamp(48px,7.5vw,66px)`, `clamp(50px,5.5vw,80px)`, `clamp(52px,12.8vw,68px)`, `clamp(52px,7vw,64px)`, `clamp(54px,5.5vw,82px)`, `clamp(54px,6.3vw,75px)`, `clamp(54px,6vw,90px)`, `clamp(54px,6vw,92px)`, `clamp(58px,10.5vw,76px)`, `clamp(58px,6vw,96px)`, `clamp(62px,6.5vw,76px)`, `clamp(66px,6.4vw,102px)` |
+| `gap` | `0`, `0 15px`, `0 20px`, `0 26px`, `0 28px`, `0 30px`, `0 54px`, `10px`, `10px 22px`, `10px 26px`, `12px`, `12px 16px`, `12px 18px`, `12px 20px`, `12px 22px`, `12px 24px`, `12px 28px`, `14px`, `14px 24px`, `15px`, `16px`, `17px`, `18px`, `18px 34px`, `20px`, `22px`, `24px`, `25px`, `26px`, `28px`, `30px`, `30px 40px`, `32px`, `34px`, `35px`, `36px`, `36px 28px`, `38px`, `40px`, `42px`, `44px`, `44px 24px`, `45px 28px`, `4px`, `4px 24px`, `50px`, `60px`, `60px 32px`, `6px`, `7%`, `70px`, `7px`, `80px`, `8px`, `8px 20px`, `8px 22px`, `8vw`, `9px`, `clamp(30px,5vw,80px)` |
+| `inset` | `0`, `0 0 auto`, `auto 10px 10px auto`, `auto 16px 16px auto`, `auto 8px 8px auto` |
+| `left` | `0`, `10px`, `12px`, `14px`, `16px`, `18px`, `22px` |
+| `letter-spacing` | `-.025em`, `-.02em`, `-.035em`, `-.03em`, `-.045em`, `-.04em`, `-.055em`, `-.05em`, `-.065em`, `-.4px`, `-.5px`, `-.7px`, `-.8px`, `-1.4px`, `-1.6px`, `-1.7px`, `-1.8px`, `-1px`, `-2.5px`, `-2px`, `-3px`, `.01em`, `.04em`, `.05em`, `.06em`, `.08em`, `.12em`, `.13em`, `.16em`, `.18em`, `.1em`, `.1em!important`, `.8px`, `1.3px`, `1px`, `2.3px`, `2px`, `inherit`, `normal` |
+| `line-height` | `.8`, `.98`, `1`, `1.02`, `1.04`, `1.05`, `1.08`, `1.1`, `1.12`, `1.13`, `1.15`, `1.2`, `1.25`, `1.3`, `1.35`, `1.5`, `1.6`, `1.65`, `1.7`, `1.75`, `1.8`, `1.85`, `1.9`, `1.95`, `inherit` |
+| `margin` | `-1px`, `0`, `0 0 12px`, `0 0 15px`, `0 0 18px`, `0 0 20px`, `0 0 24px`, `0 0 26px`, `0 0 28px`, `0 0 30px`, `0 0 4px`, `0 0 7px`, `0 0 8px`, `0 auto`, `10px 0 0`, `12px 0 0`, `16px 0`, `16px 0 8px`, `18px 0 25px`, `20px 0`, `20px 0 12px`, `20px 0 18px`, `20px auto 40px`, `24px 0`, `24px 0 16px`, `24px 0 30px`, `25px 0`, `26px 0 12px`, `28px 0 20px`, `28px 0 22px`, `30px 0 20px`, `30px 0 25px`, `32px 0`, `32px 0 12px`, `32px 0 42px`, `34px 0 24px`, `35px 0`, `38px 0 15px`, `38px 0 24px`, `45px 0 25px`, `45px 0 28px`, `4px 0 0`, `55px auto 35px`, `56px 0 0`, `5px 0 0`, `7px 0`, `8px 0 0`, `8px 0 24px`, `auto` |
+| `margin-bottom` | `0`, `10px`, `12px`, `14px`, `18px`, `20px`, `22px`, `24px`, `25px`, `26px`, `28px`, `30px`, `34px`, `35px`, `38px`, `40px`, `44px`, `45px`, `48px`, `7px`, `8px` |
 | `margin-left` | `0`, `10px`, `12px`, `25px`, `35px`, `5px`, `auto` |
 | `margin-right` | `28px`, `8px`, `auto` |
-| `margin-top` | `-10px`, `0`, `10px`, `12px`, `14px`, `15px`, `16px`, `18px`, `20px`, `24px`, `25px`, `28px`, `30px`, `35px`, `45px`, `55px`, `6px` |
+| `margin-top` | `-10px`, `0`, `10px`, `120px`, `12px`, `14px`, `15px`, `16px`, `18px`, `20px`, `22px`, `24px`, `25px`, `28px`, `30px`, `34px`, `35px`, `40px`, `44px`, `45px`, `4px`, `50px`, `55px`, `5px`, `6px`, `80px`, `9px` |
 | `outline-offset` | `3px`, `4px`, `5px`, `6px` |
-| `padding` | `0`, `0 14px`, `0 20px 5px`, `0 30px 14px 43px`, `10px`, `10px 0`, `10px 0 15px`, `10px 15px`, `12px`, `12px 0`, `12px 0 14px`, `12px 10px`, `12px 18px`, `14px 0`, `14px 16px`, `14px 20px`, `15px`, `15px 0`, `15px 22px`, `16px`, `16px 22px`, `16px 24px`, `18px`, `18px 20px`, `19px 0`, `20px`, `20px 15px`, `20px 24px`, `20px 5%`, `20px 6% 28px`, `22px 0`, `22px 18px`, `22px 26px`, `24px`, `24px 0`, `24px 6%`, `25px`, `25px 0`, `25px 30px`, `25px 6%`, `25px 6% 0`, `26px`, `28px 4%`, `30px`, `30px 24px`, `30px 5%`, `35px 22px`, `35px 25px`, `35px 5%`, `35px 6% 22px`, `38px`, `40px`, `40px 0`, `40px 5% 0`, `42px 5%`, `45px`, `45px 5% 25px`, `4px`, `4px 0 0`, `4px 0 4px 16px`, `55px 6%`, `5px`, `6px`, `6px 10px`, `6px 12px`, `6px 16px`, `7px 2px 12px`, `8px`, `8px 0`, `8px 12px`, `8px 14px`, `8px 26px 6px`, `95px 5%`, `clamp(24px,3vw,42px)`, `max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))` |
-| `padding-bottom` | `0`, `10px`, `14px`, `20px`, `24px`, `26px`, `30px`, `35px`, `40px`, `43px`, `44px`, `58px`, `5px`, `60px`, `65px`, `max(24px,env(safe-area-inset-bottom))` |
-| `padding-left` | `12px`, `16px`, `38px`, `5%`, `max(6%,env(safe-area-inset-left))` |
-| `padding-right` | `0`, `16px`, `5%`, `max(6%,env(safe-area-inset-right))` |
-| `padding-top` | `0`, `12px`, `20px`, `24px`, `25px`, `30px`, `35px`, `36px`, `40px`, `55px`, `58px`, `60px`, `65px`, `7px`, `max(14px,env(safe-area-inset-top))`, `max(20px,env(safe-area-inset-top))` |
-| `right` | `0`, `10px`, `18px` |
-| `row-gap` | `36px` |
-| `scroll-margin-top` | `0`, `100px`, `125px`, `130px`, `24px`, `25px` |
+| `padding` | `0`, `0 0 28px 40px`, `0 14px`, `0 20px 5px`, `0 30px 14px 43px`, `0 70px 34px 64px`, `104px 5%`, `10px`, `10px 0`, `10px 0 15px`, `10px 15px`, `11px 0`, `11px 12px`, `11px 13px`, `12px`, `12px 0`, `12px 0 0`, `12px 0 14px`, `12px 0!important`, `12px 10px`, `12px 18px`, `13px 16px`, `13px 20px`, `14px 0`, `14px 16px`, `14px 20px`, `15px`, `15px 0`, `15px 22px`, `16px`, `16px 22px`, `16px 24px`, `17px 24px`, `18px`, `18px 0 30px`, `18px 20px`, `18px 6%`, `19px 0`, `20px`, `20px 0`, `20px 15px`, `20px 24px`, `20px 5%`, `20px 6% 28px`, `22px 0`, `22px 16px`, `22px 18px`, `22px 24px`, `22px 26px`, `22px 6% 0`, `23px 0 27px`, `23px 5%`, `24px`, `24px 0`, `24px 20px`, `24px 6%`, `25px`, `25px 0`, `25px 30px`, `25px 6%`, `25px 6% 0`, `26px`, `26px 0`, `28px 0`, `28px 24px`, `28px 4%`, `30px`, `30px 24px`, `30px 5%`, `30px 5% 0`, `32px 0`, `35px 22px`, `35px 25px`, `35px 5%`, `35px 6% 22px`, `38px`, `40px`, `40px 0`, `40px 5% 0`, `42px 5%`, `42px 6% max(28px,env(safe-area-inset-bottom))`, `45px`, `45px 5% 25px`, `4px`, `4px 0 0`, `4px 0 4px 16px`, `4px 7px`, `55px 6%`, `58px 5% 32px`, `5px`, `60px 18px 20px`, `6px`, `6px 10px`, `6px 12px`, `6px 16px`, `6px 9px`, `70px 24px 24px`, `7px 10px`, `7px 12px`, `7px 18px`, `7px 2px 12px`, `8px`, `8px 0`, `8px 12px`, `8px 14px`, `8px 26px 6px`, `95px 5%`, `clamp(24px,3vw,42px)`, `max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))` |
+| `padding-bottom` | `0`, `104px`, `10px`, `14px`, `20px`, `24px`, `26px`, `30px`, `35px`, `40px`, `42px`, `43px`, `44px`, `58px`, `5px`, `60px`, `64px`, `65px`, `70px`, `76px`, `max(24px,env(safe-area-inset-bottom))` |
+| `padding-left` | `12px`, `16px`, `34px`, `38px`, `5%`, `6%`, `max(6%,env(safe-area-inset-left))` |
+| `padding-right` | `0`, `16px`, `5%`, `6%`, `max(6%,env(safe-area-inset-right))` |
+| `padding-top` | `0`, `104px`, `12px`, `20px`, `22px`, `24px`, `25px`, `26px`, `28px`, `30px`, `32px`, `35px`, `36px`, `38px`, `40px`, `42px`, `55px`, `58px`, `60px`, `64px`, `65px`, `76px`, `7px`, `max(14px,env(safe-area-inset-top))`, `max(20px,env(safe-area-inset-top))` |
+| `right` | `0`, `10px`, `14px`, `18px` |
+| `row-gap` | `26px`, `36px` |
+| `scroll-margin-top` | `0`, `100px`, `115px`, `125px`, `130px`, `24px`, `25px` |
 | `scroll-padding-top` | `125px`, `30px` |
-| `top` | `-18px`, `-30px`, `0`, `100%`, `12px`, `14px` |
+| `top` | `-18px`, `-30px`, `0`, `100%`, `10px`, `12px`, `14px`, `16px`, `18px`, `22px` |
 <!-- style-inventory:end -->

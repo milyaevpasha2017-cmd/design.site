@@ -20,6 +20,42 @@ matchMedia('(max-width: 900px)').addEventListener('change', () => closeMenu());
 navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
   closeMenu();
 }));
+// Progressive UI enhancements: source content remains visible without JS.
+let progressQueued = false;
+function updateProgress() {
+  progressQueued = false;
+  const root = document.documentElement, range = root.scrollHeight - root.clientHeight;
+  root.style.setProperty('--page-progress', String(range > 0 ? Math.max(0, Math.min(1, root.scrollTop / range)) : 0));
+}
+function queueProgress() { if (!progressQueued) { progressQueued = true; requestAnimationFrame(updateProgress); } }
+addEventListener('scroll', queueProgress, {passive:true});
+addEventListener('resize', queueProgress); updateProgress();
+const portfolio = $('.portfolio-section');
+if (portfolio?.querySelector('.project-card')) {
+  const switcher = portfolio.querySelector('.project-view-switch');
+  if (switcher) {
+    switcher.hidden = false;
+    switcher.querySelectorAll('[data-project-view]').forEach(button => button.addEventListener('click', () => {
+      portfolio.dataset.projectLayout = button.dataset.projectView;
+      switcher.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      queueProgress();
+    }));
+  }
+}
+function revealLinkedService() {
+  if (!/^#service-[1-9]\d*$/.test(location.hash)) return;
+  const detail = document.getElementById(location.hash.slice(1));
+  if (!detail?.matches('.service-detail')) return;
+  detail.open = true;
+  requestAnimationFrame(() => { detail.scrollIntoView({block:'start'}); detail.querySelector('summary')?.focus({preventScroll:true}); });
+}
+addEventListener('hashchange', revealLinkedService); revealLinkedService();
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('reveal-in'); observer.unobserve(entry.target); }
+  }), {threshold:.12});
+  document.querySelectorAll('.project-card,.steps article,.service-teasers>a').forEach(element => observer.observe(element));
+}
 // Full-size photographs on individual project pages.
 const dialog = $('#project-dialog');
 if (dialog) {
