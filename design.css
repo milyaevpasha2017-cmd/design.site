@@ -233,3 +233,14 @@ input,textarea{font-family:var(--font-body);font-size:15px;border-color:#adb7a4}
 .quiz-result-cta{display:inline-flex;align-items:center;background:var(--ink);color:var(--paper);margin:0 0 28px}
 #quiz-edit:disabled{opacity:.45;cursor:wait}
 @media(max-width:600px){.quiz-moods .quiz-option{display:flex}.quiz-moods .quiz-option img{width:100%;height:150px;min-height:0;object-fit:cover}.quiz-moods .quiz-option-copy{padding:18px 44px 18px 16px}}
+/* Quiz contact dialog; the result stays readable behind the modal. */
+.quiz-result-cta{border:0;font-family:var(--font-body);text-align:left;cursor:pointer;max-width:100%;line-height:1.6}
+.quiz-modal{width:min(620px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);margin:auto;padding:0;border:0;border-radius:14px;overflow:auto;background:var(--paper);color:var(--ink);box-shadow:0 24px 90px #0005;overscroll-behavior:contain}
+.quiz-modal::backdrop{background:#182018a6;backdrop-filter:blur(4px)}
+.quiz-modal .quiz-modal-panel{position:relative;padding:40px;border:0;border-radius:0;background:var(--paper)}
+.quiz-dialog-close{position:absolute;top:12px;right:12px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--paper);font:26px var(--font-body);cursor:pointer;line-height:1}
+#quiz-dialog-title{font-size:42px;line-height:1.05;max-width:85%;margin:10px 0 18px}
+#quiz-dialog-description{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:28px}
+.quiz-modal .form-title{display:none}.quiz-modal .submit{width:100%;border-radius:30px;justify-content:space-between}.quiz-modal .form-note{font-size:12px}
+.quiz-modal #brief-status:empty{margin:0}.quiz-modal #brief-status:not(:empty){font-size:14px;padding:14px;border:1px solid var(--line);border-radius:6px;margin-top:20px}
+@media(max-width:600px){.quiz-modal{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:10px}.quiz-modal .quiz-modal-panel{padding:28px 22px}#quiz-dialog-title{font-size:34px;margin-top:22px}#quiz-dialog-description{font-size:13px}.quiz-result-cta{font-size:12px;gap:16px}}

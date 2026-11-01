@@ -1,4 +1,4 @@
-import legal from './legal/2026-11-01.json' with {type:'json'};
+import legal from './legal/2026-11-01-v2.json' with {type:'json'};
 export const LEGAL_VERSION=legal.version;
 export const DOCUMENTS=legal.documents;
 export const consentText=DOCUMENTS.consent.sections.map(([title,text])=>title+'\n'+text).join('\n\n');

@@ -140,7 +140,7 @@ if (form) {
   let sending = false, accepted = false, requestId = newRequestId();
   form.addEventListener('input', event => {
     event.target.setCustomValidity?.('');
-    if (accepted) { accepted = false; requestId = newRequestId(); status.textContent = ''; button.disabled = false; }
+    if (accepted) { accepted = false; delete form.dataset.accepted; requestId = newRequestId(); status.textContent = ''; button.disabled = false; }
   });
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (sending || accepted) return;
@@ -156,10 +156,10 @@ if (form) {
     error.hidden = true; status.textContent = copy.sending || 'Отправляем заявку…';
     form.setAttribute('aria-busy', 'true');
     try {
-      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message, website: values.get('website'), consent: values.get('consent') === 'on', consentVersion: values.get('consent_version') }) });
+      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message, quizDelivery: Boolean(form.dataset.quizSummary), website: values.get('website'), consent: values.get('consent') === 'on', consentVersion: values.get('consent_version') }) });
       let data; try { data = await response.json(); } catch { throw new Error('Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.'); }
       if (!response.ok || !data.ok || data.id !== requestId) throw new Error(data.error || 'Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.');
-      accepted = true;
+      accepted = true; form.dataset.accepted = 'true';
       // Count only server-confirmed acceptance; analytics must never break the form.
       try { window.ym?.(113965901, 'reachGoal', 'lead_submitted'); if (form.dataset.quizSummary) window.ym?.(113965901, 'reachGoal', 'quiz_lead_submitted'); } catch {}
       form.reset(); status.textContent = copy.result; status.focus();

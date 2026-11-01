@@ -19,8 +19,9 @@ export class LeadInbox{
     };
     const name=clean(data.name,100,true),contact=clean(data.contact,150,true),message=clean(data.message??'',3000);
     if(contact.length<3)throw error('Укажите телефон, email или контакт в Telegram.');
+    const quizDelivery=data.quizDelivery===true;
     const consentHash=await digest(consentText);
-    const fingerprint=await digest(JSON.stringify([name,contact,message]));
+    const fingerprint=await digest(JSON.stringify([name,contact,message,...(quizDelivery?['quiz-telegram']:[])]));
     const now=Date.now(),index='index:'+data.id,key='lead:'+String(9999999999999-now).padStart(13,'0')+':'+data.id;
     const ipKey='rate:'+await digest(this.config.ADMIN_PASSWORD_HASH+'\n'+ip);
     return this.storage.transaction(async store=>{
@@ -34,7 +35,7 @@ export class LeadInbox{
       await store.put(ipKey,{times:[...times,now],expires:now+86400000});
       await store.put('rate:global',{times:[...recent,now],expires:now+3600000});
       await store.put(index,key);
-      await store.put(key,{id:data.id,name,contact,message,fingerprint,createdAt:now,consent:{accepted:true,acceptedAt:now,version:LEGAL_VERSION,document:'/consent/',text:consentText,textHash:consentHash},status:'new',notification:{state:'pending',attempts:0,nextAt:now}});
+      await store.put(key,{id:data.id,name,contact,message,...(quizDelivery?{source:'quiz'}:{}),fingerprint,createdAt:now,consent:{accepted:true,acceptedAt:now,version:LEGAL_VERSION,...(quizDelivery?{telegramContent:true}:{}),document:'/consent/',text:consentText,textHash:consentHash},status:'new',notification:{state:'pending',attempts:0,nextAt:now}});
       return {id:data.id};
     });
   }
@@ -78,8 +79,9 @@ export class LeadInbox{
           if(n.state==='sent'||n.state==='failed'||n.nextAt>Date.now())continue;
           let ok=false,channel=null;
           if(telegram)try{
-            // Contact details remain on the VPS. Telegram receives only a receipt reference.
-            const response=await this.fetcher('https://api.telegram.org/bot'+this.config.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:this.config.TELEGRAM_CHAT_ID,text:'Новая заявка на epiphany-int.ru\n№ '+record.id+'\nОткрыть: '+this.config.SITE_ORIGIN+'/admin/leads.html#'+record.id,link_preview_options:{is_disabled:true}})});
+            // Only quiz submissions with the current explicit consent include their contents.
+            // Older and ordinary-form records keep the original reference-only delivery.
+            const response=await this.fetcher('https://api.telegram.org/bot'+this.config.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:this.config.TELEGRAM_CHAT_ID,text:(record.source==='quiz'&&record.consent?.telegramContent===true?'Результаты интерьерного квиза\nИмя: '+record.name+'\nКонтакт: '+record.contact+'\n\n'+record.message+'\n\n':'Новая заявка на epiphany-int.ru\n')+'№ '+record.id+'\nОткрыть: '+this.config.SITE_ORIGIN+'/admin/leads.html#'+record.id,link_preview_options:{is_disabled:true}})});
             ok=response.ok&&(await response.json()).ok===true;
           }catch{/* Never log Telegram URLs, credentials or customer messages. */}
           if(ok)channel='telegram';

@@ -43,7 +43,7 @@ export function initQuiz() {
     lead.dataset.quizSummary = result.message;
     // A new result is a new submission, including after a previously accepted request.
     lead.dispatchEvent(new Event('input', {bubbles:true}));
-    questions.hidden = true; $('#quiz-result').hidden = false; $('#quiz-contact').hidden = false;
+    questions.hidden = true; $('#quiz-result').hidden = false;
     $('#quiz-result-title').focus({preventScroll:true}); root.scrollIntoView({block:'start'});
     if (!completed) {completed = true; goal('quiz_completed');}
   });
@@ -51,10 +51,23 @@ export function initQuiz() {
   new MutationObserver(() => { edit.disabled = lead.getAttribute('aria-busy') === 'true'; }).observe(lead, {attributes:true, attributeFilter:['aria-busy']});
   edit.addEventListener('click', () => {
     if (lead.getAttribute('aria-busy') === 'true') return;
-    $('#quiz-result').hidden = true; $('#quiz-contact').hidden = true;
+    $('#quiz-result').hidden = true;
     delete lead.dataset.quizSummary; questions.hidden = false; step = 0; focusStep();
   });
   // Quiz preferences stay in this page's memory until the visitor explicitly submits.
-  lead.querySelector('[name="message"]').maxLength = 1500;
+  const modal = $('#quiz-contact');
+  $('#quiz-discuss-open').addEventListener('click', () => {
+    if (!lead.dataset.quizSummary) return;
+    modal.showModal(); document.body.classList.add('modal-open');
+    if (lead.dataset.accepted === 'true') $('#brief-status').focus();
+    else lead.querySelector('[name="name"]').focus();
+  });
+  $('#quiz-dialog-close').addEventListener('click', () => modal.close());
+  modal.addEventListener('close', () => document.body.classList.remove('modal-open'));
+  modal.addEventListener('click', event => {
+    if (event.target !== modal) return;
+    const bounds = modal.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) modal.close();
+  });
   root.hidden = false;
 }

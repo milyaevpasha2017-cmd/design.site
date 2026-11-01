@@ -38,3 +38,19 @@ test('quiz: result and complete answers are stored in the private inbox with exp
     assert.equal((await f.request('/api/leads')).status,401);
   } finally {await ns.close();await rm(dir,{recursive:true,force:true});}
 });
+
+test('quiz Telegram delivery: current explicit consent sends full result once; ordinary receipts stay private',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'quiz-telegram-'));const ns=new SQLiteNamespace(join(dir,'state.sqlite'));const messages=[];
+  try {
+    const inbox=new LeadInbox(ns.storage('quiz'),{ADMIN_PASSWORD_HASH:'synthetic',SITE_ORIGIN:'https://studio.example',TELEGRAM_BOT_TOKEN:'synthetic',TELEGRAM_CHAT_ID:'123'},async(url,options)=>{messages.push(JSON.parse(options.body));return Response.json({ok:true});});
+    const request={id:crypto.randomUUID(),name:'Synthetic quiz visitor',contact:'test@example.com',message:quizResult(config,answers).message,quizDelivery:true,consent:true,consentVersion:LEGAL_VERSION};
+    for(const denied of [{consent:false},{consentVersion:'2026-11-01'}])await assert.rejects(inbox.submit({...request,...denied},'ip'),e=>e.status===400);
+    await inbox.submit(request,'ip');await inbox.submit(request,'ip');
+    await assert.rejects(inbox.submit({...request,quizDelivery:false},'ip'),e=>e.status===409);
+    const record=(await inbox.list()).leads[0];assert.equal(record.source,'quiz');assert.equal(record.consent.telegramContent,true);
+    await inbox.notify();await inbox.notify();assert.equal(messages.length,1);
+    assert.ok(messages[0].text.includes(request.name));assert.ok(messages[0].text.includes(request.contact));assert.ok(messages[0].text.includes(request.message));assert.ok(messages[0].text.length<4096);assert.equal(messages[0].parse_mode,undefined);
+    await inbox.submit({...request,id:crypto.randomUUID(),quizDelivery:false},'ip');await inbox.notify();assert.equal(messages.length,2);
+    assert.ok(!messages[1].text.includes(request.name));assert.ok(!messages[1].text.includes(request.contact));assert.ok(!messages[1].text.includes(request.message));
+  }finally{await ns.close();await rm(dir,{recursive:true,force:true});}
+});
