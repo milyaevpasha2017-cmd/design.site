@@ -15,7 +15,7 @@ from urllib.parse import urlsplit, urljoin
 from xml.sax.saxutils import escape as xml_escape
 
 ROOT = Path(__file__).resolve().parents[1]
-LEGAL=json.loads((ROOT/'legal/2026-11-01.json').read_text())
+LEGAL=json.loads((ROOT/'site-worker/src/legal/2026-11-01.json').read_text())
 DOCUMENTS=LEGAL['documents']
 LEGAL_VERSION=LEGAL['version']
 DEFAULT_URL = 'https://milyaevpasha2017-cmd.github.io/design.site/'

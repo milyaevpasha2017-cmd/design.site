@@ -15,7 +15,7 @@ def main():
     (ROOT / '_site-vps/deployment.json').write_text(metadata)
     (ROOT / 'release.json').write_text(metadata)
     roots = ['_site-vps', 'site-worker/src', 'site-worker/generated/site.json',
-             'vps', 'legal', 'password-admin/schema.json', 'rich-text.mjs', 'release.json']
+             'vps', 'password-admin/schema.json', 'rich-text.mjs', 'release.json']
     with tarfile.open(sys.argv[1], 'w:gz') as archive:
         for name in roots:
             path = ROOT / name
