@@ -193,3 +193,33 @@ strong{font-weight:700}u{text-underline-offset:3px}
 .cookie-actions button{min-height:44px;padding:12px 18px;border:1px solid var(--ink);background:var(--paper);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
 .cookie-actions button:hover{background:var(--ink);color:var(--paper)}
 @media(max-width:600px){.cookie-banner{bottom:10px;left:10px;right:10px;padding:18px;display:block}.cookie-actions{margin-top:16px}.cookie-actions button{flex:1}.legal-links{gap:12px 20px}.legal-document p{font-size:14px}}
+
+/* A direct, persistent route from every public page to the enquiry form. */
+.header{position:sticky;top:0;z-index:30;background:var(--paper);gap:26px}
+#navigation{margin-left:auto}
+.header-apply{display:inline-flex;align-items:center;justify-content:center;gap:18px;min-height:46px;padding:14px 20px;background:var(--ink);color:var(--paper);font-size:13px;white-space:nowrap;flex:none}
+.header-apply:hover,.hero-cta:hover{background:#4c5442;color:var(--paper)}
+.apply-short{display:none}
+.hero-cta{padding:16px 22px;background:var(--ink);color:var(--paper);border:0;min-height:50px;gap:24px}
+#brief-form{scroll-margin-top:125px}
+#brief-form:focus{outline:none}
+.inquiry-page{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-areas:'intro form' 'alternatives form';column-gap:clamp(36px,6vw,90px);row-gap:36px;align-items:start;padding-top:36px;padding-bottom:60px}
+.inquiry-intro{grid-area:intro;min-width:0}
+.inquiry-intro .breadcrumbs{margin-bottom:34px}
+.inquiry-intro h1{font-size:clamp(46px,5.2vw,72px);line-height:1.08;letter-spacing:-2px;margin:24px 0}
+.inquiry-intro .page-intro{font-size:16px;line-height:1.8;max-width:420px}
+.inquiry-form{grid-area:form;background:#e8e9df;padding:clamp(24px,3vw,42px);border:1px solid var(--line);min-width:0}
+.inquiry-form .form-title{font-size:32px;letter-spacing:-.8px;line-height:1.2;margin:0 0 26px}
+.inquiry-form input:not([type=checkbox]):not([type=hidden]),.inquiry-form textarea{margin-bottom:22px}
+.inquiry-form .submit{min-height:50px;font-size:14px}
+.inquiry-alternatives{grid-area:alternatives;min-width:0}
+.inquiry-alternatives h2{font:400 24px/1.35 Georgia,serif;margin:0 0 12px}
+.inquiry-alternatives .contact-links{margin-top:0;max-width:420px}
+.inquiry-alternatives .contact-links a{font:14px/1.5 Arial,sans-serif;min-height:48px;padding:14px 0;gap:20px}
+@media(min-width:901px) and (max-width:1150px){.header{gap:18px}.header .logo{font-size:36px}.header .brand-subtitle{font-size:6px;letter-spacing:1px}.header .brand-mark{width:30px;height:36px}.header .logo-with-mark{gap:10px}#navigation{gap:16px}#navigation a{font-size:12px}.header-apply{padding:14px 16px;gap:10px;font-size:12px}}
+@media(max-width:900px){.header{gap:16px}.header-apply{margin-left:auto}.menu-toggle{min-width:44px;width:44px;min-height:44px;justify-content:center;padding:8px;gap:0;flex:none}.menu-label{display:none}#navigation{margin-left:0}.inquiry-page{column-gap:30px}.inquiry-form{padding:26px}.inquiry-intro h1{font-size:48px}}
+@media(max-width:700px){.inquiry-page{grid-template-columns:minmax(0,1fr);grid-template-areas:'intro' 'form' 'alternatives';gap:24px;padding-top:24px;padding-bottom:44px}.inquiry-intro .breadcrumbs{margin-bottom:22px}.inquiry-intro .eyebrow{margin-bottom:14px}.inquiry-intro h1{font-size:42px;letter-spacing:-1.4px;margin:16px 0}.inquiry-intro .page-intro{max-width:none;font-size:15px;margin-bottom:0}.inquiry-form{padding:24px}.inquiry-form .form-title{font-size:29px;margin-bottom:24px}.inquiry-alternatives{margin-top:12px}.inquiry-alternatives .contact-links{max-width:none}}
+@media(max-width:600px){.header{gap:8px;padding-top:max(14px,env(safe-area-inset-top));padding-bottom:14px}.header .brand-name{font-size:30px}.header .brand-subtitle{font-size:5.5px;letter-spacing:1px}.header .brand-mark{width:24px;height:29px}.header .logo-with-mark{gap:8px}.header-apply{min-height:44px;padding:12px;gap:10px;font-size:12px}.apply-long{display:none}.apply-short{display:inline}.header-apply .icon{width:14px;height:14px}.hero-cta{font-size:14px;min-height:48px;padding:14px 20px}#brief-form{scroll-margin-top:100px}.inquiry-form{padding:22px 18px}.inquiry-form .consent-check{font-size:12px}}
+@media(max-width:380px){.header{padding-left:5%;padding-right:5%;gap:6px}.header .brand-name{font-size:26px}.header .brand-subtitle{font-size:5px;letter-spacing:.8px}.header .brand-mark{width:20px;height:25px}.header .logo-with-mark{gap:6px}.header-apply{padding:12px 10px}.header-apply .icon{display:none}.inquiry-intro h1{font-size:38px}}
+.inquiry-alternatives h2{letter-spacing:-.4px}
+@media(max-width:900px){#brief-form{scroll-margin-top:0}}

@@ -11,6 +11,7 @@ function closeMenu(restoreFocus = false) {
 menuButton.addEventListener('click', () => {
   const open = menuButton.getAttribute('aria-expanded') !== 'true';
   menuButton.setAttribute('aria-expanded', String(open)); navigation.classList.toggle('open', open);
+  if (open) navigation.querySelector('a')?.focus();
 });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(true); });
 document.addEventListener('click', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); });
@@ -89,6 +90,12 @@ document.querySelectorAll('[data-video-url]').forEach(card => {
 const form = $('#brief-form');
 if (form) {
   form.hidden = false;
+  form.tabIndex = -1;
+  // The form is revealed by JS; resolve the incoming anchor after it is visible.
+  if (location.hash === '#brief-form') requestAnimationFrame(() => {
+    form.scrollIntoView({block:'start'});
+    form.focus({preventScroll:true});
+  });
   const copy = JSON.parse($('#form-data').textContent).form;
   const status = $('#brief-status'), error = $('#brief-error'), button = form.querySelector('[type="submit"]');
   let sending = false, accepted = false, requestId = crypto.randomUUID();
