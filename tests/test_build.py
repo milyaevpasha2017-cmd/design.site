@@ -31,7 +31,7 @@ class BuildTests(unittest.TestCase):
         return module.build(self.content,self.root/'public',base)
     def test_all_pages_have_real_links_and_one_main_heading(self):
         pages=self.build()
-        self.assertEqual(len(pages),14)
+        self.assertEqual(len(pages),15)
         for path,body in pages.items():
             parser=Links();parser.feed(body);self.assertEqual(parser.titles,1,path)
             for value in parser.urls:

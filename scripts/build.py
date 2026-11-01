@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LEGAL=json.loads((ROOT/'site-worker/src/legal/2026-11-01.json').read_text())
 DOCUMENTS=LEGAL['documents']
 LEGAL_VERSION=LEGAL['version']
+QUIZ=json.loads((ROOT/'site-worker/src/quiz.json').read_text())
 DEFAULT_URL = 'https://milyaevpasha2017-cmd.github.io/design.site/'
 ROUTES = {'home':'', 'projects':'projects/', 'about':'about/', 'services':'services/', 'videos':'videos/', 'contact':'contact/'}
 def e(value): return html.escape(str(value), quote=True)
@@ -125,7 +126,7 @@ class Site:
                 page['@type']='WebPage'
                 image=self.image(project['image'])
                 page['primaryImageOfPage']={'@type':'ImageObject','url':urljoin(self.url,image.removeprefix(self.base))}
-        elif current!='home':crumbs.append((self.ui.get(current,DOCUMENTS.get(current,{}).get('title','')),canonical))
+        elif current!='home':crumbs.append((self.ui.get(current,DOCUMENTS.get(current,{}).get('title','Интерьерный квиз' if current=='quiz' else '')),canonical))
         if len(crumbs)>1:
             graph.append({'@type':'BreadcrumbList','@id':canonical+'#breadcrumb','itemListElement':[{'@type':'ListItem','position':i+1,'name':name,'item':url} for i,(name,url) in enumerate(crumbs)]})
             page['breadcrumb']={'@id':canonical+'#breadcrumb'}
@@ -154,6 +155,7 @@ class Site:
     def home(self):
         p=self.pages['home']
         body=f'''<section class="hero hero-editorial"><div class="hero-top"><p class="eyebrow">{e(p['label'])}</p><span class="availability"><i></i>{e(p['availability'])}</span></div><div class="hero-composition"><div class="hero-copy"><h1><span>{inline(p['title'])}</span> <em>{inline(p['emphasis'])}</em></h1><p class="hero-description">{r(p['intro'])}</p><div class="hero-actions">{self.button('contact',p['button'],'hero-cta')}<a class="hero-secondary" href="#selected-projects">{e(p['explore'])}{icon('arrow-down')}</a></div></div><a class="hero-image" href="{self.link('projects')}" aria-label="{e(p['explore'])}">{self.photo(p['image'],p['image_alt'],'hero-photo',True)}<span class="hero-image-label">EPIPHANY / INTERIOR</span><div class="image-caption"><span>{inline(p['caption'])}</span><span>{inline(p['image_note'])}</span></div></a></div><div class="hero-bottom"><p>{r(p['bottom'])}</p><span>Свет. Материалы. Ощущения.</span></div></section>
+{self.quiz_teaser()}
 <section id="selected-projects" class="projects section"><div class="section-heading"><div><p class="eyebrow">{e(p['projects_label'])}</p>{heading(p['projects_title'],p['projects_emphasis'],2)}</div><p class="small-note">{r(p['projects_note'])}</p></div>{self.cards(self.projects[:3])}<div class="section-more">{self.button('projects',self.ui['all_projects'])}</div></section>
 <section class="intro section"><div class="intro-side"><p class="eyebrow">{e(p['about_label'])}</p><img class="intro-mark" src="{self.base}assets/branding/logo-mark.png" width="180" height="208" alt="" aria-hidden="true" loading="lazy"></div><div class="intro-copy">{heading(p['about_title'],p['about_emphasis'],2)}<p class="body-copy">{r(p['about_intro'])}</p>{self.button('about',self.ui['more_about'])}</div></section>
 <section class="section home-services"><p class="eyebrow">{e(p['services_label'])}</p>{heading(p['services_title'],p['services_emphasis'],2)}<div class="service-teasers">'''
@@ -161,6 +163,21 @@ class Site:
             body+=f'<a href="{self.link("services")}#service-{i+1}"><span class="eyebrow">{i+1:02d}</span><h3>{inline(item["title"])}</h3>{icon()}<p>{r(item["description"])}</p></a>'
         body+=f'</div>{self.button("services",self.ui["all_services"])}</section>'+self.steps(self.pages['services'])+self.cta(p['cta'])
         return self.shell(p['seo_title'],p['seo_description'],body,'home')
+    def quiz_teaser(self):
+        return f'<section class="section quiz-teaser"><div><p class="eyebrow">ВАШ ИНТЕРЬЕР НАЧИНАЕТСЯ С ВАС</p><h2>Найдите настроение<br><em>своего интерьера.</em></h2><p class="body-copy">Пять коротких шагов помогут собрать пожелания к будущему пространству. Результат — сразу, без телефона и регистрации.</p><a class="hero-cta" href="{self.base}quiz/">Подобрать настроение {icon()}</a><p class="small-note">Около 2 минут · без расчёта стоимости</p></div><div class="quiz-teaser-art" aria-hidden="true">'+''.join(f'<img src="{self.base}assets/quiz/{name}.svg" alt="" loading="lazy" width="720" height="560">' for name in ['warm','calm','expressive'])+'</div></section>'
+    def quiz_page(self):
+        questions=''
+        for i,q in enumerate(QUIZ['questions']):
+            questions+=f'<fieldset class="quiz-step" data-quiz-step="{i}"{" hidden" if i else ""}><legend>{e(q["title"])}</legend><p class="quiz-hint" id="quiz-hint-{i}">{e(q["hint"])}</p><div class="quiz-options{" quiz-moods" if q["id"]=="mood" else ""}">'
+            for o in q['options']:
+                image=f'<img src="{self.base}{o[3]}" alt="" width="720" height="560" loading="lazy">' if len(o)>3 else ''
+                small=f'<small>{e(o[2])}</small>' if len(o)>2 else ''
+                questions+=f'<label class="quiz-option"><input class="ym-disable-keys" type="{"checkbox" if q.get("multiple") else "radio"}" name="{q["id"]}" value="{o[0]}" aria-describedby="quiz-hint-{i}">{image}<span class="quiz-option-copy"><strong>{e(o[1])}</strong>{small}<span class="quiz-check" aria-hidden="true">✓</span></span></label>'
+            questions+='</div>'
+            if q.get('area'):questions+='<div class="quiz-area"><label for="quiz-area">Примерная площадь, м² · необязательно</label><input class="ym-disable-keys" id="quiz-area" name="area" type="text" inputmode="decimal" maxlength="8" placeholder="Например, 65"></div>'
+            questions+='</fieldset>'
+        body=f'<section class="section quiz-page"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span aria-hidden="true">/</span><span aria-current="page">Интерьерный квиз</span></nav><p class="eyebrow">ПЯТЬ ШАГОВ К ВАШЕЙ ИДЕЕ</p><h1>Какой интерьер<br><em>вам близок?</em></h1><p class="page-intro">Выберите атмосферу и расскажите о задаче. Покажем направление и подходящий формат работы — контакт понадобится только если захотите обсудить результат.</p><noscript><p class="body-copy">Для квиза нужен JavaScript. Вы можете написать дизайнеру напрямую.</p></noscript><div id="interior-quiz" hidden><form id="quiz-questions" novalidate><div class="quiz-progress"><span id="quiz-count" aria-live="polite">Шаг 1 из 5</span><progress id="quiz-progress" value="1" max="5" aria-label="Прогресс квиза"></progress><span>≈ 2 минуты</span></div>{questions}<p id="quiz-error" role="alert" tabindex="-1" hidden></p><div class="quiz-actions"><button type="button" class="text-link" id="quiz-back" disabled>Назад</button><button type="submit" class="submit" id="quiz-next">Далее {icon()}</button></div></form><section id="quiz-result" aria-labelledby="quiz-result-title" hidden><p class="eyebrow">ВАШЕ НАПРАВЛЕНИЕ</p><h2 id="quiz-result-title" tabindex="-1"></h2><p id="quiz-result-text" class="body-copy"></p><ul id="quiz-tips"></ul><div class="quiz-recommendation"><p class="eyebrow">С ЧЕГО МОЖНО НАЧАТЬ</p><h3 id="quiz-format-title"></h3><p id="quiz-format-text"></p></div><a class="hero-cta quiz-result-cta" href="#brief-form">Обсудить результат {icon()}</a><details class="quiz-summary"><summary>Ваши ответы</summary><dl id="quiz-answer-list"></dl></details><p class="small-note">Это отправная точка для разговора, а не готовый проект. Точный объём работ и стоимость обсуждаются с дизайнером.</p><button type="button" class="text-link" id="quiz-edit">Изменить ответы</button><div class="quiz-discuss"><h2>Обсудим, как воплотить<br><em>это в вашем пространстве?</em></h2><p class="body-copy">Оставьте контакт — дизайнер получит ваши ответы и свяжется с вами. Заполнять заявку необязательно.</p></div></section></div><div id="quiz-contact" class="inquiry-form" hidden>{self.form(self.pages["contact"])}</div><div class="quiz-direct">{self.button("contact","Перейти к обычной форме")}{self.contacts()}</div><script id="quiz-data" type="application/json">{safe_json(QUIZ)}</script></section>'
+        return self.shell('Какой интерьер вам близок? — квиз Epiphany Interior','Выберите атмосферу будущего интерьера и получите рекомендации без регистрации. Пять шагов: пространство, настроение, приоритеты, этап и сроки.',body,'quiz','quiz/')
     def form(self,p):
         f=p['form'];fields=''
         for name in ['name','contact','message']:
@@ -212,7 +229,7 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None)
     if output.resolve() in (ROOT.resolve(),Path(content).resolve()) or ROOT.resolve().is_relative_to(output.resolve()): raise ValueError('Unsafe output directory')
     if output.exists():shutil.rmtree(output)
     output.mkdir(parents=True)
-    pages={'index.html':site.home()}
+    pages={'index.html':site.home(),'quiz/index.html':site.quiz_page()}
     for key in ROUTES:
         if key!='home':pages[ROUTES[key]+'index.html']=site.standard_page(key)
     for i,p in enumerate(site.projects):pages['projects/'+p['slug']+'/index.html']=site.project_page(p,i)
@@ -229,7 +246,7 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None)
         login=output/'admin/login';login.mkdir();shutil.copy2(ROOT/'password-admin/login.html',login/'index.html')
     elif admin_mode == 'github': shutil.copytree(ROOT/'admin',output/'admin')
     else: raise ValueError('Unknown admin mode')
-    for file in ['style.css','design.css','script.js','metrika.js','content-utils.mjs','rich-text.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
+    for file in ['style.css','design.css','script.js','quiz.js','quiz-model.mjs','metrika.js','content-utils.mjs','rich-text.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
     # Formatted source JSON is private to the build/CMS, never needed by site visitors.
     urls=[site.url+(path.removesuffix('index.html')) for path in pages if path!='404.html' and (path!='videos/index.html' or site.indexable('videos'))]
     (output/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+xml_escape(url)+'</loc></url>' for url in urls)+'</urlset>')

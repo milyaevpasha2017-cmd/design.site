@@ -1,3 +1,5 @@
+import {initQuiz} from './quiz.js';
+import {quizLeadMessage} from './quiz-model.mjs';
 import { vkEmbed, contactURL } from './content-utils.mjs';
 const $ = selector => document.querySelector(selector);
 const node = (tag, className, text) => { const el = document.createElement(tag); if (className) el.className = className; if (text != null) el.textContent = text; return el; };
@@ -123,6 +125,7 @@ document.querySelectorAll('[data-video-url]').forEach(card => {
   });
 });
 // Submit the request only with separate personal-data consent.
+const newRequestId = () => crypto.randomUUID?.() || '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, char => (+char ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +char / 4).toString(16));
 const form = $('#brief-form');
 if (form) {
   form.hidden = false;
@@ -134,10 +137,10 @@ if (form) {
   });
   const copy = JSON.parse($('#form-data').textContent).form;
   const status = $('#brief-status'), error = $('#brief-error'), button = form.querySelector('[type="submit"]');
-  let sending = false, accepted = false, requestId = crypto.randomUUID();
+  let sending = false, accepted = false, requestId = newRequestId();
   form.addEventListener('input', event => {
     event.target.setCustomValidity?.('');
-    if (accepted) { accepted = false; requestId = crypto.randomUUID(); status.textContent = ''; button.disabled = false; }
+    if (accepted) { accepted = false; requestId = newRequestId(); status.textContent = ''; button.disabled = false; }
   });
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (sending || accepted) return;
@@ -145,18 +148,20 @@ if (form) {
       field.setCustomValidity((field.type==='checkbox'?field.checked:field.value.trim()) ? '' : field.type==='checkbox'?'Подтвердите согласие на обработку персональных данных.':copy.whitespace_error);
       if (!field.reportValidity()) return;
     }
+    if (document.querySelector('#interior-quiz') && !form.dataset.quizSummary) return;
     const values = new FormData(form);
+    const message = form.dataset.quizSummary ? quizLeadMessage(form.dataset.quizSummary, values.get('message') || '') : values.get('message');
     const fields = [...form.querySelectorAll('input, textarea')];
     sending = true; button.disabled = true; fields.forEach(field => {field.readOnly = true;if(field.type==='checkbox')field.disabled=true;});
     error.hidden = true; status.textContent = copy.sending || 'Отправляем заявку…';
     form.setAttribute('aria-busy', 'true');
     try {
-      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message: values.get('message'), website: values.get('website'), consent: values.get('consent') === 'on', consentVersion: values.get('consent_version') }) });
+      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message, website: values.get('website'), consent: values.get('consent') === 'on', consentVersion: values.get('consent_version') }) });
       let data; try { data = await response.json(); } catch { throw new Error('Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.'); }
       if (!response.ok || !data.ok || data.id !== requestId) throw new Error(data.error || 'Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.');
       accepted = true;
       // Count only server-confirmed acceptance; analytics must never break the form.
-      try { window.ym?.(113965901, 'reachGoal', 'lead_submitted'); } catch {}
+      try { window.ym?.(113965901, 'reachGoal', 'lead_submitted'); if (form.dataset.quizSummary) window.ym?.(113965901, 'reachGoal', 'quiz_lead_submitted'); } catch {}
       form.reset(); status.textContent = copy.result; status.focus();
     } catch (failure) {
       status.textContent = ''; error.hidden = false;
@@ -168,6 +173,8 @@ if (form) {
     }
   });
 }
+
+initQuiz();
 
 // Existing links to sections of the original one-page site keep working.
 if (location.pathname === new URL(document.querySelector('.logo').href).pathname) {
