@@ -1,3 +1,4 @@
+import {initMotion} from './motion.js';
 import {initDecisions} from './decisions.js';
 import {initQuiz} from './quiz.js';
 import {quizLeadMessage} from './quiz-model.mjs';
@@ -177,6 +178,7 @@ if (form) {
 }
 
 initQuiz();
+initMotion();
 
 // Existing links to sections of the original one-page site keep working.
 if (location.pathname === new URL(document.querySelector('.logo').href).pathname) {
