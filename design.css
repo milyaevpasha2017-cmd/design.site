@@ -306,3 +306,6 @@ body .project-view-switch button,body .cookie-actions button{font-family:var(--f
 @media(max-width:600px){#selected-projects .project-rail{gap:18px}#selected-projects .project-rail>.project-card:nth-child(n){flex-basis:88%;width:88%}#selected-projects .project-rail>.project-card:nth-child(n) .project-image{aspect-ratio:4/5}.project-rail-controls button{font-size:13px;padding:10px 16px}.home-services .service-teasers>a{min-height:95px}.intro{padding-top:64px;padding-bottom:64px}}
 @media(prefers-reduced-motion:reduce){.motion-arrived,.quiz-teaser-art.art-moving img{animation:none!important}#selected-projects .project-rail{scroll-behavior:auto}#selected-projects .project-rail .card-photo{transform:none!important;will-change:auto}}
 #selected-projects .project-rail{scrollbar-width:none}#selected-projects .project-rail::-webkit-scrollbar{display:none}
+/* Center primary action labels; keep the closing CTA compact. */
+body .submit,body .hero-cta,body .decision-cta,body .quiz-result-cta,.quiz-modal .submit{justify-content:center;text-align:center}
+.page-cta .submit{display:inline-flex;width:auto;min-width:min(240px,100%);max-width:100%;justify-content:center;text-align:center;padding:17px 32px;border-radius:4px}
