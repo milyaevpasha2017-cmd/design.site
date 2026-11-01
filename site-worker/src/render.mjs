@@ -1,3 +1,4 @@
+import DECISIONS from './decisions.json' with {type:'json'};
 import QUIZ from './quiz.json' with {type:'json'};
 import {DOCUMENTS,LEGAL_VERSION,legalFooter,cookieBanner} from './legal.mjs';
 import {richText,plainText} from '../../rich-text.mjs';
@@ -95,6 +96,7 @@ export class Site {
   home(){
     const p=this.pages.home;
     const body=`<section class="hero hero-editorial"><div class="hero-top"><p class="eyebrow">${e(p.label)}</p><span class="availability"><i></i>${e(p.availability)}</span></div><div class="hero-composition"><div class="hero-copy"><h1><span>${inline(p.title)}</span> <em>${inline(p.emphasis)}</em></h1><p class="hero-description">${r(p.intro)}</p><div class="hero-actions">${this.button('contact',p.button,'hero-cta')}<a class="hero-secondary" href="#selected-projects">${e(p.explore)}${icon('arrow-down')}</a></div></div><a class="hero-image" href="/projects/" aria-label="${e(p.explore)}">${this.photo(p.image,p.image_alt,'hero-photo',true)}<span class="hero-image-label">EPIPHANY / INTERIOR</span><div class="image-caption"><span>${inline(p.caption)}</span><span>${inline(p.image_note)}</span></div></a></div><div class="hero-bottom"><p>${r(p.bottom)}</p><span>Свет. Материалы. Ощущения.</span></div></section>
+${DECISIONS.html.replaceAll('__BASE__','/')}
 ${this.quizTeaser()}
 <section id="selected-projects" class="projects section"><div class="section-heading"><div><p class="eyebrow">${e(p.projects_label)}</p>${heading(p.projects_title,p.projects_emphasis,2)}</div><p class="small-note">${r(p.projects_note)}</p></div>${this.cards(this.projects.slice(0,3))}<div class="section-more">${this.button('projects',this.ui.all_projects)}</div></section>
 <section class="intro section"><div class="intro-side"><p class="eyebrow">${e(p.about_label)}</p><img class="intro-mark" src="/assets/branding/logo-mark.png" width="180" height="208" alt="" aria-hidden="true" loading="lazy"></div><div class="intro-copy">${heading(p.about_title,p.about_emphasis,2)}<p class="body-copy">${r(p.about_intro)}</p>${this.button('about',this.ui.more_about)}</div></section>

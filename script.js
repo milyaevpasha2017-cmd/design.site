@@ -1,3 +1,4 @@
+import {initDecisions} from './decisions.js';
 import {initQuiz} from './quiz.js';
 import {quizLeadMessage} from './quiz-model.mjs';
 import { vkEmbed, contactURL } from './content-utils.mjs';
@@ -127,6 +128,7 @@ document.querySelectorAll('[data-video-url]').forEach(card => {
 // Submit the request only with separate personal-data consent.
 const newRequestId = () => crypto.randomUUID?.() || '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, char => (+char ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +char / 4).toString(16));
 const form = $('#brief-form');
+const decisionContext = initDecisions();
 if (form) {
   form.hidden = false;
   form.tabIndex = -1;
@@ -150,7 +152,7 @@ if (form) {
     }
     if (document.querySelector('#interior-quiz') && !form.dataset.quizSummary) return;
     const values = new FormData(form);
-    const message = form.dataset.quizSummary ? quizLeadMessage(form.dataset.quizSummary, values.get('message') || '') : values.get('message');
+    const message = form.dataset.quizSummary ? quizLeadMessage(form.dataset.quizSummary, values.get('message') || '') : [decisionContext?.summary, values.get('message')].filter(Boolean).join('\n\n');
     const fields = [...form.querySelectorAll('input, textarea')];
     sending = true; button.disabled = true; fields.forEach(field => {field.readOnly = true;if(field.type==='checkbox')field.disabled=true;});
     error.hidden = true; status.textContent = copy.sending || 'Отправляем заявку…';

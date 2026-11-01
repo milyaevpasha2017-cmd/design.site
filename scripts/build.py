@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LEGAL=json.loads((ROOT/'site-worker/src/legal/2026-11-01-v2.json').read_text())
 DOCUMENTS=LEGAL['documents']
 LEGAL_VERSION=LEGAL['version']
+DECISIONS=json.loads((ROOT/'site-worker/src/decisions.json').read_text())
 QUIZ=json.loads((ROOT/'site-worker/src/quiz.json').read_text())
 DEFAULT_URL = 'https://milyaevpasha2017-cmd.github.io/design.site/'
 ROUTES = {'home':'', 'projects':'projects/', 'about':'about/', 'services':'services/', 'videos':'videos/', 'contact':'contact/'}
@@ -157,6 +158,7 @@ class Site:
     def home(self):
         p=self.pages['home']
         body=f'''<section class="hero hero-editorial"><div class="hero-top"><p class="eyebrow">{e(p['label'])}</p><span class="availability"><i></i>{e(p['availability'])}</span></div><div class="hero-composition"><div class="hero-copy"><h1><span>{inline(p['title'])}</span> <em>{inline(p['emphasis'])}</em></h1><p class="hero-description">{r(p['intro'])}</p><div class="hero-actions">{self.button('contact',p['button'],'hero-cta')}<a class="hero-secondary" href="#selected-projects">{e(p['explore'])}{icon('arrow-down')}</a></div></div><a class="hero-image" href="{self.link('projects')}" aria-label="{e(p['explore'])}">{self.photo(p['image'],p['image_alt'],'hero-photo',True)}<span class="hero-image-label">EPIPHANY / INTERIOR</span><div class="image-caption"><span>{inline(p['caption'])}</span><span>{inline(p['image_note'])}</span></div></a></div><div class="hero-bottom"><p>{r(p['bottom'])}</p><span>Свет. Материалы. Ощущения.</span></div></section>
+{DECISIONS['html'].replace('__BASE__',self.base)}
 {self.quiz_teaser()}
 <section id="selected-projects" class="projects section"><div class="section-heading"><div><p class="eyebrow">{e(p['projects_label'])}</p>{heading(p['projects_title'],p['projects_emphasis'],2)}</div><p class="small-note">{r(p['projects_note'])}</p></div>{self.cards(self.projects[:3])}<div class="section-more">{self.button('projects',self.ui['all_projects'])}</div></section>
 <section class="intro section"><div class="intro-side"><p class="eyebrow">{e(p['about_label'])}</p><img class="intro-mark" src="{self.base}assets/branding/logo-mark.png" width="180" height="208" alt="" aria-hidden="true" loading="lazy"></div><div class="intro-copy">{heading(p['about_title'],p['about_emphasis'],2)}<p class="body-copy">{r(p['about_intro'])}</p>{self.button('about',self.ui['more_about'])}</div></section>
@@ -248,7 +250,7 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None)
         login=output/'admin/login';login.mkdir();shutil.copy2(ROOT/'password-admin/login.html',login/'index.html')
     elif admin_mode == 'github': shutil.copytree(ROOT/'admin',output/'admin')
     else: raise ValueError('Unknown admin mode')
-    for file in ['style.css','design.css','script.js','quiz.js','quiz-model.mjs','metrika.js','content-utils.mjs','rich-text.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
+    for file in ['style.css','design.css','script.js','quiz.js','quiz-model.mjs','decisions.js','metrika.js','content-utils.mjs','rich-text.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
     # Formatted source JSON is private to the build/CMS, never needed by site visitors.
     urls=[site.url+(path.removesuffix('index.html')) for path in pages if path!='404.html' and (path!='videos/index.html' or site.indexable('videos'))]
     (output/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+xml_escape(url)+'</loc></url>' for url in urls)+'</urlset>')
