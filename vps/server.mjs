@@ -22,7 +22,14 @@ export async function application(config,{fetcher=fetch,telegramFetcher=telegram
     const env={...config,LEADS:inbox,ADMIN_STATE:namespace,ASSETS:await staticAssets(config.ASSETS_PATH),SITE_CONTENT:JSON.parse(await readFile(config.SNAPSHOT_PATH,'utf8'))};
     inbox.getContacts=()=>currentContacts(namespace,env.SITE_CONTENT);
     const worker=createSiteWorker(fetcher);
-    return {namespace,inbox,fetch:request=>worker.fetch(request,env),origin:origin.origin};
+    return {namespace,inbox,fetch:async request=>{
+      const response=await worker.fetch(request,env),path=new URL(request.url).pathname;
+      if(response.ok&&((request.method==='POST'&&path==='/api/leads')||(request.method==='PUT'&&path.startsWith('/api/leads/')))){
+        // Persist first and acknowledge promptly; delivery runs independently.
+        queueMicrotask(()=>void inbox.notify().catch(()=>console.error('Lead notification remains queued')));
+      }
+      return response;
+    },origin:origin.origin};
   }catch(error){await namespace.close();throw error;}
 }
 
@@ -55,6 +62,8 @@ if(process.argv[1]&&await realpath(process.argv[1])===fileURLToPath(import.meta.
   process.umask(0o077);
   const root=fileURLToPath(new URL('../',import.meta.url));
   const app=await application({...process.env,DATABASE_PATH:process.env.DATABASE_PATH||'/var/lib/epiphany/state.sqlite',ASSETS_PATH:resolve(root,'_site-vps'),SNAPSHOT_PATH:resolve(root,'site-worker/generated/site.json')});
+  await app.inbox.resumePending();
+  void app.inbox.notify().catch(()=>console.error('Lead notification remains queued'));
   const server=httpServer(app),timer=setInterval(()=>Promise.all([app.namespace.sweep(),app.inbox.sweep(),app.inbox.notify()]).catch(()=>console.error('Background maintenance failed')),30000);timer.unref();
   const port=Number(process.env.PORT||3000);
   if(!Number.isSafeInteger(port)||port<1024||port>65535)throw new Error('Invalid port');

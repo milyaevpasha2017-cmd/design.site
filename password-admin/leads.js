@@ -17,7 +17,7 @@ function card(record){
   for(const [value,text]of Object.entries(labels)){const option=make('option','',text);option.value=value;select.append(option);}select.value=record.status;
   select.addEventListener('change',async()=>{const previous=record.status;select.disabled=true;$('#leads-error').textContent='';try{const saved=await api('leads/'+record.id,{method:'PUT',body:JSON.stringify({status:select.value})});record.status=saved.status;$('#leads-status').textContent='Статус сохранён';}catch(e){select.value=previous;$('#leads-error').textContent=e.message;}finally{select.disabled=false;}});
   label.append(select);controls.append(label);
-  if(record.notification.state==='failed'){
+  if(record.notification.state!=='sent'){
     const retry=make('button','secondary','Повторить уведомление');retry.type='button';
     retry.addEventListener('click',async()=>{retry.disabled=true;try{await api('leads/'+record.id,{method:'PUT',body:JSON.stringify({retryNotification:true})});await load();}catch(e){$('#leads-error').textContent=e.message;retry.disabled=false;}});controls.append(retry);
   }
@@ -27,10 +27,12 @@ function card(record){
     remove.disabled=true;try{await api('leads/'+record.id,{method:'DELETE',body:'{}'});article.remove();$('#leads-status').textContent='Заявка удалена';}catch(e){$('#leads-error').textContent=e.message;remove.disabled=false;}
   });controls.append(remove);
   const notices={sent:record.notification.channel==='email'?'Заявка отправлена по резервной почте':'Уведомление в Telegram отправлено',pending:'Уведомление ожидает отправки',failed:'Не удалось доставить уведомление. Заявка сохранена здесь.'};
+  const deliveryErrors={telegram_timeout:'Telegram не ответил вовремя. Заявка сохранена.',telegram_network:'Сервер не смог подключиться к Telegram.',telegram_unauthorized:'Telegram отклонил токен бота. Нужна проверка настройки.',telegram_forbidden:'Боту запрещено писать получателю. Проверьте, что дизайнер запустил бота и не заблокировал его.',telegram_chat_not_found:'Чат получателя не найден. Проверьте настройку Telegram.',telegram_message_too_long:'Telegram отклонил слишком длинное сообщение.',telegram_bad_request:'Telegram отклонил запрос. Нужна проверка настройки.',telegram_rate_limited:'Telegram ограничил частоту отправки. Повтор запланирован.',telegram_unavailable:'Telegram временно недоступен.'};
+  const deliveryNote=deliveryErrors[record.notification.lastError]||'';
   const consent=make('details','lead-consent');
   consent.append(make('summary','hint',record.consent?.accepted?'Согласие: '+new Date(record.consent.acceptedAt).toLocaleString('ru-RU')+' · версия '+record.consent.version:'Заявка поступила до введения отдельной фиксации согласия'));
   if(record.consent?.text)consent.append(make('p','lead-message',record.consent.text));
-  article.append(head,contact,message,reference,make('p','hint',notices[record.notification.state]),consent,controls);return article;
+  article.append(head,contact,message,reference,make('p','hint',notices[record.notification.state]+(deliveryNote?' '+deliveryNote:'')),consent,controls);return article;
 }
 async function load(append=false){
   if(loading)return;loading=true;$('#refresh').disabled=true;$('#more').disabled=true;$('#leads-error').textContent='';

@@ -90,3 +90,22 @@ test('personal data consent: strict server validation, immutable text/version/ti
  await inbox.submit(request,'ip');assert.deepEqual((await inbox.list()).leads[0].consent,record.consent);
  assert.ok(!record.consent.text.includes(request.contact));
 }));
+
+test('Telegram delivery allows a slow connection beyond the old eight-second cutoff',()=>environment(async({service})=>{
+  const inbox=service({TELEGRAM_BOT_TOKEN:'synthetic',TELEGRAM_CHAT_ID:'123'},async(url,{signal})=>new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>resolve(Response.json({ok:true})),9000);
+    signal.addEventListener('abort',()=>{clearTimeout(timer);reject(Object.assign(new Error('synthetic timeout'),{code:'TELEGRAM_TIMEOUT'}));},{once:true});
+  }));
+  await inbox.submit(data(),'slow-ip');await inbox.notify();assert.equal((await inbox.list()).leads[0].notification.state,'sent');
+}));
+
+test('Telegram errors are actionable and sanitized; legacy pending recovery is one-time and sent receipts are untouched',()=>environment(async({service,ns})=>{
+  const inbox=service({TELEGRAM_BOT_TOKEN:'synthetic',TELEGRAM_CHAT_ID:'123'},async()=>Response.json({ok:false,error_code:400,description:'Bad Request: chat not found'},{status:400}));
+  const request=data();await inbox.submit(request,'ip');await inbox.notify();
+  const record=(await inbox.list()).leads[0];assert.equal(record.notification.lastError,'telegram_chat_not_found');assert.equal(record.notification.transportVersion,2);
+  const store=ns.storage('epiphany-leads'),key=await store.get('index:'+request.id),raw=await store.get(key);
+  raw.notification={state:'pending',attempts:2,nextAt:Date.now()+3600000};await store.put(key,raw);
+  await inbox.resumePending();const resumed=await store.get(key);assert.ok(resumed.notification.nextAt<=Date.now());assert.equal(resumed.notification.attempts,2);
+  resumed.notification.nextAt=Date.now()+3600000;await store.put(key,resumed);await inbox.resumePending();assert.equal((await store.get(key)).notification.nextAt,resumed.notification.nextAt);
+  resumed.notification={state:'sent',attempts:1,nextAt:0};await store.put(key,resumed);await inbox.resumePending();assert.deepEqual((await store.get(key)).notification,resumed.notification);
+}));

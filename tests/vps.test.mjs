@@ -104,3 +104,18 @@ test('SQLite schema migration and down SQL run on a disposable empty database',a
     assert.equal(db.prepare("SELECT count(*) AS count FROM sqlite_master WHERE type='table'").get().count,0);
   }finally{db.close();}
 });
+
+test('VPS: accepted lead starts delivery immediately without waiting for Telegram or the background interval',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'epiphany-immediate-'));let app,releaseDelivery,deliveryStarted;
+  const started=new Promise(resolve=>{deliveryStarted=resolve;});
+  try {
+    const f=await fixture(),assets=join(dir,'public');await mkdir(assets);const snapshot=join(dir,'snapshot.json');await writeFile(snapshot,JSON.stringify(f.env.SITE_CONTENT));
+    const config={...f.env,DATABASE_PATH:join(dir,'state.sqlite'),ASSETS_PATH:assets,SNAPSHOT_PATH:snapshot,TELEGRAM_BOT_TOKEN:'synthetic',TELEGRAM_CHAT_ID:'123'};
+    app=await application(config,{fetcher:f.fetcher,telegramFetcher:()=>new Promise(resolve=>{releaseDelivery=resolve;deliveryStarted();})});
+    const id=crypto.randomUUID();const response=await app.fetch(new Request(config.SITE_ORIGIN+'/api/leads',{method:'POST',headers:{Origin:config.SITE_ORIGIN,'Content-Type':'application/json'},body:JSON.stringify({id,name:'Synthetic visitor',contact:'@synthetic',message:'',consent:true,consentVersion:LEGAL_VERSION})}));
+    assert.equal(response.status,201);await started;assert.equal((await app.inbox.list()).leads[0].notification.state,'pending');
+    releaseDelivery(Response.json({ok:true}));
+    for(let i=0;i<30&&app.inbox.running;i++)await new Promise(resolve=>setImmediate(resolve));
+    assert.equal((await app.inbox.list()).leads[0].notification.state,'sent');
+  }finally {if(releaseDelivery)releaseDelivery(Response.json({ok:true}));if(app){for(let i=0;i<30&&app.inbox.running;i++)await new Promise(resolve=>setImmediate(resolve));await app.namespace.close();}await rm(dir,{recursive:true,force:true});}
+});

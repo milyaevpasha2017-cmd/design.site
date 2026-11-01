@@ -11,13 +11,13 @@ export function telegramFetch(input,options={}){
   return new Promise((resolve,reject)=>{
     const child=spawn('/usr/bin/curl',plan.args,{env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8'},stdio:['pipe','pipe','ignore']});
     const chunks=[];let length=0,done=false;
-    const finish=(error,result)=>{if(done)return;done=true;clearTimeout(timer);options.signal?.removeEventListener('abort',abort);error?reject(new Error('Telegram connection failed')):resolve(result);};
-    const abort=()=>{child.kill('SIGKILL');finish(true);};
+    const finish=(error,result)=>{if(done)return;done=true;clearTimeout(timer);options.signal?.removeEventListener('abort',abort);error?reject(Object.assign(new Error('Telegram connection failed'),{code:error==='timeout'?'TELEGRAM_TIMEOUT':'TELEGRAM_NETWORK'})):resolve(result);};
+    const abort=()=>{child.kill('SIGKILL');finish('timeout');};
     const timer=setTimeout(abort,23000);timer.unref();
     child.stdout.on('data',chunk=>{length+=chunk.length;if(length>1049000){abort();return;}chunks.push(chunk);});
     child.on('error',()=>finish(true));
     child.on('close',code=>{
-      if(code!==0){finish(true);return;}
+      if(code!==0){finish(code===28?'timeout':true);return;}
       try{const raw=Buffer.concat(chunks).toString('utf8'),split=raw.lastIndexOf('\n'),status=Number(raw.slice(split+1));if(split<0||status<200||status>599)throw new Error();finish(false,new Response(raw.slice(0,split),{status,headers:{'Content-Type':'application/json'}}));}catch{finish(true);}
     });
     child.stdin.on('error',()=>{});

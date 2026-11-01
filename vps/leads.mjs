@@ -66,6 +66,21 @@ export class LeadInbox{
     if(!uuid.test(id))throw error('Некорректная заявка.');
     await this.storage.transaction(async store=>{const key=await store.get('index:'+id);if(key)await store.delete(key);await store.delete('index:'+id);});return {ok:true};
   }
+  async resumePending(){
+    // Retry legacy pending receipts once with the corrected transport budget.
+    let cursor='';
+    do {
+      const rows=await this.storage.list({prefix:'lead:',startAfter:cursor,limit:100});
+      for(const [key] of rows){
+        cursor=key;
+        await this.storage.transaction(async store=>{
+          const record=await store.get(key),n=record?.notification;
+          if(n?.state==='pending'&&n.transportVersion!==2){record.notification={...n,nextAt:Date.now(),transportVersion:2};await store.put(key,record);}
+        });
+      }
+      if(rows.size<100)break;
+    }while(cursor);
+  }
   async notify(){
     const telegram=Boolean(this.config.TELEGRAM_BOT_TOKEN&&this.config.TELEGRAM_CHAT_ID);
     if(this.running||(!telegram&&!mailConfigured(this.config)))return;
@@ -77,13 +92,21 @@ export class LeadInbox{
         for(const [key,record]of rows){
           cursor=key;const n=record.notification;
           if(n.state==='sent'||n.state==='failed'||n.nextAt>Date.now())continue;
-          let ok=false,channel=null;
+          let ok=false,channel=null,lastError=null,retryAfter=0;
           if(telegram)try{
             // Only quiz submissions with the current explicit consent include their contents.
             // Older and ordinary-form records keep the original reference-only delivery.
-            const response=await this.fetcher('https://api.telegram.org/bot'+this.config.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',redirect:'error',signal:AbortSignal.timeout(8000),headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:this.config.TELEGRAM_CHAT_ID,text:(record.source==='quiz'&&record.consent?.telegramContent===true?'Результаты интерьерного квиза\nИмя: '+record.name+'\nКонтакт: '+record.contact+'\n\n'+record.message+'\n\n':'Новая заявка на epiphany-int.ru\n')+'№ '+record.id+'\nОткрыть: '+this.config.SITE_ORIGIN+'/admin/leads.html#'+record.id,link_preview_options:{is_disabled:true}})});
-            ok=response.ok&&(await response.json()).ok===true;
-          }catch{/* Never log Telegram URLs, credentials or customer messages. */}
+            const response=await this.fetcher('https://api.telegram.org/bot'+this.config.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',redirect:'error',signal:AbortSignal.timeout(25000),headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:this.config.TELEGRAM_CHAT_ID,text:(record.source==='quiz'&&record.consent?.telegramContent===true?'Результаты интерьерного квиза\nИмя: '+record.name+'\nКонтакт: '+record.contact+'\n\n'+record.message+'\n\n':'Новая заявка на epiphany-int.ru\n')+'№ '+record.id+'\nОткрыть: '+this.config.SITE_ORIGIN+'/admin/leads.html#'+record.id,link_preview_options:{is_disabled:true}})});
+            const result=await response.json();
+            ok=response.ok&&result.ok===true;
+            if(!ok){
+              const code=Number(result.error_code||response.status);
+              lastError=code===401?'telegram_unauthorized':code===403?'telegram_forbidden':code===429?'telegram_rate_limited':code===400?'telegram_bad_request':'telegram_unavailable';
+              if(code===400&&/chat not found/i.test(result.description||''))lastError='telegram_chat_not_found';
+              if(code===400&&/message is too long/i.test(result.description||''))lastError='telegram_message_too_long';
+              if(code===429&&Number.isInteger(result.parameters?.retry_after))retryAfter=Math.max(1,Math.min(3600,result.parameters.retry_after))*1000;
+            }
+          }catch(failure){lastError=failure?.code==='TELEGRAM_TIMEOUT'?'telegram_timeout':'telegram_network';/* Never log token URLs or customer data. */}
           if(ok)channel='telegram';
           if(!ok&&mailConfigured(this.config)){
             try{
@@ -95,7 +118,7 @@ export class LeadInbox{
           await this.storage.transaction(async store=>{
             const current=await store.get(key);if(!current)return;
             const attempts=current.notification.attempts+1;
-            current.notification={channel,state:ok?'sent':attempts>=8?'failed':'pending',attempts,nextAt:Date.now()+Math.min(3600000,30000*2**attempts)};
+            current.notification={channel,state:ok?'sent':attempts>=8?'failed':'pending',attempts,transportVersion:2,...(!ok&&lastError?{lastError}:{}),nextAt:Date.now()+Math.max(retryAfter,Math.min(3600000,30000*2**attempts))};
             await store.put(key,current);
           });
           if(++sent>=10)return;
