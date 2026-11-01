@@ -38,20 +38,20 @@
 
 Цветовые литералы (включая прозрачные варианты и старые переопределяемые правила):
 
-`#0006`, `#20251dd1`, `#34392f`, `#34392f0a`, `#4c5442`, `#4e5844`, `#63685c`, `#687254`, `#737b60`, `#777b70`, `#7b7d73`, `#818771`, `#8a2f28`, `#9b3026`, `#b5b8a9`, `#b7bbaa`, `#bfc2b5`, `#c6bda9`, `#d9d9ce`, `#e5e4dc`, `#e8e9df`, `#eceee5`, `#f5f3ee`, `#fdfcf9`, `#fff`, `#fff0ea`, `currentColor`, `rgba(24,29,21,.85)`, `transparent`, `white`
+`#0006`, `#20251d30`, `#20251dd1`, `#34392f`, `#34392f0a`, `#4c5442`, `#4e5844`, `#63685c`, `#687254`, `#737b60`, `#777b70`, `#7b7d73`, `#818771`, `#8a2f28`, `#9b3026`, `#b5b8a9`, `#b7bbaa`, `#bfc2b5`, `#c6bda9`, `#d9d9ce`, `#e5e4dc`, `#e8e9df`, `#eceee5`, `#f5f3ee`, `#fdfcf9`, `#fff`, `#fff0ea`, `currentColor`, `rgba(24,29,21,.85)`, `transparent`, `white`
 
 | Свойство | Допустимые значения текущей версии |
 |---|---|
-| `bottom` | `0`, `18px`, `5px` |
+| `bottom` | `0`, `10px`, `18px`, `5px` |
 | `font` | `10px Arial,sans-serif`, `11px Arial,sans-serif`, `11px/1.7 Arial,sans-serif`, `13px Arial,sans-serif`, `15px/1.6 Arial,Helvetica,sans-serif`, `400 22px Georgia,serif`, `400 25px Georgia,serif`, `400 25px/1.4 Georgia,serif`, `400 26px Georgia,serif`, `400 26px/1.65 Georgia,serif`, `400 27px Georgia,serif`, `400 32px/1.2 Georgia,serif`, `400 clamp(19px,5.8vw,26px)/1.3 Georgia,serif`, `40px/.85 Georgia,serif`, `8px/1.5 Arial,sans-serif`, `inherit` |
 | `font-family` | `Arial,Helvetica,sans-serif`, `Arial,sans-serif`, `Georgia,'Times New Roman',serif`, `Georgia,serif` |
-| `font-size` | `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `18px`, `19px`, `20px`, `22px`, `23px`, `24px`, `25px`, `27px`, `28px`, `30px`, `32px`, `34px`, `36px`, `40px`, `42px`, `44px`, `48px`, `51px`, `6px`, `7px`, `8px`, `9px`, `clamp(21px,5.8vw,24px)`, `clamp(22px,6.3vw,25px)`, `clamp(32px,4vw,54px)`, `clamp(36px,10.8vw,44px)`, `clamp(37px,4vw,60px)`, `clamp(42px,11.8vw,58px)`, `clamp(48px,6.3vw,96px)`, `clamp(48px,6.5vw,88px)`, `clamp(48px,7.5vw,66px)`, `clamp(50px,5.5vw,80px)`, `clamp(54px,6.3vw,75px)` |
-| `gap` | `0`, `10px`, `12px`, `12px 18px`, `12px 28px`, `14px`, `15px`, `16px`, `18px`, `20px`, `22px`, `24px`, `25px`, `28px`, `30px`, `34px`, `35px`, `36px 28px`, `42px`, `45px 28px`, `4px`, `4px 24px`, `50px`, `60px`, `6px`, `7%`, `7px`, `8px`, `8px 20px`, `9px` |
+| `font-size` | `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `18px`, `19px`, `20px`, `22px`, `23px`, `24px`, `25px`, `26px`, `27px`, `28px`, `30px`, `32px`, `34px`, `36px`, `40px`, `42px`, `44px`, `48px`, `51px`, `6px`, `7px`, `8px`, `9px`, `clamp(21px,5.8vw,24px)`, `clamp(22px,6.3vw,25px)`, `clamp(32px,4vw,54px)`, `clamp(34px,5vw,64px)`, `clamp(36px,10.8vw,44px)`, `clamp(37px,4vw,60px)`, `clamp(42px,11.8vw,58px)`, `clamp(48px,6.3vw,96px)`, `clamp(48px,6.5vw,88px)`, `clamp(48px,7.5vw,66px)`, `clamp(50px,5.5vw,80px)`, `clamp(54px,6.3vw,75px)` |
+| `gap` | `0`, `10px`, `12px`, `12px 18px`, `12px 20px`, `12px 28px`, `14px`, `14px 24px`, `15px`, `16px`, `18px`, `20px`, `22px`, `24px`, `25px`, `28px`, `30px`, `34px`, `35px`, `36px 28px`, `42px`, `45px 28px`, `4px`, `4px 24px`, `50px`, `60px`, `6px`, `7%`, `7px`, `8px`, `8px 20px`, `9px` |
 | `inset` | `0`, `auto 10px 10px auto`, `auto 16px 16px auto`, `auto 8px 8px auto` |
-| `left` | `0`, `12px` |
-| `letter-spacing` | `-.5px`, `-.7px`, `-.8px`, `-1.6px`, `-1.7px`, `-1.8px`, `-2.5px`, `-2px`, `-3px`, `1.3px`, `1px`, `2.3px`, `2px`, `inherit`, `normal` |
-| `line-height` | `.8`, `1`, `1.08`, `1.25`, `1.3`, `1.35`, `1.5`, `1.6`, `1.7`, `1.75`, `1.8`, `1.85`, `1.9`, `inherit` |
-| `margin` | `-1px`, `0`, `0 0 12px`, `0 0 15px`, `0 0 18px`, `0 0 20px`, `0 0 24px`, `0 0 28px`, `0 0 7px`, `10px 0 0`, `12px 0 0`, `16px 0`, `16px 0 8px`, `18px 0 25px`, `20px 0`, `20px 0 12px`, `20px 0 18px`, `20px auto 40px`, `24px 0 30px`, `25px 0`, `26px 0 12px`, `28px 0 20px`, `30px 0 20px`, `30px 0 25px`, `32px 0 42px`, `35px 0`, `38px 0 15px`, `45px 0 25px`, `45px 0 28px`, `55px auto 35px`, `5px 0 0`, `7px 0`, `8px 0 0`, `auto` |
+| `left` | `0`, `10px`, `12px`, `18px` |
+| `letter-spacing` | `-.5px`, `-.7px`, `-.8px`, `-1.6px`, `-1.7px`, `-1.8px`, `-1px`, `-2.5px`, `-2px`, `-3px`, `1.3px`, `1px`, `2.3px`, `2px`, `inherit`, `normal` |
+| `line-height` | `.8`, `1`, `1.08`, `1.12`, `1.25`, `1.3`, `1.35`, `1.5`, `1.6`, `1.7`, `1.75`, `1.8`, `1.85`, `1.9`, `inherit` |
+| `margin` | `-1px`, `0`, `0 0 12px`, `0 0 15px`, `0 0 18px`, `0 0 20px`, `0 0 24px`, `0 0 28px`, `0 0 7px`, `0 0 8px`, `0 auto`, `10px 0 0`, `12px 0 0`, `16px 0`, `16px 0 8px`, `18px 0 25px`, `20px 0`, `20px 0 12px`, `20px 0 18px`, `20px auto 40px`, `24px 0 30px`, `25px 0`, `26px 0 12px`, `28px 0 20px`, `30px 0 20px`, `30px 0 25px`, `32px 0 12px`, `32px 0 42px`, `35px 0`, `38px 0 15px`, `45px 0 25px`, `45px 0 28px`, `55px auto 35px`, `5px 0 0`, `7px 0`, `8px 0 0`, `8px 0 24px`, `auto` |
 | `margin-bottom` | `0`, `10px`, `12px`, `20px`, `22px`, `24px`, `25px`, `28px`, `30px`, `35px`, `40px`, `45px`, `48px`, `7px` |
 | `margin-left` | `0`, `10px`, `12px`, `25px`, `35px`, `5px`, `auto` |
 | `margin-right` | `28px`, `8px`, `auto` |
@@ -62,7 +62,7 @@
 | `padding-left` | `12px`, `16px`, `38px`, `max(6%,env(safe-area-inset-left))` |
 | `padding-right` | `0`, `16px`, `max(6%,env(safe-area-inset-right))` |
 | `padding-top` | `0`, `12px`, `20px`, `24px`, `25px`, `30px`, `35px`, `40px`, `55px`, `58px`, `60px`, `65px`, `7px`, `max(20px,env(safe-area-inset-top))` |
-| `right` | `0`, `18px` |
+| `right` | `0`, `10px`, `18px` |
 | `scroll-margin-top` | `125px`, `130px`, `24px`, `25px` |
 | `scroll-padding-top` | `125px`, `30px` |
 | `top` | `-18px`, `-30px`, `0`, `100%`, `12px`, `14px` |

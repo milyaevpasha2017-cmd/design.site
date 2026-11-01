@@ -27,7 +27,10 @@ function card(record){
     remove.disabled=true;try{await api('leads/'+record.id,{method:'DELETE',body:'{}'});article.remove();$('#leads-status').textContent='Заявка удалена';}catch(e){$('#leads-error').textContent=e.message;remove.disabled=false;}
   });controls.append(remove);
   const notices={sent:record.notification.channel==='email'?'Заявка отправлена по резервной почте':'Уведомление в Telegram отправлено',pending:'Уведомление ожидает отправки',failed:'Не удалось доставить уведомление. Заявка сохранена здесь.'};
-  article.append(head,contact,message,reference,make('p','hint',notices[record.notification.state]),controls);return article;
+  const consent=make('details','lead-consent');
+  consent.append(make('summary','hint',record.consent?.accepted?'Согласие: '+new Date(record.consent.acceptedAt).toLocaleString('ru-RU')+' · версия '+record.consent.version:'Заявка поступила до введения отдельной фиксации согласия'));
+  if(record.consent?.text)consent.append(make('p','lead-message',record.consent.text));
+  article.append(head,contact,message,reference,make('p','hint',notices[record.notification.state]),consent,controls);return article;
 }
 async function load(append=false){
   if(loading)return;loading=true;$('#refresh').disabled=true;$('#more').disabled=true;$('#leads-error').textContent='';

@@ -15,6 +15,9 @@ from urllib.parse import urlsplit, urljoin
 from xml.sax.saxutils import escape as xml_escape
 
 ROOT = Path(__file__).resolve().parents[1]
+LEGAL=json.loads((ROOT/'legal/2026-11-01.json').read_text())
+DOCUMENTS=LEGAL['documents']
+LEGAL_VERSION=LEGAL['version']
 DEFAULT_URL = 'https://milyaevpasha2017-cmd.github.io/design.site/'
 ROUTES = {'home':'', 'projects':'projects/', 'about':'about/', 'services':'services/', 'videos':'videos/', 'contact':'contact/'}
 def e(value): return html.escape(str(value), quote=True)
@@ -95,6 +98,15 @@ class Site:
         return '<div class="contact-links">'+''.join(links)+'</div>' if links else ''
     def nav(self,current):
         return ''.join(f'<a href="{self.link(key)}"'+(' aria-current="page"' if current==key else '')+f'>{e(self.ui[key])}</a>' for key in ['projects','about','services','videos','contact'])
+    def legal_footer(self):
+        return '<nav class="legal-links" aria-label="Правовая информация">'+''.join(f'<a href="{self.base}{key}/">{e(doc["title"])}</a>' for key,doc in DOCUMENTS.items())+'<button type="button" data-cookie-settings>Настройки cookie</button></nav>'
+    def cookie_banner(self):
+        return f'<section id="cookie-banner" class="cookie-banner" aria-label="Настройки cookie" hidden><div><h2>Настройки cookie</h2><p>С вашего согласия используем Яндекс Метрику и Вебвизор для анализа посещений. Вы можете отказаться — сайт и форма продолжат работать. <a href="{self.base}cookies/">Подробнее о cookie</a> · <a href="{self.base}privacy/">Политика обработки данных</a></p></div><div class="cookie-actions"><button type="button" data-cookie-accept>Принять</button><button type="button" data-cookie-reject>Отклонить</button></div></section>'
+    def legal_page(self,key):
+        doc=DOCUMENTS[key]
+        crumbs=f'<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span aria-hidden="true">/</span><span aria-current="page">{e(doc["title"])}</span></nav>'
+        body=f'<article class="section legal-document">{crumbs}{heading(doc["title"])}<p class="legal-version">Редакция от {LEGAL_VERSION}</p>'+''.join(f'<section><h2>{e(title)}</h2><p>{r(text)}</p></section>' for title,text in doc['sections'])+'</article>'
+        return self.shell(doc['title']+' — Epiphany Interior',doc['sections'][0][1],body,key,key+'/')
     def indexable(self,key):
         return bool(key) and (key!='videos' or bool(self.pages['videos'].get('items')))
     def robots(self):
@@ -113,7 +125,7 @@ class Site:
                 page['@type']='WebPage'
                 image=self.image(project['image'])
                 page['primaryImageOfPage']={'@type':'ImageObject','url':urljoin(self.url,image.removeprefix(self.base))}
-        elif current!='home':crumbs.append((self.ui[current],canonical))
+        elif current!='home':crumbs.append((self.ui.get(current,DOCUMENTS.get(current,{}).get('title','')),canonical))
         if len(crumbs)>1:
             graph.append({'@type':'BreadcrumbList','@id':canonical+'#breadcrumb','itemListElement':[{'@type':'ListItem','position':i+1,'name':name,'item':url} for i,(name,url) in enumerate(crumbs)]})
             page['breadcrumb']={'@id':canonical+'#breadcrumb'}
@@ -126,7 +138,7 @@ class Site:
         share_image=urljoin(self.url,self.image(image_source).removeprefix(self.base))
         seo=(f'<link rel="canonical" href="{e(canonical)}">' if current else '')+('<meta name="robots" content="index,follow,max-image-preview:large">'+self.structured(title,description,current,path) if indexable else '<meta name="robots" content="noindex,follow">')
         logo=f'<a class="logo logo-with-mark" href="{self.link("home")}"><img class="brand-mark" src="{self.base}assets/branding/logo-mark.png" width="64" height="74" alt="" aria-hidden="true"><span class="brand-wordmark"><span class="brand-name">{e(s["brand"])}</span><span class="brand-subtitle">{e(s["brand_subtitle"])}</span></span></a>'
-        return f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>{e(title)}</title><meta name="description" content="{e(description)}"><meta name="theme-color" content="#f5f3ee"><link rel="icon" type="image/x-icon" href="{self.base}favicon.ico?v=epiphany-1"><link rel="icon" type="image/png" sizes="32x32" href="{self.base}assets/branding/icon-32.png?v=epiphany-1"><link rel="icon" type="image/png" sizes="192x192" href="{self.base}assets/branding/icon-192.png?v=epiphany-1"><link rel="apple-touch-icon" sizes="180x180" href="{self.base}assets/branding/icon-180.png?v=epiphany-1"><meta property="og:type" content="website"><meta property="og:site_name" content="Epiphany Interior"><meta property="og:image" content="{e(share_image)}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}"><meta property="og:url" content="{e(canonical)}"><meta property="og:locale" content="ru_RU">{seo}<link rel="stylesheet" href="{self.base}style.css"><script defer src="{self.base}metrika.js"></script><script type="module" src="{self.base}script.js"></script></head><body><noscript><div><img src="https://mc.yandex.ru/watch/113965901" style="position:absolute; left:-9999px;" alt=""></div></noscript><a class="skip-link" href="#main-content">{e(self.ui['skip'])}</a>{(ROOT/'templates/icons.svg').read_text()}<header class="header">{logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">{e(self.ui['menu'])}{icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">{self.nav(current)}</nav></header><main id="main-content" tabindex="-1">{body}</main><footer>{logo}<p>{r(s['footer_tagline'])}</p><a href="#main-content">{e(self.ui['top'])} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">{self.nav(current)}</nav><p class="footer-note">{r(s['footer_note'])}</p></footer>{extra}</body></html>'''
+        return f'''<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>{e(title)}</title><meta name="description" content="{e(description)}"><meta name="theme-color" content="#f5f3ee"><link rel="icon" type="image/x-icon" href="{self.base}favicon.ico?v=epiphany-1"><link rel="icon" type="image/png" sizes="32x32" href="{self.base}assets/branding/icon-32.png?v=epiphany-1"><link rel="icon" type="image/png" sizes="192x192" href="{self.base}assets/branding/icon-192.png?v=epiphany-1"><link rel="apple-touch-icon" sizes="180x180" href="{self.base}assets/branding/icon-180.png?v=epiphany-1"><meta property="og:type" content="website"><meta property="og:site_name" content="Epiphany Interior"><meta property="og:image" content="{e(share_image)}"><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}"><meta property="og:url" content="{e(canonical)}"><meta property="og:locale" content="ru_RU">{seo}<link rel="stylesheet" href="{self.base}style.css"><script defer src="{self.base}metrika.js"></script><script type="module" src="{self.base}script.js"></script></head><body><a class="skip-link" href="#main-content">{e(self.ui['skip'])}</a>{(ROOT/'templates/icons.svg').read_text()}<header class="header">{logo}<button class="menu-toggle" aria-expanded="false" aria-controls="navigation">{e(self.ui['menu'])}{icon('menu')}</button><nav id="navigation" aria-label="Основная навигация">{self.nav(current)}</nav></header><main id="main-content" tabindex="-1">{body}</main><footer>{logo}<p>{r(s['footer_tagline'])}</p><a href="#main-content">{e(self.ui['top'])} ↑</a><nav class="footer-nav" aria-label="Навигация в подвале">{self.nav(current)}</nav><p class="footer-note">{r(s['footer_note'])}</p>{self.legal_footer()}</footer>{self.cookie_banner()}{extra}</body></html>'''
     def page_head(self,p,current):
         return f'<section class="page-heading section"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span aria-hidden="true">/</span><span aria-current="page">{e(self.ui[current])}</span></nav><p class="eyebrow">{e(p["label"])}</p>{heading(p["title"],p["emphasis"])}<p class="page-intro">{r(p["intro"])}</p></section>'
     def cta(self,p):
@@ -155,7 +167,7 @@ class Site:
             label=f'{name}_label';placeholder=f'{name}_placeholder'
             field=f'<textarea class="ym-disable-keys" dir="auto" id="{name}" name="{name}" rows="4" maxlength="3000" placeholder="{e(f[placeholder])}"></textarea>' if name=='message' else f'<input class="ym-disable-keys" dir="auto" id="{name}" name="{name}" required maxlength="{100 if name=="name" else 150}" autocomplete="{"name" if name=="name" else "off"}" placeholder="{e(f[placeholder])}">'
             fields+=f'<label for="{name}">{e(f[label])}</label>{field}'
-        return f'<noscript><p class="body-copy">{r(f["nojs_note"])}</p></noscript><form id="brief-form" hidden><h2 class="form-title">{inline(p["form_title"])}</h2>{fields}<div class="form-trap" aria-hidden="true"><label for="website">Ваш сайт</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div><button class="submit" type="submit">{e(f["submit"])}{icon()}</button><p class="form-note">{r(f["note"])}</p><p id="brief-status" role="status" aria-live="polite" tabindex="-1"></p><p id="brief-error" role="alert" tabindex="-1" hidden></p></form><script id="form-data" type="application/json">{safe_json(dict(form=f))}</script>'
+        return f'<noscript><p class="body-copy">{r(f["nojs_note"])}</p></noscript><form id="brief-form" hidden><h2 class="form-title">{inline(p["form_title"])}</h2>{fields}<div class="form-trap" aria-hidden="true"><label for="website">Ваш сайт</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div><input type="hidden" name="consent_version" value="{LEGAL_VERSION}"><label class="consent-check" for="personal-consent"><input type="checkbox" id="personal-consent" name="consent" required><span>Я даю <a href="{self.base}consent/" target="_blank" rel="noopener">согласие на обработку персональных данных</a> для ответа на обращение. <a href="{self.base}privacy/" target="_blank" rel="noopener">Политика обработки данных</a>.</span></label><button class="submit" type="submit">{e(f["submit"])}{icon()}</button><p class="form-note">{r(f["note"])}</p><p id="brief-status" role="status" aria-live="polite" tabindex="-1"></p><p id="brief-error" role="alert" tabindex="-1" hidden></p></form><script id="form-data" type="application/json">{safe_json(dict(form=f))}</script>'
     def standard_page(self,key):
         p=self.pages[key];body=self.page_head(p,key)
         if key=='projects':body+='<section class="section portfolio-section">'+self.cards(self.projects,2)+'</section>'
@@ -204,6 +216,7 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None)
     for key in ROUTES:
         if key!='home':pages[ROUTES[key]+'index.html']=site.standard_page(key)
     for i,p in enumerate(site.projects):pages['projects/'+p['slug']+'/index.html']=site.project_page(p,i)
+    for key in DOCUMENTS:pages[key+'/index.html']=site.legal_page(key)
     u=site.ui
     pages['404.html']=site.shell(u['not_found_title'],u['not_found_text'],f'<section class="section page-heading"><p class="eyebrow">404</p>{heading(u["not_found_title"])}<p class="page-intro">{e(u["not_found_text"])}</p>{site.button("home",u["home"])}</section>','')
     for path,body in pages.items():

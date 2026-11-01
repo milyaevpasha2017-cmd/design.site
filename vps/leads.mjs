@@ -1,3 +1,4 @@
+import {LEGAL_VERSION,consentText} from '../site-worker/src/legal.mjs';
 import {telegramFetch} from './telegram.mjs';
 import {mailConfigured,sendMail} from './mail.mjs';
 import {digest} from '../site-worker/src/security.mjs';
@@ -9,6 +10,7 @@ export class LeadInbox{
   constructor(storage,config,fetcher=telegramFetch,mailer=sendMail){this.mailer=mailer;this.storage=storage;this.config=config;this.fetcher=fetcher;this.running=false;}
   async submit(data,ip){
     if(!data||typeof data!=='object'||Array.isArray(data))throw error('Некорректная заявка.');
+    if(data.consent!==true||data.consentVersion!==LEGAL_VERSION)throw error('Для отправки заявки необходимо отдельное согласие на обработку персональных данных. Обновите страницу и отметьте галочку.');
     if(!uuid.test(data.id||''))throw error('Обновите страницу и повторите отправку.');
     if(data.website)throw error('Не удалось отправить форму. Напишите напрямую.');
     const clean=(value,max,required=false)=>{
@@ -17,6 +19,7 @@ export class LeadInbox{
     };
     const name=clean(data.name,100,true),contact=clean(data.contact,150,true),message=clean(data.message??'',3000);
     if(contact.length<3)throw error('Укажите телефон, email или контакт в Telegram.');
+    const consentHash=await digest(consentText);
     const fingerprint=await digest(JSON.stringify([name,contact,message]));
     const now=Date.now(),index='index:'+data.id,key='lead:'+String(9999999999999-now).padStart(13,'0')+':'+data.id;
     const ipKey='rate:'+await digest(this.config.ADMIN_PASSWORD_HASH+'\n'+ip);
@@ -31,7 +34,7 @@ export class LeadInbox{
       await store.put(ipKey,{times:[...times,now],expires:now+86400000});
       await store.put('rate:global',{times:[...recent,now],expires:now+3600000});
       await store.put(index,key);
-      await store.put(key,{id:data.id,name,contact,message,fingerprint,createdAt:now,status:'new',notification:{state:'pending',attempts:0,nextAt:now}});
+      await store.put(key,{id:data.id,name,contact,message,fingerprint,createdAt:now,consent:{accepted:true,acceptedAt:now,version:LEGAL_VERSION,document:'/consent/',text:consentText,textHash:consentHash},status:'new',notification:{state:'pending',attempts:0,nextAt:now}});
       return {id:data.id};
     });
   }

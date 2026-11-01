@@ -1,3 +1,4 @@
+import {LEGAL_VERSION} from '../site-worker/src/legal.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';
@@ -7,7 +8,7 @@ import {SQLiteNamespace} from '../vps/storage.mjs';
 import {LeadInbox} from '../vps/leads.mjs';
 import {backupDatabase} from '../vps/backup.mjs';
 import {fixture} from './helpers/password-site.mjs';
-const data=()=>({id:crypto.randomUUID(),name:"O’Neil 👩🏽‍🎨",contact:'@test_customer',message:'<script>alert(1)</script> שלום',website:''});
+const data=()=>({id:crypto.randomUUID(),name:"O’Neil 👩🏽‍🎨",contact:'@test_customer',message:'<script>alert(1)</script> שלום',website:'',consent:true,consentVersion:LEGAL_VERSION});
 async function environment(fn){
   const root=await mkdtemp(join(tmpdir(),'epiphany-leads-'));let ns=new SQLiteNamespace(join(root,'state.sqlite'));
   try{await fn({root,ns,service:(config={},fetcher)=>new LeadInbox(ns.storage('epiphany-leads'),{ADMIN_PASSWORD_HASH:'synthetic-salt',SITE_ORIGIN:'https://studio.example',...config},fetcher)});}
@@ -76,4 +77,16 @@ test('mail recipient follows current contact settings and successful receipts ar
   const pub=ns.get('epiphany-published-content');await pub.fetch('https://internal/',{method:'POST',body:JSON.stringify({action:'publish:update',file:'content/settings.json',data:settings,commit:'new-commit',sha:'new-sha'})});
   assert.equal((await currentContacts(ns,f.env.SITE_CONTENT)).email,'changed@example.com');
   const inbox=service();const request=data();await inbox.submit(request,'ip');await inbox.retry(request.id);assert.equal((await inbox.list()).leads[0].notification.attempts,0);
+}));
+
+test('personal data consent: strict server validation, immutable text/version/time evidence and idempotency',()=>environment(async({ns,service})=>{
+ const inbox=service(),request=data();
+ for(const consent of [false,undefined,'true',1])await assert.rejects(inbox.submit({...request,consent},'ip'),e=>e.status===400);
+ await assert.rejects(inbox.submit({...request,consentVersion:'outdated'},'ip'),e=>e.status===400);
+ assert.equal((await inbox.list()).leads.length,0);
+ await inbox.submit(request,'ip');
+ const record=(await inbox.list()).leads[0];assert.equal(record.consent.accepted,true);assert.equal(record.consent.version,LEGAL_VERSION);
+ assert.equal(record.consent.acceptedAt,record.createdAt);assert.match(record.consent.text,/Миляеву Павлу Сергеевичу/);assert.equal(record.consent.textHash.length,64);
+ await inbox.submit(request,'ip');assert.deepEqual((await inbox.list()).leads[0].consent,record.consent);
+ assert.ok(!record.consent.text.includes(request.contact));
 }));

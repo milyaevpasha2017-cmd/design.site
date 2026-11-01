@@ -85,7 +85,7 @@ document.querySelectorAll('[data-video-url]').forEach(card => {
     iframe.allowFullscreen = true; iframe.referrerPolicy = 'strict-origin-when-cross-origin'; frame.replaceChildren(iframe);
   });
 });
-// Prepare a message locally; opening a mail client never sends it automatically.
+// Submit the request only with separate personal-data consent.
 const form = $('#brief-form');
 if (form) {
   form.hidden = false;
@@ -99,16 +99,16 @@ if (form) {
   form.addEventListener('submit', async event => {
     event.preventDefault(); if (sending || accepted) return;
     for (const field of form.querySelectorAll('[required]')) {
-      field.setCustomValidity(field.value.trim() ? '' : copy.whitespace_error);
+      field.setCustomValidity((field.type==='checkbox'?field.checked:field.value.trim()) ? '' : field.type==='checkbox'?'Подтвердите согласие на обработку персональных данных.':copy.whitespace_error);
       if (!field.reportValidity()) return;
     }
     const values = new FormData(form);
     const fields = [...form.querySelectorAll('input, textarea')];
-    sending = true; button.disabled = true; fields.forEach(field => field.readOnly = true);
+    sending = true; button.disabled = true; fields.forEach(field => {field.readOnly = true;if(field.type==='checkbox')field.disabled=true;});
     error.hidden = true; status.textContent = copy.sending || 'Отправляем заявку…';
     form.setAttribute('aria-busy', 'true');
     try {
-      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message: values.get('message'), website: values.get('website') }) });
+      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message: values.get('message'), website: values.get('website'), consent: values.get('consent') === 'on', consentVersion: values.get('consent_version') }) });
       let data; try { data = await response.json(); } catch { throw new Error('Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.'); }
       if (!response.ok || !data.ok || data.id !== requestId) throw new Error(data.error || 'Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.');
       accepted = true;
@@ -120,7 +120,7 @@ if (form) {
       error.textContent = failure.name === 'TimeoutError' || failure instanceof TypeError ? 'Не удалось подтвердить отправку. Проверьте интернет и повторите: повторная попытка не создаст копию заявки.' : failure.message;
       error.focus();
     } finally {
-      sending = false; fields.forEach(field => field.readOnly = false); button.disabled = accepted;
+      sending = false; fields.forEach(field => {field.readOnly = false;if(field.type==='checkbox')field.disabled=false;}); button.disabled = accepted;
       form.removeAttribute('aria-busy');
     }
   });

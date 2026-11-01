@@ -1,3 +1,4 @@
+import {LEGAL_VERSION} from '../site-worker/src/legal.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,writeFile,mkdir,rm,symlink,readFile} from 'node:fs/promises';
@@ -32,7 +33,7 @@ test('VPS: real HTTP, trusted HTTPS proxy, login, publication, restart and backu
     });
     assert.equal((await request('/healthz')).status,200);
     const leadId=crypto.randomUUID();
-    const receipt=await request('/api/leads',{method:'POST',headers:{Origin:config.SITE_ORIGIN,'Content-Type':'application/json'},body:JSON.stringify({id:leadId,name:'Synthetic client',contact:'@test_contact',message:''})});
+    const receipt=await request('/api/leads',{method:'POST',headers:{Origin:config.SITE_ORIGIN,'Content-Type':'application/json'},body:JSON.stringify({id:leadId,name:'Synthetic client',consent:true,consentVersion:LEGAL_VERSION,contact:'@test_contact',message:''})});
     assert.equal(receipt.status,201);assert.equal((await receipt.json()).id,leadId);
     assert.equal((await request('/api/leads')).status,401);
 
