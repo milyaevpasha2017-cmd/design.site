@@ -40,6 +40,7 @@ export function startNavigation(mount,dispose){
         if(cookie)next.querySelector('#cookie-banner')?.replaceWith(cookie);
         dispose();document.body.replaceChildren(...[...next.body.childNodes].map(node=>document.adoptNode(node)));
         document.body.className=next.body.className;document.body.dataset.page=next.body.dataset.page;
+        for(const role of ['fontBody','fontDisplay'])document.body.dataset[role]=next.body.dataset[role]||'';
         document.title=next.title;document.head.querySelectorAll(metadata).forEach(el=>el.remove());
         next.head.querySelectorAll(metadata).forEach(el=>document.head.append(document.adoptNode(el)));
         if(!pop)history.pushState({epiphanyPage:newKey()},'',finalURL.href);

@@ -1,7 +1,4 @@
 /* Epiphany Interior — typography, composition and interaction layer. */
-@font-face{font-family:Manrope;src:url('assets/fonts/manrope.woff2') format('woff2');font-style:normal;font-weight:200 800;font-display:swap}
-@font-face{font-family:'Cormorant Garamond';src:url('assets/fonts/cormorant.woff2') format('woff2');font-style:normal;font-weight:500;font-display:swap}
-@font-face{font-family:'Cormorant Garamond';src:url('assets/fonts/cormorant-italic.woff2') format('woff2');font-style:italic;font-weight:500;font-display:swap}
 :root{--paper:#f5f4ef;--ink:#242b25;--muted:#626b61;--line:#d7dbd1;--accent:#697858;--soft:#e8ece2;--font-body:Manrope,Arial,sans-serif;--font-display:'Cormorant Garamond',Georgia,serif;--ease:cubic-bezier(.22,1,.36,1)}
 body{font-family:var(--font-body);background:var(--paper);color:var(--ink);line-height:1.65}
 header,main,footer{max-width:1680px}
@@ -318,3 +315,6 @@ main{view-transition-name:page-content}.header{view-transition-name:site-header}
 @keyframes page-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 html.page-loading{cursor:progress}html.page-loading .reading-progress{background:#b7c5a2}
 @media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+
+/* The wordmark keeps the original brand typeface when the site fonts change. */
+.header .logo .brand-name,footer .logo .brand-name{font-family:"Cormorant Garamond",Georgia,serif}

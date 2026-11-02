@@ -1342,6 +1342,41 @@
               "widget": "text"
             }
           ]
+        },
+        {
+          "name": "typography",
+          "label": "Библиотека шрифтов",
+          "widget": "object",
+          "required": false,
+          "fontLibrary": true,
+          "fields": [
+            {
+              "name": "body",
+              "label": "Основной шрифт",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "manrope",
+                "cormorant",
+                "onest",
+                "montserrat",
+                "literata"
+              ]
+            },
+            {
+              "name": "display",
+              "label": "Акцентный шрифт",
+              "widget": "select",
+              "required": false,
+              "options": [
+                "manrope",
+                "cormorant",
+                "onest",
+                "montserrat",
+                "literata"
+              ]
+            }
+          ]
         }
       ],
       "sections": [
@@ -1353,6 +1388,14 @@
             "contacts"
           ],
           "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Библиотека шрифтов",
+          "fields": [
+            "typography"
+          ],
+          "hint": "Шрифты для всего сайта. Фирменный логотип сохраняет своё начертание.",
           "collapsed": false
         },
         {

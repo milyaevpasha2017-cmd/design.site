@@ -14,6 +14,7 @@ export function validate(fields,data) {
     else if(field.widget==='number'){if(!Number.isSafeInteger(value) || value<0)throw new Error(`Некорректное число «${field.label}».`);}
     else {
       if(typeof value!=='string'||value.length>20000||(!value.trim()&&required))throw new Error(`Некорректный текст «${field.label}».`);
+      if(field.widget==='select'&&!field.options.includes(value))throw new Error(`Некорректный выбор «${field.label}».`);
       if(field.pattern&&!new RegExp(field.pattern[0]).test(value))throw new Error(field.pattern[1]);
       if(field.widget==='image' && !(/^assets\/[a-zA-Z0-9_./-]+$/.test(value)&&!value.split('/').includes('..')) && !/^https:\/\//.test(value))throw new Error('Некорректный адрес фотографии.');
     }

@@ -1,0 +1,19 @@
+/* Self-hosted font library. Only families used by the page are downloaded. */
+@font-face{font-family:"Manrope";src:url("assets/fonts/manrope.woff2") format("woff2");font-style:normal;font-weight:200 800;font-display:swap}
+body[data-font-body="manrope"]{--font-body:"Manrope",Arial,sans-serif}
+body[data-font-display="manrope"]{--font-display:"Manrope",Arial,sans-serif}
+@font-face{font-family:"Cormorant Garamond";src:url("assets/fonts/cormorant.woff2") format("woff2");font-style:normal;font-weight:500;font-display:swap}
+@font-face{font-family:"Cormorant Garamond";src:url("assets/fonts/cormorant-italic.woff2") format("woff2");font-style:italic;font-weight:500;font-display:swap}
+body[data-font-body="cormorant"]{--font-body:"Cormorant Garamond",Georgia,serif}
+body[data-font-display="cormorant"]{--font-display:"Cormorant Garamond",Georgia,serif}
+@font-face{font-family:"Onest";src:url("assets/fonts/onest.woff2") format("woff2");font-style:normal;font-weight:100 900;font-display:swap}
+body[data-font-body="onest"]{--font-body:"Onest",Arial,sans-serif}
+body[data-font-display="onest"]{--font-display:"Onest",Arial,sans-serif}
+@font-face{font-family:"Montserrat";src:url("assets/fonts/montserrat.woff2") format("woff2");font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:"Montserrat";src:url("assets/fonts/montserrat-italic.woff2") format("woff2");font-style:italic;font-weight:100 900;font-display:swap}
+body[data-font-body="montserrat"]{--font-body:"Montserrat",Arial,sans-serif}
+body[data-font-display="montserrat"]{--font-display:"Montserrat",Arial,sans-serif}
+@font-face{font-family:"Literata";src:url("assets/fonts/literata.woff2") format("woff2");font-style:normal;font-weight:500;font-display:swap}
+@font-face{font-family:"Literata";src:url("assets/fonts/literata-italic.woff2") format("woff2");font-style:italic;font-weight:500;font-display:swap}
+body[data-font-body="literata"]{--font-body:"Literata",Georgia,serif}
+body[data-font-display="literata"]{--font-display:"Literata",Georgia,serif}

@@ -1,3 +1,4 @@
+import {renderTypography} from './fonts.js';
 import {plainText} from '../rich-text.mjs';
 import {combineHeadings,combinedValue,addFormatting} from './formatting.mjs';
 const $=selector=>document.querySelector(selector);
@@ -31,6 +32,7 @@ function renderFields(container,fields,data,path=''){
   for(const field of combineHeadings(fields)){
     const key=field.name,id='field-'+(path+key).replaceAll(/[^a-zA-Z0-9_-]/g,'-');
     const group=make('div','field');const optional=field.required===false?' · необязательно':'';
+    if(field.fontLibrary){renderTypography(group,data[key],value=>{data[key]=value;updateStatus();});container.append(group);continue;}
     if(field.widget==='object'){
       const details=make('details','object-group');details.open=!field.collapsed;details.append(make('summary','',field.label));
       const inner=make('div','object-fields');const object=data[key]&&typeof data[key]==='object'?data[key]:{};

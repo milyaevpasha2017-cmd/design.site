@@ -33,3 +33,21 @@ details[open]>summary.section-title::after{content:' −'}
 /* Client inbox */
 .leads-main{max-width:1100px;padding:35px 5%}.lead-card{border:1px solid #d9d9ce;padding:24px;margin:20px 0;border-radius:12px;background:#fff}
 .lead-card:target{outline:2px solid #737b60}.lead-heading,.lead-controls{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}.lead-heading h2{margin:0;font-size:24px}.lead-message,.lead-contact{white-space:pre-wrap;overflow-wrap:anywhere}.lead-contact{font-weight:600;margin-top:20px}.lead-controls select{display:block;padding:10px;margin-top:6px}.lead-controls label{margin:0}.leads-main button{cursor:pointer}#leads-error{color:#8a2f28}
+/* Font library: independent preview, keeping the editor itself readable. */
+.font-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:24px 0 0}
+.font-select{display:block;width:100%;min-height:48px;padding:12px 36px 12px 14px;border:1px solid var(--line);border-radius:4px;background:var(--white);color:var(--ink);font:inherit;font-size:16px}
+.font-select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.font-pair-preview{padding:32px;background:#f5f4ef;border:1px solid var(--line);border-radius:8px;margin-bottom:20px;overflow-wrap:anywhere}
+.font-pair-preview .font-eyebrow{font-size:10px;letter-spacing:.12em;margin:0 0 22px}
+.font-pair-preview .font-heading{font-size:clamp(30px,4vw,48px);font-weight:400;line-height:1.12;letter-spacing:-.035em;max-width:650px;margin:0 0 24px}
+.font-heading em{display:block;font-size:1.14em;font-weight:500}
+.font-body{font-size:16px;line-height:1.8;max-width:560px;margin:0 0 24px}
+.font-button{display:inline-block;padding:14px 24px;background:#242b25;color:#fff;font-size:15px;font-weight:650;border-radius:3px;line-height:1.4}
+.font-selection{margin:24px 0 0}
+.font-library{margin:28px 0 12px;border-top:1px solid var(--line)}
+.font-library summary{cursor:pointer;padding:20px 0;font-size:16px}
+.font-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.font-card{min-width:0;padding:20px;border:1px solid var(--line);border-radius:6px;background:var(--white)}
+.font-card h4{font:600 13px/1.5 Arial,sans-serif;margin:0 0 18px}
+.font-sample{font-size:26px;line-height:1.3;overflow-wrap:anywhere;margin:0 0 16px}
+@media(max-width:700px){.font-controls,.font-catalog{grid-template-columns:1fr}.font-pair-preview{padding:24px 18px}}

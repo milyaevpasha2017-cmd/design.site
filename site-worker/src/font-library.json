@@ -1,0 +1,50 @@
+[
+  {
+    "id": "manrope",
+    "name": "Manrope",
+    "family": "Manrope",
+    "fallback": "Arial,sans-serif",
+    "description": "Чистый современный гротеск. Текущий основной шрифт.",
+    "file": "manrope.woff2",
+    "weights": "200 800"
+  },
+  {
+    "id": "cormorant",
+    "name": "Cormorant Garamond",
+    "family": "Cormorant Garamond",
+    "fallback": "Georgia,serif",
+    "description": "Выразительная антиква с мягким курсивом. Текущий акцентный шрифт.",
+    "file": "cormorant.woff2",
+    "italic": "cormorant-italic.woff2",
+    "weights": "500"
+  },
+  {
+    "id": "onest",
+    "name": "Onest",
+    "family": "Onest",
+    "fallback": "Arial,sans-serif",
+    "description": "Спокойный, открытый и хорошо читаемый гротеск.",
+    "file": "onest.woff2",
+    "weights": "100 900"
+  },
+  {
+    "id": "montserrat",
+    "name": "Montserrat",
+    "family": "Montserrat",
+    "fallback": "Arial,sans-serif",
+    "description": "Геометричные формы и заметные заголовки.",
+    "file": "montserrat.woff2",
+    "italic": "montserrat-italic.woff2",
+    "weights": "100 900"
+  },
+  {
+    "id": "literata",
+    "name": "Literata",
+    "family": "Literata",
+    "fallback": "Georgia,serif",
+    "description": "Современная антиква с выразительным курсивом.",
+    "file": "literata.woff2",
+    "italic": "literata-italic.woff2",
+    "weights": "500"
+  }
+]
