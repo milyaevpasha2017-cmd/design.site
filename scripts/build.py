@@ -244,6 +244,7 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None)
         target=output/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(body)
     shutil.copytree(ROOT/'assets',output/'assets')
     shutil.copy2(ROOT/'assets/branding/favicon.ico',output/'favicon.ico')
+    shutil.copy2(ROOT/'yandex_59d8ac18e7c2c0a9.html',output/'yandex_59d8ac18e7c2c0a9.html')
     if admin_mode == 'password':
         if site.base != '/': raise ValueError('Password admin requires a root domain URL')
         shutil.copytree(ROOT/'password-admin',output/'admin',ignore=shutil.ignore_patterns('schema.json'))
