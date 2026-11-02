@@ -31,5 +31,7 @@
   if(valid){if(saved.accepted)load();else clearAnalytics();}else if(banner)banner.hidden=false;
   document.querySelector('[data-cookie-accept]')?.addEventListener('click',()=>choose(true));
   document.querySelector('[data-cookie-reject]')?.addEventListener('click',()=>choose(false));
-  document.querySelectorAll('[data-cookie-settings]').forEach(button=>button.addEventListener('click',()=>{if(banner){banner.hidden=false;banner.querySelector('[data-cookie-accept]')?.focus();}}));
+  const bindSettings=()=>document.querySelectorAll('[data-cookie-settings]').forEach(button=>button.addEventListener('click',()=>{if(banner){banner.hidden=false;banner.querySelector('[data-cookie-accept]')?.focus();}}));
+  bindSettings();
+  document.addEventListener?.('site:navigated',bindSettings);
 })();

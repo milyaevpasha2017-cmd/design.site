@@ -3,6 +3,12 @@ import {initDecisions} from './decisions.js';
 import {initQuiz} from './quiz.js';
 import {quizLeadMessage} from './quiz-model.mjs';
 import { vkEmbed, contactURL } from './content-utils.mjs';
+import {startNavigation} from './navigation.js';
+import {watch} from './page-lifecycle.js';
+let activePage;
+function mountPage(){
+activePage?.abort();activePage=new AbortController();
+const signal=activePage.signal;
 const $ = selector => document.querySelector(selector);
 const node = (tag, className, text) => { const el = document.createElement(tag); if (className) el.className = className; if (text != null) el.textContent = text; return el; };
 const menuButton = $('.menu-toggle');
@@ -17,23 +23,24 @@ menuButton.addEventListener('click', () => {
   menuButton.setAttribute('aria-expanded', String(open)); navigation.classList.toggle('open', open);
   if (open) navigation.querySelector('a')?.focus();
 });
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(true); });
-document.addEventListener('click', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); });
-document.addEventListener('focusin', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); });
-matchMedia('(max-width: 900px)').addEventListener('change', () => closeMenu());
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(true); },{signal});
+document.addEventListener('click', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); },{signal});
+document.addEventListener('focusin', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); },{signal});
+matchMedia('(max-width: 900px)').addEventListener('change', () => closeMenu(),{signal});
 navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
   closeMenu();
 }));
 // Progressive UI enhancements: source content remains visible without JS.
 let progressQueued = false;
 function updateProgress() {
+  if(signal.aborted)return;
   progressQueued = false;
   const root = document.documentElement, range = root.scrollHeight - root.clientHeight;
   root.style.setProperty('--page-progress', String(range > 0 ? Math.max(0, Math.min(1, root.scrollTop / range)) : 0));
 }
 function queueProgress() { if (!progressQueued) { progressQueued = true; requestAnimationFrame(updateProgress); } }
-addEventListener('scroll', queueProgress, {passive:true});
-addEventListener('resize', queueProgress); updateProgress();
+addEventListener('scroll', queueProgress, {passive:true,signal});
+addEventListener('resize', queueProgress,{signal}); updateProgress();
 const portfolio = $('.portfolio-section');
 if (portfolio?.querySelector('.project-card')) {
   const switcher = portfolio.querySelector('.project-view-switch');
@@ -53,11 +60,12 @@ function revealLinkedService() {
   detail.open = true;
   requestAnimationFrame(() => { detail.scrollIntoView({block:'start'}); detail.querySelector('summary')?.focus({preventScroll:true}); });
 }
-addEventListener('hashchange', revealLinkedService); revealLinkedService();
+addEventListener('hashchange', revealLinkedService,{signal}); revealLinkedService();
 if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const observer = new IntersectionObserver(entries => entries.forEach(entry => {
     if (entry.isIntersecting) { entry.target.classList.add('reveal-in'); observer.unobserve(entry.target); }
   }), {threshold:.12});
+  watch(observer,signal);
   document.querySelectorAll('.project-card,.steps article,.service-teasers>a').forEach(element => observer.observe(element));
 }
 // Full-size photographs on individual project pages.
@@ -177,11 +185,14 @@ if (form) {
   });
 }
 
-initQuiz();
-initMotion();
+initQuiz(signal);
+initMotion(signal);
 
 // Existing links to sections of the original one-page site keep working.
 if (location.pathname === new URL(document.querySelector('.logo').href).pathname) {
   const legacy = { '#projects':'projects/', '#approach':'about/', '#services':'services/', '#videos':'videos/', '#contact':'contact/' };
   if (legacy[location.hash]) location.replace(new URL(legacy[location.hash], document.querySelector('.logo').href));
 }
+}
+mountPage();
+startNavigation(mountPage,()=>activePage.abort());

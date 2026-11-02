@@ -1,6 +1,7 @@
+import {watch} from './page-lifecycle.js';
 import {quizResult} from './quiz-model.mjs';
 const goal = name => { try { window.ym?.(113965901, 'reachGoal', name); } catch {} };
-export function initQuiz() {
+export function initQuiz(signal) {
   const root = document.querySelector('#interior-quiz'); if (!root) return;
   const $ = selector => document.querySelector(selector);
   const config = JSON.parse($('#quiz-data').textContent), questions = $('#quiz-questions'), lead = $('#brief-form');
@@ -48,7 +49,7 @@ export function initQuiz() {
     if (!completed) {completed = true; goal('quiz_completed');}
   });
   const edit = $('#quiz-edit');
-  new MutationObserver(() => { edit.disabled = lead.getAttribute('aria-busy') === 'true'; }).observe(lead, {attributes:true, attributeFilter:['aria-busy']});
+  watch(new MutationObserver(() => { edit.disabled = lead.getAttribute('aria-busy') === 'true'; }),signal).observe(lead, {attributes:true, attributeFilter:['aria-busy']});
   edit.addEventListener('click', () => {
     if (lead.getAttribute('aria-busy') === 'true') return;
     $('#quiz-result').hidden = true;

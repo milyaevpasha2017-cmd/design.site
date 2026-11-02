@@ -250,7 +250,7 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None)
         login=output/'admin/login';login.mkdir();shutil.copy2(ROOT/'password-admin/login.html',login/'index.html')
     elif admin_mode == 'github': shutil.copytree(ROOT/'admin',output/'admin')
     else: raise ValueError('Unknown admin mode')
-    for file in ['style.css','design.css','script.js','quiz.js','quiz-model.mjs','decisions.js','motion.js','metrika.js','content-utils.mjs','rich-text.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
+    for file in ['style.css','design.css','script.js','quiz.js','quiz-model.mjs','decisions.js','motion.js','navigation.js','page-lifecycle.js','metrika.js','content-utils.mjs','rich-text.mjs','.nojekyll']:shutil.copy2(ROOT/file,output/file)
     # Formatted source JSON is private to the build/CMS, never needed by site visitors.
     urls=[site.url+(path.removesuffix('index.html')) for path in pages if path!='404.html' and (path!='videos/index.html' or site.indexable('videos'))]
     (output/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+xml_escape(url)+'</loc></url>' for url in urls)+'</urlset>')
