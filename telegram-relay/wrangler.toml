@@ -1,0 +1,11 @@
+name = "epiphany-telegram-relay"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = true
+preview_urls = false
+
+[vars]
+TELEGRAM_CHAT_ID = "653315064"
+# Add TELEGRAM_BOT_TOKEN as a Cloudflare secret, never as a plaintext variable.
+[observability]
+enabled = false

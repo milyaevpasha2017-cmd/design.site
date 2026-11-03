@@ -12,7 +12,7 @@ import {LeadInbox} from './leads.mjs';
 import {currentContacts} from './contacts.mjs';
 import {telegramFetch} from './telegram.mjs';
 
-export async function application(config,{fetcher=fetch,telegramFetcher=telegramFetch}={}){
+export async function application(config,{fetcher=fetch,telegramFetcher=(input,options)=>telegramFetch(input,options,config)}={}){
   const origin=new URL(config.SITE_ORIGIN);
   if(origin.protocol!=='https:'||origin.origin!==config.SITE_ORIGIN||origin.username||origin.password)throw new Error('SITE_ORIGIN must be an HTTPS origin without a trailing slash');
   if(!config.ADMIN_USERNAME||!validPasswordHash(config.ADMIN_PASSWORD_HASH)||!config.GITHUB_CONTENT_TOKEN||!/^\w[\w.-]*\/[\w.-]+$/.test(config.CONTENT_REPO||''))throw new Error('Missing or invalid server configuration');
