@@ -22,6 +22,6 @@ test('relay verifies bot identity without sending messages and preserves rate-li
  const worker=createRelay(async(url)=>{assert.ok(url.endsWith('/getMe'));return Response.json({ok:true,result:{id:1,username:'epiphany_int_bot',extra:'omit'}});});
  assert.deepEqual(await (await worker.fetch(request('/getMe',{}),env)).json(),{ok:true,result:{id:1,username:'epiphany_int_bot'}});
  const limited=createRelay(async()=>Response.json({ok:false,error_code:429,parameters:{retry_after:91},description:'sensitive'},{status:429}));
- const response=await limited.fetch(request(),env);assert.equal(response.status,429);assert.deepEqual(await response.json(),{ok:false,error_code:429,parameters:{retry_after:91}});
+ const response=await limited.fetch(request(),env);assert.equal(response.status,429);assert.deepEqual(await response.json(),{ok:false,error_code:429,stage:'telegram_api',parameters:{retry_after:91}});
  const timeout=createRelay(async()=>{throw new Error('token must not leak');});assert.deepEqual(await (await timeout.fetch(request(),env)).json(),{ok:false,error_code:504});
 });

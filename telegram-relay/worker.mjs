@@ -20,7 +20,7 @@ export function createRelay(fetcher=fetch){return {async fetch(request,env){
   if(url.search||!['/getMe','/sendMessage'].includes(url.pathname))return fail(404);
   if(request.method!=='POST')return fail(405);
   if(!env.TELEGRAM_BOT_TOKEN||!env.TELEGRAM_CHAT_ID)return fail(503);
-  if(!await authorized(request.headers.get('Authorization')||'','Bearer '+env.TELEGRAM_BOT_TOKEN))return fail(401);
+  if(!await authorized(request.headers.get('Authorization')||'','Bearer '+env.TELEGRAM_BOT_TOKEN))return reply(401,{ok:false,error_code:401,stage:'relay_auth'});
   if(!request.headers.get('Content-Type')?.startsWith('application/json'))return fail(415);
   let payload;
   try{
@@ -40,7 +40,7 @@ export function createRelay(fetcher=fetch){return {async fetch(request,env){
       return reply(200,{ok:true,result:url.pathname==='/getMe'?{id:data.result.id,username:data.result.username}:true});
     }
     const code=[400,401,403,429].includes(data.error_code)?data.error_code:502;
-    return reply(code,{ok:false,error_code:code,...(code===429?{parameters:{retry_after:Math.max(1,Math.min(3600,Number(data.parameters?.retry_after)||60))}}:{})});
+    return reply(code,{ok:false,error_code:code,stage:'telegram_api',...(code===429?{parameters:{retry_after:Math.max(1,Math.min(3600,Number(data.parameters?.retry_after)||60))}}:{})});
   }catch{return fail(504);}
 }};}
 export default createRelay();
