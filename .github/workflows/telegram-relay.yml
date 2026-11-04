@@ -20,6 +20,7 @@ jobs:
           node-version: '24'
       - run: node --test tests/telegram-relay.test.mjs tests/telegram-transport.test.mjs
       - run: npm ci --prefix site-worker --ignore-scripts
+      - run: node tests/browser/telegram-relay-workerd.mjs
       - run: npm exec --prefix site-worker -- wrangler deploy --config telegram-relay/wrangler.toml
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

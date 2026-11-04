@@ -11,7 +11,7 @@ test('relay rejects unauthenticated calls, arbitrary methods, wrong recipient an
 test('relay forwards only approved fields to fixed Telegram bot and does not echo client details',async()=>{
  const worker=createRelay(async(url,options)=>{
   assert.equal(url,'https://api.telegram.org/bot'+env.TELEGRAM_BOT_TOKEN+'/sendMessage');
-  assert.equal(options.redirect,'error');assert.deepEqual(options.headers,{'Content-Type':'application/json'});
+  assert.equal(options.redirect,'manual');assert.deepEqual(options.headers,{'Content-Type':'application/json'});
   assert.deepEqual(JSON.parse(options.body),{chat_id:env.TELEGRAM_CHAT_ID,text:'Новая заявка',link_preview_options:{is_disabled:true}});
   return Response.json({ok:true,result:{text:'private',chat:{id:123}}});
  });

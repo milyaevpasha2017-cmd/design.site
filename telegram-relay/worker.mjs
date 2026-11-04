@@ -15,7 +15,7 @@ async function readBody(request){
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-export function createRelay(fetcher=fetch){return {async fetch(request,env){
+export function createRelay(fetcher=(input,options)=>globalThis.fetch(input,options)){return {async fetch(request,env){
   const url=new URL(request.url);
   if(url.search||!['/getMe','/sendMessage'].includes(url.pathname))return fail(404);
   if(request.method!=='POST')return fail(405);
@@ -32,9 +32,10 @@ export function createRelay(fetcher=fetch){return {async fetch(request,env){
   }catch{return fail(400);}
   try{
     const upstream=await fetcher('https://api.telegram.org/bot'+env.TELEGRAM_BOT_TOKEN+url.pathname,{
-      method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
+      method:'POST',redirect:'manual',signal:AbortSignal.timeout(15000),
       headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
     });
+    if(upstream.status>=300&&upstream.status<400)return reply(502,{ok:false,error_code:502,stage:'telegram_redirect'});
     let data;
     try{data=await upstream.json();}catch{return reply(502,{ok:false,error_code:502,stage:'telegram_response',upstream_status:upstream.status});}
 
