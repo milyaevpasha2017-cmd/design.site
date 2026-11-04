@@ -22,7 +22,7 @@ async function asset(request,env,privatePage=false){
 }
 async function publicSite(request,env,path){
   if(!env.SITE_CONTENT)return asset(request,env);
-  if(path==='/yandex_59d8ac18e7c2c0a9.html')return ['GET','HEAD'].includes(request.method)?asset(request,env):new Response('Method not allowed',{status:405});
+  if(['/yandex_59d8ac18e7c2c0a9.html','/google2a6a1606b1efa065.html'].includes(path))return ['GET','HEAD'].includes(request.method)?asset(request,env):new Response('Method not allowed',{status:405});
   if(path.startsWith('/assets/uploads/')){
     const built=await asset(request,env);
     if(built.status!==404)return built;
