@@ -27,12 +27,14 @@ test('saved text and settings are public immediately, without rebuilding or expo
   const f=await fixture(),user=await f.login();
   const document=await (await f.request('/api/pages/home',{cookie:user.cookie})).json();
   document.data.emphasis='Новый текст без ожидания <script>alert(1)</script>';
+  document.data.about_intro='Сохранённая биография **дизайнера** с новым текстом.';
   let result=await f.request('/api/pages/home',{method:'PUT',cookie:user.cookie,csrf:user.csrf,body:document});
   assert.equal((await result.json()).published,true);
   let page=await f.request('/');let html=await page.text();
   assert.equal(page.status,200);assert.equal(page.headers.get('Cache-Control'),'no-store');
   assert.ok(html.includes('Новый текст без ожидания &lt;script&gt;'));
   assert.ok(!html.includes('<script>alert(1)</script>'));
+  assert.ok(html.includes('Сохранённая биография <strong>дизайнера</strong> с новым текстом.'));
   assert.ok(!html.includes('server-only-test-token'));assert.ok(!html.includes('pbkdf2'));
   const settings=await (await f.request('/api/pages/settings',{cookie:user.cookie})).json();
   settings.data.footer_tagline='Новый подвал на всех страницах';
