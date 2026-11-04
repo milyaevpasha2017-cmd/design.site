@@ -26,7 +26,7 @@ menuButton.addEventListener('click', () => {
 document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(true); },{signal});
 document.addEventListener('click', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); },{signal});
 document.addEventListener('focusin', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); },{signal});
-matchMedia('(max-width: 900px)').addEventListener('change', () => closeMenu(),{signal});
+matchMedia(document.body.dataset.page==='home'?'(max-width: 1100px)':'(max-width: 900px)').addEventListener('change', () => closeMenu(),{signal});
 navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
   closeMenu();
 }));
