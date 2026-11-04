@@ -23,5 +23,12 @@ test('relay verifies bot identity without sending messages and preserves rate-li
  assert.deepEqual(await (await worker.fetch(request('/getMe',{}),env)).json(),{ok:true,result:{id:1,username:'epiphany_int_bot'}});
  const limited=createRelay(async()=>Response.json({ok:false,error_code:429,parameters:{retry_after:91},description:'sensitive'},{status:429}));
  const response=await limited.fetch(request(),env);assert.equal(response.status,429);assert.deepEqual(await response.json(),{ok:false,error_code:429,stage:'telegram_api',parameters:{retry_after:91}});
- const timeout=createRelay(async()=>{throw new Error('token must not leak');});assert.deepEqual(await (await timeout.fetch(request(),env)).json(),{ok:false,error_code:504});
+ const timeout=createRelay(async()=>{throw new Error('token must not leak');});assert.deepEqual(await (await timeout.fetch(request(),env)).json(),{ok:false,error_code:502,stage:'telegram_transport',reason:'network'});
+});
+
+test('relay distinguishes deadlines from non-JSON responses without reflecting credentials',async()=>{
+ const timeout=createRelay(async()=>{throw new DOMException('secret URL','TimeoutError');});
+ assert.deepEqual(await (await timeout.fetch(request(),env)).json(),{ok:false,error_code:504,stage:'telegram_transport',reason:'timeout'});
+ const html=createRelay(async()=>new Response('<html>private gateway error</html>',{status:403}));
+ assert.deepEqual(await (await html.fetch(request(),env)).json(),{ok:false,error_code:502,stage:'telegram_response',upstream_status:403});
 });

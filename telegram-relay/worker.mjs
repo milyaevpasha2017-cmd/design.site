@@ -35,12 +35,17 @@ export function createRelay(fetcher=fetch){return {async fetch(request,env){
       method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),
       headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
     });
-    const data=await upstream.json();
+    let data;
+    try{data=await upstream.json();}catch{return reply(502,{ok:false,error_code:502,stage:'telegram_response',upstream_status:upstream.status});}
+
     if(upstream.ok&&data.ok===true){
       return reply(200,{ok:true,result:url.pathname==='/getMe'?{id:data.result.id,username:data.result.username}:true});
     }
     const code=[400,401,403,429].includes(data.error_code)?data.error_code:502;
     return reply(code,{ok:false,error_code:code,stage:'telegram_api',...(code===429?{parameters:{retry_after:Math.max(1,Math.min(3600,Number(data.parameters?.retry_after)||60))}}:{})});
-  }catch{return fail(504);}
+  }catch(error){
+    const kind=['TimeoutError','AbortError'].includes(error?.name)?'timeout':error?.name==='TypeError'?'type_error':'network';
+    return reply(kind==='timeout'?504:502,{ok:false,error_code:kind==='timeout'?504:502,stage:'telegram_transport',reason:kind});
+  }
 }};}
 export default createRelay();

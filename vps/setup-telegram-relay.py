@@ -29,7 +29,9 @@ try{
  const data=await response.json();
  if(!response.ok||data.ok!==true){
   const messages={relay_auth:'Worker rejected the server token: Cloudflare secret and server token differ.',telegram_api:'Worker reached Telegram, but Telegram rejected the request.'};
-  process.stdout.write('HTTP '+response.status+'. '+(messages[data.stage]||'Worker returned an error.'));process.exit(1);
+  const transport={timeout:'Cloudflare to Telegram timeout.',type_error:'Cloudflare fetch TypeError.',network:'Cloudflare to Telegram network failure.'};
+  const detail=data.stage==='telegram_transport'?(transport[data.reason]||'Cloudflare transport failed.'):data.stage==='telegram_response'?'Telegram returned a non-JSON response.':messages[data.stage]||'Worker returned an error.';
+  process.stdout.write('HTTP '+response.status+'. '+detail);process.exit(1);
  }
  if(data.result?.username!=='epiphany_int_bot'){process.stdout.write('Bot identity differs from epiphany_int_bot.');process.exit(1);} 
  process.stdout.write('verified');
