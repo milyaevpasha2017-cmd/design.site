@@ -18,19 +18,22 @@
         {
           "name": "label",
           "label": "Надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "availability",
           "label": "География работы",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "title",
           "label": "Заголовок",
           "widget": "text",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "emphasis",
@@ -43,7 +46,8 @@
           "label": "Вступительный текст",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "image",
@@ -53,50 +57,58 @@
         {
           "name": "image_alt",
           "label": "Описание фотографии",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "caption",
           "label": "Подпись к фотографии",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "image_note",
           "label": "Примечание к фотографии",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "bottom",
           "label": "Подпись под первым экраном",
           "widget": "string",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "button",
           "label": "Текст кнопки",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "explore",
           "label": "Ссылка на портфолио",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "projects_label",
           "label": "Проекты: надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "projects_title",
           "label": "Проекты: заголовок",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "projects_emphasis",
@@ -109,19 +121,22 @@
           "label": "Проекты: примечание",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "about_label",
           "label": "О дизайнере: надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "about_title",
           "label": "О дизайнере: заголовок",
           "widget": "text",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "about_emphasis",
@@ -134,19 +149,22 @@
           "label": "О дизайнере: короткий текст",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "services_label",
           "label": "Услуги: надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "services_title",
           "label": "Услуги: заголовок",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "services_emphasis",
@@ -162,14 +180,16 @@
             {
               "name": "label",
               "label": "Надзаголовок",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "title",
               "label": "Заголовок приглашения",
               "widget": "text",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "emphasis",
@@ -182,15 +202,40 @@
               "label": "Вступительный текст",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "button",
               "label": "Текст кнопки",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             }
           ],
           "collapsed": true
+        },
+        {
+          "name": "text_blocks",
+          "label": "Дополнительные текстовые блоки",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок блока",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст блока",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -268,6 +313,14 @@
           ],
           "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
+        },
+        {
+          "label": "Дополнительные текстовые блоки",
+          "fields": [
+            "text_blocks"
+          ],
+          "hint": "Отображаются в конце страницы. Добавляйте, удаляйте и меняйте порядок кнопками выше и ниже.",
+          "collapsed": false
         }
       ]
     },
@@ -289,14 +342,16 @@
         {
           "name": "label",
           "label": "Надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "title",
           "label": "Заголовок",
           "widget": "text",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "emphasis",
@@ -309,7 +364,8 @@
           "label": "Вступительный текст",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "paragraphs",
@@ -320,7 +376,8 @@
             "label": "Абзац",
             "widget": "text",
             "rich": true,
-            "richLinks": true
+            "richLinks": true,
+            "required": false
           }
         },
         {
@@ -331,14 +388,16 @@
         {
           "name": "image_alt",
           "label": "Описание фотографии",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "principles_title",
           "label": "Заголовок принципов",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "principles",
@@ -347,20 +406,23 @@
           "field": {
             "name": "principle",
             "label": "Принцип",
-            "widget": "string"
+            "widget": "string",
+            "required": false
           }
         },
         {
           "name": "process_label",
           "label": "Этапы: надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "process_title",
           "label": "Этапы: заголовок",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "process_emphasis",
@@ -376,14 +438,16 @@
             {
               "name": "label",
               "label": "Надзаголовок",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "title",
               "label": "Заголовок приглашения",
               "widget": "text",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "emphasis",
@@ -396,15 +460,40 @@
               "label": "Вступительный текст",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "button",
               "label": "Текст кнопки",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             }
           ],
           "collapsed": true
+        },
+        {
+          "name": "text_blocks",
+          "label": "Дополнительные текстовые блоки",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок блока",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст блока",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -464,6 +553,14 @@
           ],
           "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
+        },
+        {
+          "label": "Дополнительные текстовые блоки",
+          "fields": [
+            "text_blocks"
+          ],
+          "hint": "Отображаются в конце страницы. Добавляйте, удаляйте и меняйте порядок кнопками выше и ниже.",
+          "collapsed": false
         }
       ]
     },
@@ -485,14 +582,16 @@
         {
           "name": "label",
           "label": "Надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "title",
           "label": "Заголовок",
           "widget": "text",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "emphasis",
@@ -505,7 +604,8 @@
           "label": "Вступительный текст",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "cta",
@@ -515,14 +615,16 @@
             {
               "name": "label",
               "label": "Надзаголовок",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "title",
               "label": "Заголовок приглашения",
               "widget": "text",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "emphasis",
@@ -535,15 +637,40 @@
               "label": "Вступительный текст",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "button",
               "label": "Текст кнопки",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             }
           ],
           "collapsed": true
+        },
+        {
+          "name": "text_blocks",
+          "label": "Дополнительные текстовые блоки",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок блока",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст блока",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -574,6 +701,14 @@
           ],
           "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
+        },
+        {
+          "label": "Дополнительные текстовые блоки",
+          "fields": [
+            "text_blocks"
+          ],
+          "hint": "Отображаются в конце страницы. Добавляйте, удаляйте и меняйте порядок кнопками выше и ниже.",
+          "collapsed": false
         }
       ]
     },
@@ -595,14 +730,16 @@
         {
           "name": "label",
           "label": "Надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "title",
           "label": "Заголовок",
           "widget": "text",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "emphasis",
@@ -615,7 +752,8 @@
           "label": "Вступительный текст",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "items",
@@ -628,28 +766,32 @@
               "label": "Название",
               "widget": "string",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "description",
               "label": "Описание",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             }
           ]
         },
         {
           "name": "process_label",
           "label": "Этапы: надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "process_title",
           "label": "Этапы: заголовок",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "process_emphasis",
@@ -666,21 +808,24 @@
             {
               "name": "label",
               "label": "Номер и подпись",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "title",
               "label": "Заголовок",
               "widget": "string",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "description",
               "label": "Описание",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             }
           ]
         },
@@ -692,14 +837,16 @@
             {
               "name": "label",
               "label": "Надзаголовок",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "title",
               "label": "Заголовок приглашения",
               "widget": "text",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "emphasis",
@@ -712,15 +859,40 @@
               "label": "Вступительный текст",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "button",
               "label": "Текст кнопки",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             }
           ],
           "collapsed": true
+        },
+        {
+          "name": "text_blocks",
+          "label": "Дополнительные текстовые блоки",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок блока",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст блока",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -770,6 +942,14 @@
           ],
           "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
+        },
+        {
+          "label": "Дополнительные текстовые блоки",
+          "fields": [
+            "text_blocks"
+          ],
+          "hint": "Отображаются в конце страницы. Добавляйте, удаляйте и меняйте порядок кнопками выше и ниже.",
+          "collapsed": false
         }
       ]
     },
@@ -791,14 +971,16 @@
         {
           "name": "label",
           "label": "Надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "title",
           "label": "Заголовок",
           "widget": "text",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "emphasis",
@@ -811,7 +993,8 @@
           "label": "Вступительный текст",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "items",
@@ -825,14 +1008,16 @@
               "label": "Название",
               "widget": "string",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "description",
               "label": "Описание",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "url",
@@ -857,14 +1042,16 @@
           "label": "Заголовок, если видео ещё нет",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "empty_text",
           "label": "Текст, если видео ещё нет",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "cta",
@@ -874,14 +1061,16 @@
             {
               "name": "label",
               "label": "Надзаголовок",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "title",
               "label": "Заголовок приглашения",
               "widget": "text",
               "rich": true,
-              "richLinks": false
+              "richLinks": false,
+              "required": false
             },
             {
               "name": "emphasis",
@@ -894,15 +1083,40 @@
               "label": "Вступительный текст",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "button",
               "label": "Текст кнопки",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             }
           ],
           "collapsed": true
+        },
+        {
+          "name": "text_blocks",
+          "label": "Дополнительные текстовые блоки",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок блока",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст блока",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -950,6 +1164,14 @@
           ],
           "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
+        },
+        {
+          "label": "Дополнительные текстовые блоки",
+          "fields": [
+            "text_blocks"
+          ],
+          "hint": "Отображаются в конце страницы. Добавляйте, удаляйте и меняйте порядок кнопками выше и ниже.",
+          "collapsed": false
         }
       ]
     },
@@ -971,14 +1193,16 @@
         {
           "name": "label",
           "label": "Надзаголовок",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         },
         {
           "name": "title",
           "label": "Заголовок",
           "widget": "text",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "emphasis",
@@ -991,14 +1215,16 @@
           "label": "Вступительный текст",
           "widget": "text",
           "rich": true,
-          "richLinks": true
+          "richLinks": true,
+          "required": false
         },
         {
           "name": "form_title",
           "label": "Заголовок формы",
           "widget": "string",
           "rich": true,
-          "richLinks": false
+          "richLinks": false,
+          "required": false
         },
         {
           "name": "form",
@@ -1009,66 +1235,101 @@
             {
               "name": "name_label",
               "label": "Подпись: имя",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "name_placeholder",
               "label": "Подсказка: имя",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "contact_label",
               "label": "Подпись: способ связи",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "contact_placeholder",
               "label": "Подсказка: способ связи",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "message_label",
               "label": "Подпись: о проекте",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "message_placeholder",
               "label": "Подсказка: о проекте",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "submit",
               "label": "Кнопка отправки",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "note",
               "label": "Пояснение формы",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "result",
               "label": "Сообщение после успешной отправки",
-              "widget": "text"
+              "widget": "text",
+              "required": false
             },
             {
               "name": "whitespace_error",
               "label": "Сообщение о незаполненном поле",
-              "widget": "string"
+              "widget": "string",
+              "required": false
             },
             {
               "name": "nojs_note",
               "label": "Пояснение при отключённом JavaScript",
               "widget": "text",
               "rich": true,
-              "richLinks": true
+              "richLinks": true,
+              "required": false
             },
             {
               "name": "sending",
               "label": "Сообщение во время отправки",
-              "widget": "string"
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "text_blocks",
+          "label": "Дополнительные текстовые блоки",
+          "widget": "list",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок блока",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст блока",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
             }
           ]
         }
@@ -1102,6 +1363,14 @@
           ],
           "hint": "Заголовок и описание для поисковой выдачи. Не показываются в тексте страницы.",
           "collapsed": true
+        },
+        {
+          "label": "Дополнительные текстовые блоки",
+          "fields": [
+            "text_blocks"
+          ],
+          "hint": "Отображаются в конце страницы. Добавляйте, удаляйте и меняйте порядок кнопками выше и ниже.",
+          "collapsed": false
         }
       ]
     },
@@ -1449,21 +1718,24 @@
       "label": "Название",
       "widget": "string",
       "rich": true,
-      "richLinks": false
+      "richLinks": false,
+      "required": false
     },
     {
       "name": "subtitle",
       "label": "Короткая подпись",
       "widget": "string",
       "rich": true,
-      "richLinks": false
+      "richLinks": false,
+      "required": false
     },
     {
       "name": "description",
       "label": "Описание",
       "widget": "text",
       "rich": true,
-      "richLinks": true
+      "richLinks": true,
+      "required": false
     },
     {
       "name": "image",
@@ -1473,7 +1745,8 @@
     {
       "name": "image_alt",
       "label": "Описание обложки для доступности",
-      "widget": "string"
+      "widget": "string",
+      "required": false
     },
     {
       "name": "is_concept",
@@ -1496,7 +1769,8 @@
         {
           "name": "alt",
           "label": "Описание фотографии",
-          "widget": "string"
+          "widget": "string",
+          "required": false
         }
       ]
     },
@@ -1515,7 +1789,8 @@
         "label": "Абзац",
         "widget": "text",
         "rich": true,
-        "richLinks": true
+        "richLinks": true,
+        "required": false
       }
     },
     {
@@ -1536,6 +1811,29 @@
       "label": "Год",
       "widget": "string",
       "required": false
+    },
+    {
+      "name": "text_blocks",
+      "label": "Дополнительные текстовые блоки",
+      "widget": "list",
+      "required": false,
+      "fields": [
+        {
+          "name": "title",
+          "label": "Заголовок блока",
+          "widget": "string",
+          "rich": true,
+          "required": false
+        },
+        {
+          "name": "text",
+          "label": "Текст блока",
+          "widget": "text",
+          "rich": true,
+          "richLinks": true,
+          "required": false
+        }
+      ]
     }
   ],
   "projectSections": [
@@ -1588,6 +1886,13 @@
       ],
       "hint": "Описание страницы в поисковой выдаче.",
       "collapsed": true
+    },
+    {
+      "label": "Дополнительные текстовые блоки",
+      "fields": [
+        "text_blocks"
+      ],
+      "collapsed": false
     }
   ]
 }

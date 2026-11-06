@@ -79,6 +79,10 @@ function renderFields(container,fields,data,path=''){
       if(field.pattern)input.addEventListener('change',()=>{input.setCustomValidity(input.value&&!new RegExp(field.pattern[0]).test(input.value)?field.pattern[1]:'');});
     }
     input.id=id;group.append(input);
+    if(field.required===false && (field.widget==='string'||field.widget==='text')){
+      const clear=make('button','quiet','Удалить текст');clear.type='button';
+      clear.addEventListener('click',()=>{input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));});group.append(clear);
+    }
     if(field.rich)addFormatting(group,input,field);
     if(field.widget==='image'){
       const preview=make('img','image-preview');preview.alt='Предпросмотр фотографии';preview.hidden=!assetURL(input.value);if(!preview.hidden)preview.src=assetURL(input.value);

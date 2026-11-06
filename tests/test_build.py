@@ -21,6 +21,7 @@ class Links(HTMLParser):
 class BuildTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name);self.content=self.root/'content';shutil.copytree(ROOT/'content',self.content)
+        home_path=self.content/'pages/home.json';home=json.loads(home_path.read_text());home['image']='assets/living.png';home_path.write_text(json.dumps(home))
         # Fixed project fixtures keep CMS additions/removals from invalidating the test suite.
         for path in (self.content/'projects').glob('*.json'):path.unlink()
         for i,(slug,title) in enumerate([('warm-minimalism','Тёплый минимализм'),('closer-to-nature','Ближе к природе'),('art-of-simplicity','Искусство простого')]):

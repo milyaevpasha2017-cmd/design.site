@@ -80,6 +80,9 @@ export class Site {
     return '<script type="application/ld+json">'+safeJSON({'@context':'https://schema.org','@graph':graph})+'</script>';
   }
   shell(title,description,body,current,path='',extra=''){
+    const record=this.projects.find(p=>path==='projects/'+p.slug+'/')||this.pages[current];
+    const blocks=(record?.text_blocks||[]).filter(b=>b.title?.trim()||b.text?.trim());
+    body+=blocks.map(b=>`<section class="section text-block">${b.title?.trim()?heading(b.title,'',2):''}${b.text?.trim()?`<div class="body-copy">${r(b.text)}</div>`:''}</section>`).join('');
     const fonts=typography(this.settings);
     title=plainText(title);description=plainText(description);
     const s=this.settings,canonical=this.url+path,indexable=this.indexable(current);
@@ -92,7 +95,7 @@ export class Site {
   pageHead(p,current){return `<section class="page-heading section"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="/">${e(this.ui.home)}</a><span aria-hidden="true">/</span><span aria-current="page">${e(this.ui[current])}</span></nav><p class="eyebrow">${e(p.label)}</p>${heading(p.title,p.emphasis)}<p class="page-intro">${r(p.intro)}</p></section>`;}
   cta(p){return `<section class="contact section page-cta"><div><p class="eyebrow">${e(p.label)}</p>${heading(p.title,p.emphasis,2)}<p>${r(p.intro)}</p></div><div>${this.button('contact',p.button,'submit')}${this.contacts()}</div></section>`;}
   cards(projects,level=3){
-    return projects.length?'<div class="project-grid">'+projects.map((p,i)=>`<a class="project-card${i%3===2?' wide':''}" href="${this.projectLink(p)}"><div class="project-image">${this.photo(p.image,p.image_alt,'card-photo')}<span class="project-type">${e(p.is_concept?this.ui.concept_label:this.ui.project_label)}</span><span class="project-arrow">${icon()}</span></div><div class="project-title"><h${level}>${inline(p.title)}</h${level}><span>${String(i+1).padStart(2,'0')}</span></div><p>${inline(p.subtitle)}</p></a>`).join('')+'</div>':`<p class="empty-state">${e(this.ui.empty_projects)}</p>`;
+    return projects.length?'<div class="project-grid">'+projects.map((p,i)=>`<a class="project-card${i%3===2?' wide':''}" href="${this.projectLink(p)}"><div class="project-image">${this.photo(p.image,p.image_alt,'card-photo')}<span class="project-arrow">${icon()}</span></div><div class="project-title"><h${level}>${inline(p.title)}</h${level}><span>${String(i+1).padStart(2,'0')}</span></div><p>${inline(p.subtitle)}</p></a>`).join('')+'</div>':`<p class="empty-state">${e(this.ui.empty_projects)}</p>`;
   }
   steps(p){return `<section class="process section"><p class="eyebrow">${e(p.process_label)}</p>${heading(p.process_title,p.process_emphasis,2)}<div class="steps">`+this.pages.services.steps.map(x=>`<article><span>${e(x.label)}</span><h3>${inline(x.title)}</h3><p>${r(x.description)}</p></article>`).join('')+'</div></section>';}
   home(){
@@ -138,7 +141,7 @@ ${this.quizTeaser()}
   projectPage(p,index){
     const photos=[{image:p.image,alt:p.image_alt},...(p.images||[])].filter(x=>this.image(x.image||'')).map(x=>({url:this.image(x.image),alt:x.alt??p.title}));
     const crumbs=`<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="/">${e(this.ui.home)}</a><span>/</span><a href="/projects/">${e(this.ui.projects)}</a><span>/</span><span aria-current="page">${inline(p.title)}</span></nav>`;
-    let body=`<section class="section project-heading">${crumbs}<p class="eyebrow">${e(p.is_concept?this.ui.concept_label:this.ui.project_label)}</p>${heading(p.title)}<p class="page-intro">${inline(p.subtitle)}</p><div class="project-facts">`+['location','area','year'].filter(k=>p[k]).map(k=>`<span>${e(p[k])}</span>`).join('')+'</div></section>';
+    let body=`<section class="section project-heading">${crumbs}${heading(p.title)}<p class="page-intro">${inline(p.subtitle)}</p><div class="project-facts">`+['location','area','year'].filter(k=>p[k]).map(k=>`<span>${e(p[k])}</span>`).join('')+'</div></section>';
     body+='<section class="section project-story">';
     if(photos.length)body+=`<button class="project-cover" data-gallery-open="0" aria-label="${e(this.ui.open_photo)}">${this.photo(p.image,p.image_alt,'',true)}<span class="project-arrow">${icon()}</span></button>`;
     body+=`<div class="project-narrative"><p class="project-lead">${r(p.description)}</p>${paragraphs(p.body)}</div>`;
@@ -151,7 +154,7 @@ ${this.quizTeaser()}
     if(index+1<this.projects.length)body+=`<a href="${this.projectLink(this.projects[index+1])}"><span><small>${e(this.ui.next_project)}</small>${inline(this.projects[index+1].title)}</span>${icon()}</a>`;
     body+='</nav>'+this.cta(this.pages.projects.cta);
     const extra=this.galleryDialog()+`<script id="gallery-data" type="application/json">${safeJSON({title:plainText(p.title),photos})}</script>`;
-    return this.shell(plainText(p.title)+(p.is_concept?' — концепция интерьера':' — дизайн интерьера')+' — Epiphany Interior',p.seo_description||p.description,body,'projects','projects/'+p.slug+'/',extra);
+    return this.shell(plainText(p.title)+' — дизайн интерьера'+' — Epiphany Interior',p.seo_description||p.description,body,'projects','projects/'+p.slug+'/',extra);
   }
   notFound(){const u=this.ui;return this.shell(u.not_found_title,u.not_found_text,`<section class="section page-heading"><p class="eyebrow">404</p>${heading(u.not_found_title)}<p class="page-intro">${e(u.not_found_text)}</p>${this.button('home',u.home)}</section>`,'');}
   failure(){return this.shell('Сайт временно недоступен — Epiphany Interior','Не удалось загрузить актуальные данные.',`<section class="section page-heading state-page"><p class="eyebrow">ВРЕМЕННАЯ ОШИБКА</p>${heading('Не удалось загрузить страницу')}<p class="page-intro">Повторите загрузку через несколько секунд. Если вопрос срочный, напишите нам напрямую.</p><a class="text-link" href="">Повторить загрузку ${icon()}</a>${this.contacts()}</section>`,'');}

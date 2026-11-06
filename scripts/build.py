@@ -136,6 +136,11 @@ class Site:
         return '<script type="application/ld+json">'+json.dumps({'@context':'https://schema.org','@graph':graph},ensure_ascii=False,separators=(',',':')).replace('<','\\u003c').replace('&','\\u0026')+'</script>'
     def shell(self,title,description,body,current,path='',extra=''):
         s=self.settings;fonts=json.loads((ROOT/'site-worker/src/font-library.json').read_text());chosen=s.get('typography') or {};body_font=next((f for f in fonts if f['id']==chosen.get('body')),fonts[0]);display_font=next((f for f in fonts if f['id']==chosen.get('display')),fonts[1]);canonical=self.url+path;indexable=self.indexable(current)
+        record=next((p for p in self.projects if path=='projects/'+p['slug']+'/'),None) or self.pages.get(current,{})
+        for block in record.get('text_blocks',[]):
+            title_text=block.get('title','');text=block.get('text','')
+            if title_text.strip() or text.strip():
+                body+='<section class="section text-block">'+(heading(title_text,'',2) if title_text.strip() else '')+('<div class="body-copy">'+r(text)+'</div>' if text.strip() else '')+'</section>'
         title=plain_text(title);description=plain_text(description)
         project=next((p for p in self.projects if path=='projects/'+p['slug']+'/'),None)
         image_source=(project or self.pages.get(current,{}) or {}).get('image') or self.pages['home']['image']
@@ -150,7 +155,7 @@ class Site:
     def cards(self,projects,level=3):
         cards=[]
         for i,p in enumerate(projects):
-            cards.append(f'<a class="project-card{" wide" if i%3==2 else ""}" href="{self.project_link(p)}"><div class="project-image">{self.photo(p["image"],p["image_alt"],"card-photo")}<span class="project-type">{e(self.ui["concept_label"] if p.get("is_concept") else self.ui["project_label"])}</span><span class="project-arrow">{icon()}</span></div><div class="project-title"><h{level}>{inline(p["title"])}</h{level}><span>{i+1:02d}</span></div><p>{inline(p["subtitle"])}</p></a>')
+            cards.append(f'<a class="project-card{" wide" if i%3==2 else ""}" href="{self.project_link(p)}"><div class="project-image">{self.photo(p["image"],p["image_alt"],"card-photo")}<span class="project-arrow">{icon()}</span></div><div class="project-title"><h{level}>{inline(p["title"])}</h{level}><span>{i+1:02d}</span></div><p>{inline(p["subtitle"])}</p></a>')
         return '<div class="project-grid">'+''.join(cards)+'</div>' if cards else f'<p class="empty-state">{e(self.ui["empty_projects"])}</p>'
     def steps(self,p):
         items=self.pages['services']['steps']
@@ -213,7 +218,7 @@ class Site:
         photos=[dict(image=p['image'],alt=p['image_alt'])]+(p.get('images') or [])
         photos=[dict(url=self.image(x['image']),alt=x.get('alt',p['title'])) for x in photos if self.image(x.get('image',''))]
         crumbs=f'<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span>/</span><a href="{self.link("projects")}">{e(self.ui["projects"])}</a><span>/</span><span aria-current="page">{inline(p["title"])}</span></nav>'
-        body=f'<section class="section project-heading">{crumbs}<p class="eyebrow">{e(self.ui["concept_label"] if p.get("is_concept") else self.ui["project_label"])}</p>{heading(p["title"])}<p class="page-intro">{inline(p["subtitle"])}</p><div class="project-facts">'+''.join(f'<span>{e(p[k])}</span>' for k in ['location','area','year'] if p.get(k))+'</div></section>'
+        body=f'<section class="section project-heading">{crumbs}{heading(p["title"])}<p class="page-intro">{inline(p["subtitle"])}</p><div class="project-facts">'+''.join(f'<span>{e(p[k])}</span>' for k in ['location','area','year'] if p.get(k))+'</div></section>'
         body+='<section class="section project-story">'
         if photos:body+=f'<button class="project-cover" data-gallery-open="0" aria-label="{e(self.ui["open_photo"])}">{self.photo(p["image"],p["image_alt"],priority=True)}<span class="project-arrow">{icon()}</span></button>'
         body+=f'<div class="project-narrative"><p class="project-lead">{r(p["description"])}</p>{paragraphs(p.get("body",[]))}</div>'
@@ -226,7 +231,7 @@ class Site:
         if index+1<len(self.projects):body+=f'<a href="{self.project_link(self.projects[index+1])}"><span><small>{e(self.ui["next_project"])}</small>{inline(self.projects[index+1]["title"])}</span>{icon()}</a>'
         body+='</nav>'+self.cta(self.pages['projects']['cta'])
         extra=self.gallery_dialog()+f'<script id="gallery-data" type="application/json">{safe_json(dict(title=plain_text(p["title"]),photos=photos))}</script>'
-        return self.shell(plain_text(p['title'])+(' — концепция интерьера' if p.get('is_concept') else ' — дизайн интерьера')+' — Epiphany Interior',p.get('seo_description') or p['description'],body,'projects','projects/'+p['slug']+'/',extra)
+        return self.shell(plain_text(p['title'])+' — дизайн интерьера'+' — Epiphany Interior',p.get('seo_description') or p['description'],body,'projects','projects/'+p['slug']+'/',extra)
 
 def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None):
     site=Site(content,url,canonical_url);output=Path(output)
@@ -267,3 +272,4 @@ if __name__=='__main__':
     parser.add_argument('--admin-mode',choices=['github','password'],default='github')
     args=parser.parse_args();build(ROOT/'content',args.output,args.site_url,args.admin_mode,args.canonical_url)
     if args.admin_mode=='password':worker_snapshot(ROOT/'content',ROOT/'site-worker/generated/site.json')
+
