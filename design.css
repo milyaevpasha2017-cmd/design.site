@@ -400,3 +400,9 @@ footer .logo .brand-name{font-size:56px;line-height:2.45}
 body .logo .brand-subtitle{margin-top:0;line-height:1.4}
 @media(max-width:600px){.header .logo .brand-name{font-size:26px}.header .logo-with-mark{gap:8px}footer .logo .brand-name{font-size:44px}}
 @media(max-width:380px){.header .logo .brand-name{font-size:23px}}
+
+
+/* Keep the subtitle below the script's descenders, including font fallback. */
+body .logo .brand-wordmark{display:flex;flex-direction:column;align-items:flex-start}
+.header .logo .brand-name,footer .logo .brand-name{display:block;line-height:2.6}
+body .logo .brand-subtitle{display:block;margin-top:8px;flex:none}
