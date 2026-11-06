@@ -27,6 +27,7 @@ test('SEO: public routes, canonical hierarchy, escaped structured data and non-i
   const error=site.response('/missing-page/');assert.equal(error.status,404);html=await error.text();assert.match(html,/noindex,follow/);assert.ok(!html.includes('rel="canonical"'));assert.equal(graphs(html).length,0);
   assert.equal(site.response('/about').headers.get('Location'),'/about/');
   assert.equal(site.response('/about/index.html').status,301);
+  assert.equal(site.response('/missing-page/index.html').status,404);
   site.pages.home.seo_title='Безопасный </script><script>alert(1)</script>';
   html=site.home();assert.ok(!html.includes('<script>alert(1)</script>'));assert.ok(graphs(html).length);
 });
@@ -36,4 +37,13 @@ test('SEO: robots is publicly available, points to the live sitemap; admin and A
   const robots=await f.request('/robots.txt');assert.equal(robots.status,200);assert.match(robots.headers.get('Content-Type'),/text\/plain/);
   const body=await robots.text();assert.match(body,/Sitemap: https:\/\/studio\.example\/sitemap.xml/);assert.ok(!body.includes('Disallow: /\n'));
   for(const path of ['/admin/login/','/api/leads'])assert.match((await f.request(path)).headers.get('X-Robots-Tag'),/noindex/);
+});
+
+test('canonical redirects preserve search parameters while page canonical stays clean',async()=>{
+ const f=await fixture();
+ for(const path of ['/contact?interest=layout&utm_source=test','/about/index.html?utm_campaign=launch']){
+  const response=await f.request(path);assert.equal(response.status,301);
+  assert.equal(new URL(response.headers.get('Location'),'https://studio.example').search,new URL(path,'https://studio.example').search);
+ }
+ const html=await(await f.request('/contact/?interest=layout&utm_source=test')).text();assert.match(html,/rel="canonical" href="https:\/\/studio\.example\/contact\/"/);
 });

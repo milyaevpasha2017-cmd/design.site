@@ -45,13 +45,15 @@ export function startNavigation(mount,dispose){
         next.head.querySelectorAll(metadata).forEach(el=>document.head.append(document.adoptNode(el)));
         if(!pop)history.pushState({epiphanyPage:newKey()},'',finalURL.href);
         else if(finalURL.href!==location.href)history.replaceState({...history.state},'',finalURL.href);
-        currentURL=location.href;mount();settle(finalURL,position);
-        requestAnimationFrame(()=>{if(ticket===serial)settle(finalURL,position);});
+        currentURL=location.href;mount({fromNavigation:true});settle(finalURL,position);
         document.dispatchEvent(new CustomEvent('site:navigated'));
         try{window.ym?.(113965901,'hit',finalURL.href,{title:document.title,referer:from});}catch{}
       };
-      if(document.startViewTransition&&!matchMedia('(prefers-reduced-motion: reduce)').matches){transition=document.startViewTransition(commit);await transition.updateCallbackDone;await transition.finished.catch(()=>{});}
-      else commit();
+      if(document.startViewTransition&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+        let committed=false;
+        try{transition=document.startViewTransition(()=>{commit();committed=true;});await transition.updateCallbackDone;await transition.finished.catch(()=>{});}
+        catch{if(!committed)commit();}
+      }else commit();
     }catch(error){if(ticket===serial&&error.name!=='AbortError')location.assign(url.href);}
     finally{if(ticket===serial){document.documentElement.classList.remove('page-loading');loading=null;}}
   }

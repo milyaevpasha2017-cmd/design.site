@@ -19,3 +19,9 @@ class ImageOptimizationTests(unittest.TestCase):
    with Image.open(Path(tmp)/preview['path']) as image:
     self.assertEqual(image.size,(1200,630));self.assertEqual(image.format,'JPEG')
    self.assertEqual(json.loads(manifest.read_text()),result)
+ def test_small_photos_reserve_layout_space_without_reencoding(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   assets=Path(tmp)/'assets';assets.mkdir();source=assets/'small.png'
+   Image.new('RGB',(320,200),'white').save(source);before=source.read_bytes()
+   result=module.optimize(assets,Path(tmp)/'manifest.json')
+   self.assertEqual(result['assets/small.png'],{'width':320,'height':200});self.assertEqual(source.read_bytes(),before)

@@ -10,12 +10,13 @@ def optimize(assets,manifest_path):
     result={};before=after=0
     for source in sorted(assets.rglob('*')):
         if not source.is_file() or source.is_symlink() or target in source.parents or source.suffix.lower() not in ('.jpg','.jpeg','.png','.webp'):continue
-        if source.stat().st_size<150_000:continue
         try:
             with Image.open(source) as original:
                 if getattr(original,'is_animated',False):continue
                 image=ImageOps.exif_transpose(original)
-                if image.width<640:continue
+                key='assets/'+source.relative_to(assets).as_posix()
+                if image.width<640 or source.stat().st_size<150_000:
+                    result[key]={'width':image.width,'height':image.height};continue
                 image=image.convert('RGBA' if 'A' in image.getbands() else 'RGB')
                 digest=hashlib.sha256(source.read_bytes()).hexdigest()[:20]
                 widths=sorted({min(w,image.width) for w in (480,960,1600)})
@@ -37,7 +38,7 @@ def optimize(assets,manifest_path):
                 before+=source.stat().st_size;after+=(target/Path(variants[-1]['path']).name).stat().st_size
         except (OSError,ValueError,Image.DecompressionBombError):continue
     Path(manifest_path).write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n')
-    print(f'Optimized {len(result)} images: originals {before} bytes; largest display variants {after} bytes')
+    print(f'Optimized {sum(bool(v.get("variants")) for v in result.values())} images: originals {before} bytes; largest display variants {after} bytes')
     return result
 
 if __name__=='__main__':

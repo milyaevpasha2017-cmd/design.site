@@ -36,6 +36,12 @@ async function publicSite(request,env,path){
     if(!response.ok)throw new Error('Publication unavailable');
     const content=currentContent(env.SITE_CONTENT,await response.json());
     const page=new Site(content,env.SITE_ORIGIN,env.SITE_CONTENT.icons).response(path);
+    // Preserve campaign and form context when normalizing a public URL.
+    if(page.status===301&&page.headers.has('Location')){
+      const headers=new Headers(page.headers),query=new URL(request.url).search;
+      headers.set('Location',headers.get('Location')+query);
+      return new Response(null,{status:301,headers});
+    }
     return request.method==='HEAD'?new Response(null,{status:page.status,headers:page.headers}):page;
   }catch{
     const site=new Site(env.SITE_CONTENT.content,env.SITE_ORIGIN,env.SITE_CONTENT.icons);

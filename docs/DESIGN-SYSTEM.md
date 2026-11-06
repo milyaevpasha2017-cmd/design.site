@@ -75,8 +75,8 @@
 | `right` | `0`, `10px`, `12px`, `14px`, `18px`, `6%`, `max(14px,env(safe-area-inset-right))`, `max(20px,env(safe-area-inset-right))` |
 | `row-gap` | `26px`, `36px` |
 | `scroll-margin-top` | `0`, `100px`, `115px`, `120px`, `125px`, `130px`, `24px`, `25px` |
-| `scroll-padding-top` | `125px`, `30px` |
-| `top` | `-18px`, `-30px`, `0`, `100%`, `106px`, `10px`, `12%`, `12px`, `14px`, `16px`, `18px`, `22px`, `28%`, `31%`, `75%`, `9%`, `auto` |
+| `scroll-padding-top` | `125px`, `30px`, `calc(var(--header-height,156px) + 20px)` |
+| `top` | `-18px`, `-30px`, `0`, `100%`, `106px`, `10px`, `12%`, `12px`, `14px`, `16px`, `18px`, `22px`, `28%`, `31%`, `75%`, `9%`, `auto`, `calc(var(--header-height,156px) + 16px)` |
 <!-- style-inventory:end -->
 
 

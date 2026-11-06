@@ -28,3 +28,16 @@ test('social previews are lightweight JPEGs with dimensions, escaped text and a 
   }
  }finally{delete manifest[project.image];}
 });
+
+test('project grids and gallery thumbnails use responsive copies while full view retains original',async()=>{
+ const snapshot=await sourceSnapshot(),site=new Site(snapshot.content,'https://studio.example',snapshot.icons),project=site.projects[0];
+ const image='assets/gallery-test.jpg';project.images=[{image,alt:'Комната проекта'}];
+ manifest[image]={width:2400,height:1600,variants:[{path:'assets/optimized/gallery-480.webp',width:480},{path:'assets/optimized/gallery-1600.webp',width:1600}]};
+ try{
+  const html=await site.response(site.projectLink(project)).text();
+  const grid=html.match(/<div class="project-photo-grid">([\s\S]*?)<\/div>/)[1];
+  assert.match(grid,/src="\/assets\/optimized\/gallery-1600.webp"/);assert.match(grid,/srcset=/);assert.match(grid,/width="2400" height="1600"/);assert.match(grid,/loading=lazy/);
+  const data=JSON.parse(html.match(/<script id="gallery-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  assert.equal(data.photos[1].url,'/assets/gallery-test.jpg');assert.equal(data.photos[1].thumbnail,'/assets/optimized/gallery-480.webp');
+ }finally{delete manifest[image];}
+});

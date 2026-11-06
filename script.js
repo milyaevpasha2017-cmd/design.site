@@ -4,9 +4,8 @@ import {initQuiz} from './quiz.js';
 import {quizLeadMessage} from './quiz-model.mjs';
 import { vkEmbed, contactURL } from './content-utils.mjs';
 import {startNavigation} from './navigation.js';
-import {watch} from './page-lifecycle.js';
 let activePage;
-function mountPage(){
+function mountPage({fromNavigation=false}={}){
 activePage?.abort();activePage=new AbortController();
 const signal=activePage.signal;
 const $ = selector => document.querySelector(selector);
@@ -36,7 +35,7 @@ function updateProgress() {
   if(signal.aborted)return;
   progressQueued = false;
   const root = document.documentElement, range = root.scrollHeight - root.clientHeight;
-  root.style.setProperty('--page-progress', String(range > 0 ? Math.max(0, Math.min(1, root.scrollTop / range)) : 0));
+  document.querySelector('.reading-progress')?.style.setProperty('--page-progress', String(range > 0 ? Math.max(0, Math.min(1, root.scrollTop / range)) : 0));
 }
 function queueProgress() { if (!progressQueued) { progressQueued = true; requestAnimationFrame(updateProgress); } }
 addEventListener('scroll', queueProgress, {passive:true,signal});
@@ -53,21 +52,15 @@ if (portfolio?.querySelector('.project-card')) {
     }));
   }
 }
-function revealLinkedService() {
+function revealLinkedService(scroll=true) {
   if (!/^#service-[1-9]\d*$/.test(location.hash)) return;
   const detail = document.getElementById(location.hash.slice(1));
   if (!detail?.matches('.service-detail')) return;
   detail.open = true;
+  if(!scroll)return;
   requestAnimationFrame(() => { detail.scrollIntoView({block:'start'}); detail.querySelector('summary')?.focus({preventScroll:true}); });
 }
-addEventListener('hashchange', revealLinkedService,{signal}); revealLinkedService();
-if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-    entry.target.classList.toggle('reveal-in',entry.isIntersecting);
-  }), {threshold:.12});
-  watch(observer,signal);
-  document.querySelectorAll('.project-card,.steps article,.service-teasers>a').forEach(element => observer.observe(element));
-}
+addEventListener('hashchange',()=>revealLinkedService(true),{signal});revealLinkedService(!fromNavigation);
 // Full-size photographs on individual project pages.
 const dialog = $('#project-dialog');
 if (dialog) {
@@ -85,7 +78,7 @@ if (dialog) {
   $('#viewer-controls').hidden = photos.length < 2;
   if (photos.length > 1) photos.forEach((photo, i) => {
     const button = node('button', 'gallery-thumb'); button.type = 'button'; button.setAttribute('aria-label', `${i + 1}: ${photo.alt}`);
-    const img = node('img'); img.src = photo.url; img.alt = ''; img.loading = 'lazy'; button.append(img);
+    const img = node('img'); img.src = photo.thumbnail || photo.url; img.alt = ''; img.loading = 'lazy'; button.append(img);
     button.addEventListener('click', () => showPhoto(i)); $('#project-gallery').append(button);
   });
   document.querySelectorAll('[data-gallery-open]').forEach(button => button.addEventListener('click', () => {
@@ -142,7 +135,7 @@ if (form) {
   form.hidden = false;
   form.tabIndex = -1;
   // The form is revealed by JS; resolve the incoming anchor after it is visible.
-  if (location.hash === '#brief-form') requestAnimationFrame(() => {
+  if (!fromNavigation && location.hash === '#brief-form') requestAnimationFrame(() => {
     form.scrollIntoView({block:'start'});
     form.focus({preventScroll:true});
   });
