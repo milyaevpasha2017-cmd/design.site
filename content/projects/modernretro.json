@@ -1,0 +1,26 @@
+{
+  "slug": "modernretro",
+  "order": 1,
+  "published": true,
+  "title": "MODERN RETRO",
+  "subtitle": "Interior Designer: Epifanova Paulina\n",
+  "description": "Location: Perm, Russia\nArea: 56 m²",
+  "image": "assets/uploads/835e2a2f-c839-49d3-b7d1-39a8a72fbfba.jpg",
+  "image_alt": "1",
+  "is_concept": false,
+  "images": [
+    {
+      "image": "assets/uploads/a3b8b6ce-83b5-41eb-a90a-52e8404ac25f.jpg",
+      "alt": "1"
+    },
+    {
+      "image": "assets/uploads/ca250062-6986-44f3-b918-01fa55843e46.jpg",
+      "alt": "1"
+    }
+  ],
+  "seo_description": "дизайн интерьера",
+  "body": [],
+  "location": "Пермь, Россия",
+  "area": "56 m²",
+  "year": "2023"
+}
