@@ -368,3 +368,13 @@ body[data-page] .contact-links a,body[data-page] .footer-nav a{font-size:16px;mi
 
 
 body[data-page]:not([data-page=home]) #navigation>a:hover,body[data-page]:not([data-page=home]) #navigation>a:focus-visible{background:var(--soft);border-color:var(--line)}
+
+
+/* Persistent page control; image fades use opacity only to preserve gallery motion. */
+.back-to-top{position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));z-index:40;display:grid;place-items:center;width:52px;height:52px;padding:0;border:1px solid var(--line);border-radius:50%;background:var(--ink);color:var(--paper);cursor:pointer;box-shadow:0 4px 18px #0005;transition:background .2s,transform .2s}
+.back-to-top[hidden]{display:none}
+.back-to-top:hover{background:var(--accent);transform:translateY(-3px)}
+.back-to-top:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+body.modal-open .back-to-top,body:has(dialog[open]) .back-to-top{visibility:hidden}
+@media(max-width:600px){.back-to-top{width:48px;height:48px;right:max(14px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom))}}
+@media(prefers-reduced-motion:reduce){.back-to-top{transition:none}.back-to-top:hover{transform:none}}

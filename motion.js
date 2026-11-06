@@ -1,6 +1,8 @@
 import {watch} from './page-lifecycle.js';
 // Native scrolling remains in charge; no wheel interception or forced sections.
 export function initMotion(signal){
+  initImageAppearance(signal);
+  initBackToTop(signal);
   if(document.body.dataset.page!=='home')return;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const grid=document.querySelector('#selected-projects .project-grid'),controls=document.querySelector('.project-rail-controls');
@@ -65,3 +67,49 @@ export function initMotion(signal){
   addEventListener('scroll',queue,{passive:true,signal});addEventListener('resize',queue,{signal});
   reduced.addEventListener('change',()=>{if(reduced.matches)visible.forEach(image=>image.style.removeProperty('--image-drift'));else queue();},{signal});
 }
+
+function initImageAppearance(signal){
+  if(!('IntersectionObserver' in window)||!Element.prototype.animate)return;
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const registered=new WeakSet(),seen=new WeakSet(),visible=new Set(),animations=new Set();
+  const appear=image=>{
+    if(signal.aborted||seen.has(image)||!image.complete||!image.naturalWidth)return;
+    seen.add(image);
+    if(reduced.matches)return;
+    const animation=image.animate([{opacity:0},{opacity:1}],{duration:650,easing:'cubic-bezier(.22,.61,.36,1)'});
+    animations.add(animation);animation.finished.catch(()=>{}).finally(()=>animations.delete(animation));
+  };
+  const observer=watch(new IntersectionObserver(entries=>{
+    for(const entry of entries){if(entry.isIntersecting){visible.add(entry.target);appear(entry.target);}else visible.delete(entry.target);}
+  },{threshold:0}),signal);
+  const register=image=>{
+    if(registered.has(image))return;registered.add(image);observer.observe(image);
+    image.addEventListener('load',()=>{seen.delete(image);if(visible.has(image))appear(image);},{signal});
+  };
+  document.querySelectorAll('img').forEach(register);
+  // Includes gallery thumbnails, enlarged photos and images added by page widgets.
+  const mutations=new MutationObserver(records=>{
+    for(const record of records){
+      for(const node of record.removedNodes){if(node.nodeType===1){if(node.matches('img')){visible.delete(node);observer.unobserve(node);}node.querySelectorAll('img').forEach(image=>{visible.delete(image);observer.unobserve(image);});}}
+      for(const node of record.addedNodes)if(node.nodeType===1){if(node.matches('img'))register(node);node.querySelectorAll('img').forEach(register);}
+    }
+  });
+  mutations.observe(document.body,{childList:true,subtree:true});
+  reduced.addEventListener('change',()=>{if(reduced.matches)animations.forEach(animation=>animation.cancel());},{signal});
+  signal.addEventListener('abort',()=>{mutations.disconnect();animations.forEach(animation=>animation.cancel());visible.clear();},{once:true});
+}
+
+function initBackToTop(signal){
+  const button=document.createElement('button');button.type='button';button.className='back-to-top';
+  button.setAttribute('aria-label','Вернуться наверх');button.title='Вернуться наверх';button.hidden=true;
+  button.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 20V4M5 11l7-7 7 7"/></svg>';
+  document.body.append(button);
+  const update=()=>{button.hidden=scrollY<Math.max(400,innerHeight*.6);};
+  button.addEventListener('click',()=>{
+    window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+    document.querySelector('#main-content')?.focus({preventScroll:true});
+  },{signal});
+  addEventListener('scroll',update,{passive:true,signal});addEventListener('resize',update,{signal});update();
+  signal.addEventListener('abort',()=>button.remove(),{once:true});
+}
+

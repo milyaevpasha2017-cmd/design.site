@@ -51,7 +51,7 @@
 
 | Свойство | Допустимые значения текущей версии |
 |---|---|
-| `bottom` | `0`, `10px`, `14px`, `18px`, `55px`, `5px`, `6px`, `70px` |
+| `bottom` | `0`, `10px`, `14px`, `18px`, `55px`, `5px`, `6px`, `70px`, `max(20px,env(safe-area-inset-bottom))`, `max(24px,env(safe-area-inset-bottom))` |
 | `column-gap` | `30px`, `34px`, `7vw`, `clamp(36px,6vw,90px)` |
 | `font` | `10px Arial,sans-serif`, `11px Arial,sans-serif`, `11px/1.7 Arial,sans-serif`, `13px Arial,sans-serif`, `14px/1.5 Arial,sans-serif`, `15px/1.6 Arial,Helvetica,sans-serif`, `26px var(--font-body)`, `300 26px/1 var(--font-body)`, `400 22px Georgia,serif`, `400 24px/1.35 Georgia,serif`, `400 25px Georgia,serif`, `400 25px/1.4 Georgia,serif`, `400 26px Georgia,serif`, `400 26px/1.65 Georgia,serif`, `400 27px Georgia,serif`, `400 32px/1.2 Georgia,serif`, `400 clamp(19px,5.8vw,26px)/1.3 Georgia,serif`, `40px/.85 Georgia,serif`, `550 16px/1.3 var(--font-body)`, `550 17px/1.35 var(--font-body)`, `550 18px/1.35 var(--font-body)`, `600 13px/1.5 Arial,sans-serif`, `600 14px var(--font-body)`, `8px/1.5 Arial,sans-serif`, `inherit` |
 | `font-family` | `"Cormorant Garamond",Georgia,serif`, `Arial,Helvetica,sans-serif`, `Arial,sans-serif`, `Georgia,'Times New Roman',serif`, `Georgia,serif`, `var(--font-body)`, `var(--font-display)` |
@@ -72,9 +72,10 @@
 | `padding-left` | `12px`, `16px`, `20px`, `34px`, `38px`, `5%`, `6%`, `8px`, `max(6%,env(safe-area-inset-left))` |
 | `padding-right` | `0`, `16px`, `5%`, `6%`, `max(6%,env(safe-area-inset-right))` |
 | `padding-top` | `0`, `104px`, `12px`, `16px`, `20px`, `22px`, `24px`, `25px`, `26px`, `28px`, `30px`, `32px`, `35px`, `36px`, `38px`, `40px`, `42px`, `55px`, `58px`, `60px`, `64px`, `65px`, `76px`, `7px`, `90px`, `max(14px,env(safe-area-inset-top))`, `max(20px,env(safe-area-inset-top))` |
-| `right` | `0`, `10px`, `12px`, `14px`, `18px`, `6%` |
+| `right` | `0`, `10px`, `12px`, `14px`, `18px`, `6%`, `max(14px,env(safe-area-inset-right))`, `max(20px,env(safe-area-inset-right))` |
 | `row-gap` | `26px`, `36px` |
 | `scroll-margin-top` | `0`, `100px`, `115px`, `120px`, `125px`, `130px`, `24px`, `25px` |
 | `scroll-padding-top` | `125px`, `30px` |
 | `top` | `-18px`, `-30px`, `0`, `100%`, `106px`, `10px`, `12%`, `12px`, `14px`, `16px`, `18px`, `22px`, `28%`, `31%`, `75%`, `9%`, `auto` |
 <!-- style-inventory:end -->
+
