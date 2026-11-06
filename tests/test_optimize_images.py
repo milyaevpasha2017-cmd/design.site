@@ -15,4 +15,7 @@ class ImageOptimizationTests(unittest.TestCase):
     path=Path(tmp)/v['path'];self.assertTrue(path.exists())
     with Image.open(path) as image:self.assertEqual(image.width,v['width'])
    self.assertLess((Path(tmp)/item['variants'][0]['path']).stat().st_size,len(before))
+   preview=item['social'];self.assertEqual(preview['type'],'image/jpeg')
+   with Image.open(Path(tmp)/preview['path']) as image:
+    self.assertEqual(image.size,(1200,630));self.assertEqual(image.format,'JPEG')
    self.assertEqual(json.loads(manifest.read_text()),result)

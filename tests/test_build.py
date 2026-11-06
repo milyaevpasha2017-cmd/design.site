@@ -19,6 +19,19 @@ class Links(HTMLParser):
             value=d.get('src') or d.get('href')
             if value:self.urls.append(value)
 class BuildTests(unittest.TestCase):
+    def test_social_preview_uses_absolute_canonical_url_and_generated_jpeg(self):
+        from unittest.mock import patch
+        site=module.Site(ROOT/'content','https://mirror.example/design.site/','https://example.test/')
+        image=site.pages['home']['image']
+        with patch.dict(module.IMAGE_MANIFEST,{image:{'social':{'path':'assets/optimized/social-test.jpg','width':1200,'height':630,'type':'image/jpeg'}}}):
+            tags=site.social('Заголовок "тест"','Описание <b>','home','')
+        self.assertIn('property="og:url" content="https://example.test/"',tags)
+        self.assertIn('property="og:image" content="https://example.test/assets/optimized/social-test.jpg"',tags)
+        self.assertIn('property="og:image:width" content="1200"',tags)
+        self.assertIn('property="og:image:height" content="630"',tags)
+        self.assertIn('name="twitter:image"',tags)
+        self.assertIn('&quot;тест&quot;',tags)
+        self.assertNotIn('<b>',tags)
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name);self.content=self.root/'content';shutil.copytree(ROOT/'content',self.content)
         home_path=self.content/'pages/home.json';home=json.loads(home_path.read_text());home['image']='assets/living.png';home_path.write_text(json.dumps(home))
@@ -92,3 +105,4 @@ class BuildTests(unittest.TestCase):
         pages=self.build('https://interior.example/');self.assertIn('href="/about/"',pages['index.html']);self.assertIn(module.e(json.loads((self.content/'settings.json').read_text())['ui']['empty_projects']),pages['projects/index.html'])
         self.assertTrue((self.root/'public/sitemap.xml').exists())
 if __name__=='__main__':unittest.main()
+

@@ -26,8 +26,14 @@ def optimize(assets,manifest_path):
                         copy=image.copy();copy.thumbnail((width,round(image.height*width/image.width)),Image.Resampling.LANCZOS)
                         copy.save(output,'WEBP',quality=82,method=4)
                     variants.append({'path':'assets/optimized/'+output.name,'width':width})
+                social=target/f'{digest}-og-1200x630.jpg'
+                if not social.exists():
+                    cover=ImageOps.fit(image,(1200,630),method=Image.Resampling.LANCZOS)
+                    if cover.mode=='RGBA':
+                        background=Image.new('RGB',cover.size,'#f5f3ee');background.paste(cover,mask=cover.getchannel('A'));cover=background
+                    cover.convert('RGB').save(social,'JPEG',quality=86,optimize=True)
                 key='assets/'+source.relative_to(assets).as_posix()
-                result[key]={'width':image.width,'height':image.height,'variants':variants}
+                result[key]={'width':image.width,'height':image.height,'variants':variants,'social':{'path':'assets/optimized/'+social.name,'width':1200,'height':630,'type':'image/jpeg'}}
                 before+=source.stat().st_size;after+=(target/Path(variants[-1]['path']).name).stat().st_size
         except (OSError,ValueError,Image.DecompressionBombError):continue
     Path(manifest_path).write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n')
