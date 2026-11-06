@@ -17,3 +17,5 @@ body[data-font-display="montserrat"]{--font-display:"Montserrat",Arial,sans-seri
 @font-face{font-family:"Literata";src:url("assets/fonts/literata-italic.woff2") format("woff2");font-style:italic;font-weight:500;font-display:swap}
 body[data-font-body="literata"]{--font-body:"Literata",Georgia,serif}
 body[data-font-display="literata"]{--font-display:"Literata",Georgia,serif}
+
+@font-face{font-family:"Amsterdam Three Slant";src:url("assets/fonts/amsterdam-three-slant.woff") format("woff");font-style:normal;font-weight:400;font-display:swap;ascent-override:126%;descent-override:98%;line-gap-override:0%}

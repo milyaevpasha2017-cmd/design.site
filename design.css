@@ -391,3 +391,12 @@ body[data-page] .contact-links a{justify-content:flex-start;gap:12px}
 .footer-email span{min-width:0}
 body .logo .brand-subtitle{text-transform:none}
 @media(max-width:700px){.portfolio-section .project-grid{grid-template-columns:minmax(0,1fr);gap:32px}}
+
+
+/* Designer-supplied wordmark font; independent from the editable page typography. */
+.header .logo .brand-name,footer .logo .brand-name{font-family:"Amsterdam Three Slant",cursive;font-weight:400;font-style:normal;letter-spacing:normal;line-height:1.2}
+.header .logo .brand-name{font-size:36px;line-height:2.45}
+footer .logo .brand-name{font-size:56px;line-height:2.45}
+body .logo .brand-subtitle{margin-top:0;line-height:1.4}
+@media(max-width:600px){.header .logo .brand-name{font-size:26px}.header .logo-with-mark{gap:8px}footer .logo .brand-name{font-size:44px}}
+@media(max-width:380px){.header .logo .brand-name{font-size:23px}}
