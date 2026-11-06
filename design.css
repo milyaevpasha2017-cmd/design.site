@@ -323,7 +323,7 @@ html.page-loading{cursor:progress}html.page-loading .reading-progress{background
 body[data-page] #navigation{gap:6px}
 body[data-page] #navigation>a{display:flex;align-items:center;justify-content:center;min-height:52px;padding:12px 16px;font:550 16px/1.3 var(--font-body);letter-spacing:-.025em;border:1px solid transparent;border-radius:6px;transition:background .2s,border-color .2s}
 body[data-page] #navigation>a:after{display:none}
-body[data-page] #navigation>a:hover,body[data-page] #navigation>a:focus-visible{background:color-mix(in srgb,currentColor 7%,transparent);border-color:color-mix(in srgb,currentColor 22%,transparent)}
+body[data-page] #navigation>a:hover,body[data-page] #navigation>a:focus-visible{background:#ffffff0d;border-color:#ffffff30}
 body[data-page] .header-apply{min-height:52px;font-size:15px;padding:14px 22px;white-space:nowrap}
 body[data-page] main :is(.text-link,.hero-secondary){display:inline-flex;align-items:center;justify-content:center;min-height:58px;padding:16px 28px;border:1px solid var(--line);border-radius:6px;font:550 18px/1.35 var(--font-body);letter-spacing:-.025em;transition:background .25s,border-color .25s,transform .25s}
 body[data-page] main .text-link:hover{background:var(--soft);border-color:var(--accent);transform:translateY(-2px)}
@@ -366,3 +366,5 @@ body[data-page] .contact-links a,body[data-page] .footer-nav a{font-size:16px;mi
   body[data-page] main .text-link:hover{transform:none}
 }
 
+
+body[data-page]:not([data-page=home]) #navigation>a:hover,body[data-page]:not([data-page=home]) #navigation>a:focus-visible{background:var(--soft);border-color:var(--line)}
