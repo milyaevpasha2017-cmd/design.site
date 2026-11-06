@@ -42,7 +42,7 @@ export function httpServer(app){
       if(incoming.headers.host!==host||!incoming.url?.startsWith('/')||incoming.url.startsWith('//')){outgoing.writeHead(400);outgoing.end('Bad request');return;}
       if(incoming.headers['x-forwarded-proto']!=='https'){outgoing.writeHead(400);outgoing.end('HTTPS required');return;}
       const headers=new Headers();
-      for(const key of ['content-type','content-length','cookie','origin','x-csrf-token','accept'])if(incoming.headers[key])headers.set(key,incoming.headers[key]);
+      for(const key of ['content-type','content-length','cookie','origin','x-csrf-token','accept','if-none-match','if-modified-since'])if(incoming.headers[key])headers.set(key,incoming.headers[key]);
       headers.set('CF-Connecting-IP',incoming.headers['x-real-ip']||incoming.socket.remoteAddress||'unknown');
       const controller=new AbortController();incoming.on('aborted',()=>controller.abort());
       const method=incoming.method;
