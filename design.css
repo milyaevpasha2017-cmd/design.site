@@ -378,3 +378,16 @@ body[data-page]:not([data-page=home]) #navigation>a:hover,body[data-page]:not([d
 body.modal-open .back-to-top,body:has(dialog[open]) .back-to-top{visibility:hidden}
 @media(max-width:600px){.back-to-top{width:48px;height:48px;right:max(14px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom))}}
 @media(prefers-reduced-motion:reduce){.back-to-top{transition:none}.back-to-top:hover{transform:none}}
+
+
+/* Designer review: aligned portfolio and monochrome contact marks. */
+.portfolio-section .project-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 24px}
+.portfolio-section .project-grid>.project-card:nth-child(n){grid-column:auto;margin:0;min-width:0}
+.portfolio-section .project-grid>.project-card:nth-child(n) .project-image{aspect-ratio:4/3;height:auto}
+.portfolio-section .project-grid>.project-card:nth-child(n) .card-photo{object-position:center}
+.social-icon{display:inline-block;flex:none;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+body[data-page] .contact-links a{justify-content:flex-start;gap:12px}
+.footer-email{display:flex;align-items:center;gap:12px;overflow-wrap:anywhere}
+.footer-email span{min-width:0}
+body .logo .brand-subtitle{text-transform:none}
+@media(max-width:700px){.portfolio-section .project-grid{grid-template-columns:minmax(0,1fr);gap:32px}}

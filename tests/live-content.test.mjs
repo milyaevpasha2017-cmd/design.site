@@ -37,10 +37,10 @@ test('saved text and settings are public immediately, without rebuilding or expo
   assert.ok(html.includes('Сохранённая биография <strong>дизайнера</strong> с новым текстом.'));
   assert.ok(!html.includes('server-only-test-token'));assert.ok(!html.includes('pbkdf2'));
   const settings=await (await f.request('/api/pages/settings',{cookie:user.cookie})).json();
-  settings.data.footer_tagline='Новый подвал на всех страницах';
+  settings.data.contacts.email='designer@example.com';
   result=await f.request('/api/pages/settings',{method:'PUT',cookie:user.cookie,csrf:user.csrf,body:settings});
   assert.equal((await result.json()).published,true);
-  for(const route of ['/','/about/','/projects/','/contact/'])assert.ok((await (await f.request(route)).text()).includes(settings.data.footer_tagline));
+  for(const route of ['/','/about/','/projects/','/contact/'])assert.ok((await (await f.request(route)).text()).includes(settings.data.contacts.email));
 });
 
 test('project creation, unpublishing and deletion update listings, routes and sitemap immediately',async()=>{
@@ -130,3 +130,4 @@ test('out-of-order publications cannot undo newer writes, but deliberate reversi
   assert.equal((await read()).title,'Recreated');
   assert.equal(await f.storage.getAlarm(),null,'Persistent content must not start the session cleanup alarm.');
 });
+
