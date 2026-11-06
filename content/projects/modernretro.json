@@ -6,16 +6,28 @@
   "subtitle": "Interior Designer: Epifanova Paulina\n",
   "description": "Location: Perm, Russia\nArea: 56 m²",
   "image": "assets/uploads/835e2a2f-c839-49d3-b7d1-39a8a72fbfba.jpg",
-  "image_alt": "1",
+  "image_alt": "Кухня-гостиная",
   "is_concept": false,
   "images": [
     {
       "image": "assets/uploads/a3b8b6ce-83b5-41eb-a90a-52e8404ac25f.jpg",
-      "alt": "1"
+      "alt": "Прихожая"
     },
     {
-      "image": "assets/uploads/ca250062-6986-44f3-b918-01fa55843e46.jpg",
-      "alt": "1"
+      "image": "assets/uploads/7ded7478-9089-416a-9f76-a64b110a7488.jpg",
+      "alt": "Прихожая"
+    },
+    {
+      "image": "assets/uploads/4015fd9f-bf53-404d-acc1-0118ee54b349.jpg",
+      "alt": "Прихожая"
+    },
+    {
+      "image": "assets/uploads/6d06f1f5-1b94-4724-abc5-d4fa8931d127.jpg",
+      "alt": "Кухня-гостиная. Вид на кухню"
+    },
+    {
+      "image": "assets/uploads/d9c4f964-4f38-41db-ad76-67a0c1465c78.jpg",
+      "alt": "Кухня-гостиная. Вид на гостиную"
     }
   ],
   "seo_description": "дизайн интерьера",
