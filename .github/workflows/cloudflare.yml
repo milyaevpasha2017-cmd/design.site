@@ -29,9 +29,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - run: python3 -m pip install Pillow==13.0.0
       - run: python3 scripts/design-inventory.py --check
       - run: node --test tests/*.test.mjs
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - run: python3 scripts/optimize-images.py
       - run: python3 scripts/build.py --site-url "$EPIPHANY_SITE_URL" --output _site-cloudflare --admin-mode password
       - run: python3 scripts/audit-secrets.py --frontend _site-cloudflare
       - run: npm ci --prefix site-worker --ignore-scripts
@@ -41,3 +43,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+

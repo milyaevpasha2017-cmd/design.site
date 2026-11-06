@@ -63,7 +63,7 @@ function revealLinkedService() {
 addEventListener('hashchange', revealLinkedService,{signal}); revealLinkedService();
 if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-    if (entry.isIntersecting) { entry.target.classList.add('reveal-in'); observer.unobserve(entry.target); }
+    entry.target.classList.toggle('reveal-in',entry.isIntersecting);
   }), {threshold:.12});
   watch(observer,signal);
   document.querySelectorAll('.project-card,.steps article,.service-teasers>a').forEach(element => observer.observe(element));
@@ -196,4 +196,5 @@ if (location.pathname === new URL(document.querySelector('.logo').href).pathname
 }
 mountPage();
 startNavigation(mountPage,()=>activePage.abort());
+
 

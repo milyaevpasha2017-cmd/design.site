@@ -61,7 +61,7 @@ export function initMotion(signal){
   const queue=()=>{if(!queued&&!reduced.matches&&visible.size){queued=true;requestAnimationFrame(update);}};
   const watcher=watch(new IntersectionObserver(entries=>{entries.forEach(entry=>{entry.isIntersecting?visible.add(entry.target):visible.delete(entry.target);});queue();}),signal);
   document.querySelectorAll('#selected-projects .card-photo').forEach(image=>watcher.observe(image));
-  const reveal=watch(new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){if(!reduced.matches)entry.target.classList.add('motion-arrived');reveal.unobserve(entry.target);}}),{threshold:.2}),signal);
+  const reveal=watch(new IntersectionObserver(entries=>entries.forEach(entry=>{entry.target.classList.toggle('motion-arrived',entry.isIntersecting&&!reduced.matches);}),{threshold:.2}),signal);
   document.querySelectorAll('.decision-intro h2,.intro-copy h2,.home-services>h2,.quiz-teaser>div:first-child').forEach(el=>reveal.observe(el));
   const art=document.querySelector('.quiz-teaser-art');if(art)watch(new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('art-moving',entry.isIntersecting))),signal).observe(art);
   addEventListener('scroll',queue,{passive:true,signal});addEventListener('resize',queue,{signal});
@@ -76,11 +76,11 @@ function initImageAppearance(signal){
     if(signal.aborted||seen.has(image)||!image.complete||!image.naturalWidth)return;
     seen.add(image);
     if(reduced.matches)return;
-    const animation=image.animate([{opacity:0},{opacity:1}],{duration:650,easing:'cubic-bezier(.22,.61,.36,1)'});
+    const animation=image.animate([{opacity:.15},{opacity:1}],{duration:450,easing:'cubic-bezier(.22,.61,.36,1)'});
     animations.add(animation);animation.finished.catch(()=>{}).finally(()=>animations.delete(animation));
   };
   const observer=watch(new IntersectionObserver(entries=>{
-    for(const entry of entries){if(entry.isIntersecting){visible.add(entry.target);appear(entry.target);}else visible.delete(entry.target);}
+    for(const entry of entries){if(entry.isIntersecting){visible.add(entry.target);appear(entry.target);}else{visible.delete(entry.target);seen.delete(entry.target);}}
   },{threshold:0}),signal);
   const register=image=>{
     if(registered.has(image))return;registered.add(image);observer.observe(image);
@@ -112,4 +112,5 @@ function initBackToTop(signal){
   addEventListener('scroll',update,{passive:true,signal});addEventListener('resize',update,{signal});update();
   signal.addEventListener('abort',()=>button.remove(),{once:true});
 }
+
 

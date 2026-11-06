@@ -406,3 +406,24 @@ body .logo .brand-subtitle{margin-top:0;line-height:1.4}
 body .logo .brand-wordmark{display:flex;flex-direction:column;align-items:flex-start}
 .header .logo .brand-name,footer .logo .brand-name{display:block;line-height:2.6}
 body .logo .brand-subtitle{display:block;margin-top:8px;flex:none}
+
+
+/* Shared controls and spacing rhythm across every public route. */
+:root{--control-radius:28px;--content-gap:24px}
+body[data-page] main :is(.hero-cta,.decision-cta,.submit,.quiz-result-cta,.text-link,.hero-secondary),body[data-page] .quiz-modal .submit{border-radius:var(--control-radius);font-size:16px;font-weight:600;line-height:1.4;letter-spacing:normal;min-height:56px;padding:16px 24px;justify-content:center;text-align:center}
+body[data-page] .header-apply{border-radius:var(--control-radius)}
+body[data-page] #navigation>a{border-radius:24px}
+body[data-page] .page-cta{gap:48px;align-items:center}
+body[data-page] .page-cta>div:last-child{width:100%;max-width:440px;justify-self:end}
+body[data-page] .page-cta .submit{display:flex;width:100%;min-width:0;margin:0}
+body[data-page] .page-cta .contact-links{margin-top:24px;width:100%;max-width:none;gap:0 24px}
+body[data-page] .inquiry-form{border-radius:24px}
+body[data-page] .inquiry-form .submit{width:100%}
+body[data-page] .quiz-actions{flex-wrap:wrap;gap:16px}
+body[data-page] .quiz-actions>*{flex:1;min-width:0}
+body[data-page] .project-rail-controls button{border-radius:var(--control-radius)}
+@media(max-width:700px){body[data-page] .page-cta{gap:32px}body[data-page] .page-cta>div:last-child{max-width:none;justify-self:stretch}}
+@media(max-width:600px){body[data-page] .page-cta .contact-links{grid-template-columns:minmax(0,1fr)}body[data-page] main :is(.hero-cta,.decision-cta,.submit,.quiz-result-cta,.text-link,.hero-secondary){padding:16px 22px}body[data-page] .inquiry-form{border-radius:20px}body[data-page] #navigation>a{border-radius:16px}}
+body[data-page] .cookie-actions button{border-radius:var(--control-radius)}
+body[data-page] .quiz-option{border-radius:16px;overflow:hidden}
+body[data-page] :is(#photo-previous,#photo-next){border-radius:var(--control-radius)}
