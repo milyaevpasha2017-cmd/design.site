@@ -49,5 +49,5 @@ export function addFormatting(group,input,field){
   }
   input.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&['b','i','u'].includes(event.key.toLowerCase())){event.preventDefault();apply({b:'bold',i:'italic',u:'underline'}[event.key.toLowerCase()]);}});
   input.addEventListener('input',update);group.insertBefore(toolbar,input);
-  const caption=make('p','preview-label','Предпросмотр');group.append(caption,preview);update();
+  const panel=make('details','format-preview-panel');panel.open=Boolean(field.emphasisName);panel.append(make('summary','','Предпросмотр на сайте'),preview);group.append(panel);update();
 }
