@@ -433,3 +433,8 @@ html{scrollbar-gutter:stable}
 html{scroll-padding-top:calc(var(--header-height,156px) + 20px)}
 .header{backdrop-filter:none}
 @media(min-width:901px){.decision-scene{top:calc(var(--header-height,156px) + 16px)}}
+
+/* Project covers follow the heading directly and keep their natural ratio. */
+.section.project-heading{padding-top:32px;padding-bottom:32px}
+.section.project-story{padding-top:0}
+@media(max-width:700px){.section.project-heading{padding-top:24px;padding-bottom:24px}}
