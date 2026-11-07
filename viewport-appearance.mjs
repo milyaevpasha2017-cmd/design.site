@@ -13,15 +13,14 @@ export function observeAppearances(items,{signal,Observer=globalThis.Intersectio
     if(!state.inside||!state.armed||reduced?.matches||signal?.aborted||(image&&source!==(element.currentSrc||element.src)))return;
     state.armed=false;
     if(!element.animate)return;
-    const fullBleed=image&&(element.classList?.contains('hero-photo')||element.id==='dialog-photo');
-    const frames=fullBleed?[{opacity:.35},{opacity:1}]:[{opacity:image ? .18 : .25,translate:image?'0 24px':'0 20px'},{opacity:1,translate:'0 0'}];
-    const animation=element.animate(frames,{duration:image?750:650,easing:'cubic-bezier(.22,.61,.36,1)'});
+    // Opacity never changes geometry or feeds back into intersection tests.
+    const animation=element.animate([{opacity:image ? .15 : .35},{opacity:1}],{duration:image?650:600,easing:'cubic-bezier(.25,.46,.45,.94)'});
     state.animation=animation;
     animation.finished.catch(()=>{}).finally(()=>{if(state.animation===animation)state.animation=null;});
   };
   const enter=new Observer(entries=>{
     for(const entry of entries){const state=states.get(entry.target);if(!state)continue;state.inside=entry.isIntersecting;if(state.inside)void appear(state);}
-  },{rootMargin:'0px 0px -48px 0px',threshold:0});
+  },{rootMargin:'0px 0px',threshold:0});
   const leave=new Observer(entries=>{
     for(const entry of entries){const state=states.get(entry.target);if(state&&!entry.isIntersecting)state.armed=true;}
   },{rootMargin:'200px 0px',threshold:0});

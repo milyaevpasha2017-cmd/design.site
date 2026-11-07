@@ -12,7 +12,7 @@ function setup(image=true){
 }
 test('viewport edges do not restart motion; leaving the wider viewport rearms it',async()=>{
  const s=setup();s.observers[0].emit(true);await flush();assert.equal(s.animations.length,1);
- assert.equal(s.animations[0].frames[0].opacity,.18);assert.equal(s.animations[0].frames[0].translate,'0 24px');assert.equal(s.observers[0].options.rootMargin,'0px 0px -48px 0px');assert.equal(s.animations[0].options.fill,undefined);
+ assert.equal(s.animations[0].frames[0].opacity,.15);assert.equal(s.animations[0].frames[0].translate,undefined);assert.equal(s.animations[0].frames[0].transform,undefined);assert.equal(s.observers[0].options.rootMargin,'0px 0px');assert.equal(s.animations[0].options.fill,undefined);
  s.animations[0].finish();await flush();
  s.observers[0].emit(false);s.observers[0].emit(true);await flush();assert.equal(s.animations.length,1);
  s.observers[0].emit(false);s.observers[1].emit(false);s.observers[0].emit(true);await flush();assert.equal(s.animations.length,2);
@@ -29,10 +29,10 @@ test('initial images also appear with motion; reduced motion cancels enhancement
  const s=setup();s.element.fetchPriority='high';s.observers[0].emit(true);await flush();assert.equal(s.animations.length,1);s.animations[0].finish();await flush();
  s.observers[0].emit(false);s.observers[1].emit(false);s.observers[0].emit(true);await flush();assert.equal(s.animations.length,2);
  s.reduced.matches=true;s.reduced.dispatchEvent(new Event('change'));assert.ok(s.animations[1].cancelled);s.signal.abort();
- const t=setup(false);t.observers[0].emit(true);await flush();assert.equal(t.animations[0].frames[0].translate,'0 20px');assert.equal(t.animations[0].frames[0].transform,undefined);t.signal.abort();
+ const t=setup(false);t.observers[0].emit(true);await flush();assert.equal(t.animations[0].frames[0].translate,undefined);assert.equal(t.animations[0].frames[0].transform,undefined);t.signal.abort();
 });
-test('full-bleed hero fades without shifting its image and reduced motion stays static',async()=>{
+test('all images fade in place and reduced motion stays static',async()=>{
  const s=setup();s.element.classList={contains:name=>name==='hero-photo'};s.observers[0].emit(true);await flush();
- assert.equal(s.animations[0].frames[0].translate,undefined);assert.equal(s.animations[0].frames[0].opacity,.35);assert.equal(s.animations[0].options.duration,750);s.signal.abort();
+ assert.equal(s.animations[0].frames[0].translate,undefined);assert.equal(s.animations[0].frames[0].opacity,.15);assert.equal(s.animations[0].options.duration,650);s.signal.abort();
  const t=setup();t.reduced.matches=true;t.observers[0].emit(true);await flush();assert.equal(t.animations.length,0);t.signal.abort();
 });
