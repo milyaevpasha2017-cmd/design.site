@@ -12,24 +12,22 @@ export function observeAppearances(items,{signal,Observer=globalThis.Intersectio
     try{if(image&&element.decode)await element.decode();}catch{return;}finally{state.pending=false;}
     if(!state.inside||!state.armed||reduced?.matches||signal?.aborted||(image&&source!==(element.currentSrc||element.src)))return;
     state.armed=false;
-    // Initial hero and wordmark stay fully painted for LCP; replay on re-entry.
-    if(image&&state.initial&&element.fetchPriority==='high'){state.initial=false;return;}
-    state.initial=false;
     if(!element.animate)return;
-    const frames=image?[{opacity:.72},{opacity:1}]:[{opacity:.82,translate:'0 10px'},{opacity:1,translate:'0 0'}];
-    const animation=element.animate(frames,{duration:image?420:480,easing:'cubic-bezier(.22,.61,.36,1)'});
+    const fullBleed=image&&(element.classList?.contains('hero-photo')||element.id==='dialog-photo');
+    const frames=fullBleed?[{opacity:.35},{opacity:1}]:[{opacity:image ? .18 : .25,translate:image?'0 24px':'0 20px'},{opacity:1,translate:'0 0'}];
+    const animation=element.animate(frames,{duration:image?750:650,easing:'cubic-bezier(.22,.61,.36,1)'});
     state.animation=animation;
     animation.finished.catch(()=>{}).finally(()=>{if(state.animation===animation)state.animation=null;});
   };
   const enter=new Observer(entries=>{
     for(const entry of entries){const state=states.get(entry.target);if(!state)continue;state.inside=entry.isIntersecting;if(state.inside)void appear(state);}
-  },{rootMargin:'80px 0px',threshold:0});
+  },{rootMargin:'0px 0px -48px 0px',threshold:0});
   const leave=new Observer(entries=>{
     for(const entry of entries){const state=states.get(entry.target);if(state&&!entry.isIntersecting)state.armed=true;}
   },{rootMargin:'200px 0px',threshold:0});
   const register=(element,image=false)=>{
     if(signal?.aborted||states.has(element))return;
-    const state={element,image,inside:false,armed:true,pending:false,initial:true,animation:null};states.set(element,state);enter.observe(element);leave.observe(element);
+    const state={element,image,inside:false,armed:true,pending:false,animation:null};states.set(element,state);enter.observe(element);leave.observe(element);
     if(image)element.addEventListener('load',()=>{state.armed=true;void appear(state);},{signal});
   };
   for(const {element,image} of items)register(element,image);

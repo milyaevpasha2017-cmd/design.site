@@ -51,14 +51,18 @@ export function initMotion(signal){
 
 function initImageAppearance(signal){
   if(!('IntersectionObserver' in window)||!Element.prototype.animate)return;
-  const items=[...document.querySelectorAll('.steps article,.service-teasers>a,.decision-intro h2,.intro-copy h2,.home-services>h2,.quiz-teaser>div:first-child')].map(element=>({element,image:false}));
+  const groups='.steps article,.service-teasers>a,.quiz-teaser>div:first-child,.page-cta>div:first-child,.project-narrative,.project-title';
+  const textTargets=groups+',h1,h2,.page-intro,.body-copy,.hero-description,.project-card>p,.legal-document p';
+  // A grouped block animates once; its descendants must not animate a second time.
+  const textCandidate=element=>element.closest('main')&&!element.parentElement?.closest(groups);
+  const items=[...document.querySelectorAll(textTargets)].filter(textCandidate).map(element=>({element,image:false}));
   const effects=observeAppearances(items,{signal});if(!effects)return;
   const register=image=>{if(!image.closest('header,footer'))effects.register(image,true);};
   document.querySelectorAll('img').forEach(register);
   const mutations=new MutationObserver(records=>{
     for(const record of records){
-      for(const node of record.removedNodes)if(node.nodeType===1){effects.remove(node);node.querySelectorAll('img').forEach(image=>effects.remove(image));}
-      for(const node of record.addedNodes)if(node.nodeType===1){if(node.matches('img'))register(node);node.querySelectorAll('img').forEach(register);}
+      for(const node of record.removedNodes)if(node.nodeType===1){effects.remove(node);node.querySelectorAll(textTargets+',img').forEach(element=>effects.remove(element));}
+      for(const node of record.addedNodes)if(node.nodeType===1){if(node.matches('img'))register(node);node.querySelectorAll('img').forEach(register);if(node.matches(textTargets)&&textCandidate(node))effects.register(node);node.querySelectorAll(textTargets).forEach(element=>{if(textCandidate(element))effects.register(element);});}
     }
   });
   mutations.observe(document.body,{childList:true,subtree:true});signal.addEventListener('abort',()=>mutations.disconnect(),{once:true});
