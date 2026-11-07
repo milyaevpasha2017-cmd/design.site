@@ -17,7 +17,7 @@ class PackageTest(unittest.TestCase):
             root = Path(temporary)
             (root / '_site-vps').mkdir()
             (root / 'vps').mkdir()
-            expected = ['setup-telegram-relay.py', 'setup-telegram.py',
+            expected = ['setup-www.py', 'setup-telegram-relay.py', 'setup-telegram.py',
                         'notification_config.py', 'telegram.mjs', 'server.mjs']
             for name in expected + ['server.env', 'private-key', 'unexpected.py']:
                 (root / 'vps' / name).write_text('fixture')

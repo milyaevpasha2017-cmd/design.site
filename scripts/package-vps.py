@@ -26,7 +26,7 @@ def main():
                 if file.is_symlink():
                     raise ValueError('Symlinks are not permitted in release')
                 # VPS needs only its runtime JavaScript and schema.
-                if name == 'vps' and file.suffix not in ('.mjs', '.sql') and file.name not in ('setup-telegram.py','setup-telegram-relay.py','setup-email.py','send_mail.py','notification_config.py','telegram_transport.py'):
+                if name == 'vps' and file.suffix not in ('.mjs', '.sql') and file.name not in ('setup-www.py','setup-telegram.py','setup-telegram-relay.py','setup-email.py','send_mail.py','notification_config.py','telegram_transport.py'):
                     continue
                 archive.add(file, arcname=str(file.relative_to(ROOT)), recursive=False)
     print('Packaged commit ' + commit)
