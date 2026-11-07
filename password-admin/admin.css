@@ -19,3 +19,7 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 
 .editor-toolbar h1:focus{outline:none}
+
+/* The client inbox is always visible, including with mobile navigation closed. */
+.header-actions>.inbox-link{background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
+.header-actions>.inbox-link:hover{background:var(--accent);border-color:var(--accent)}
