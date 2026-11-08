@@ -438,3 +438,18 @@ html{scroll-padding-top:calc(var(--header-height,156px) + 20px)}
 .section.project-heading{padding-top:32px;padding-bottom:32px}
 .section.project-story{padding-top:0}
 @media(max-width:700px){.section.project-heading{padding-top:24px;padding-bottom:24px}}
+
+/* Extend section backgrounds on wide/zoomed-out viewports without stretching content. */
+html{background:var(--paper)}
+body[data-page]{border-inline:0}
+@media(min-width:1680px){
+  body[data-page] .header{--wide-background:rgba(245,244,239,.96)}
+  body[data-page=home] .header,.decision-section{--wide-background:#222622}
+  .hero-editorial,.intro{--wide-background:var(--ink)}
+  .quiz-teaser{--wide-background:#e5e8df}
+  body[data-page]>footer{--wide-background:#1d241e}
+  body[data-page] .header,body[data-page] main>:is(.hero-editorial,.decision-section,.quiz-teaser,.intro),body[data-page]>footer{
+    box-shadow:0 0 0 100vmax var(--wide-background);
+    clip-path:inset(0 -100vmax);
+  }
+}
