@@ -4,7 +4,7 @@
   "description": "Нежная светлая комната для девочки-подростка",
   "image": "assets/uploads/0ab1bdf0-4c1c-4fa9-8522-f83c26d46eb4.png",
   "image_alt": "Ближе к природе — иллюстрация интерьера",
-  "is_concept": true,
+  "is_concept": false,
   "images": [
     {
       "image": "assets/uploads/c1dad7ac-dc80-41f1-87c3-501f48c1f7b7.png",
