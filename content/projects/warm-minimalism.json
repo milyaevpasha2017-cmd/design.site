@@ -3,7 +3,7 @@
   "subtitle": "Квартира · спокойствие в большом городе",
   "description": "Мягкие оттенки, тактильные ткани и натуральное дерево. Концепция квартиры, где спокойная палитра помогает замедлиться в шумной столице, а открытые пространства объединяют близких.",
   "image": "assets/uploads/3665c11b-520c-47af-a923-b9d6b239838a.png",
-  "image_alt": "",
+  "image_alt": "Кухня",
   "is_concept": false,
   "images": [
     {
@@ -40,23 +40,23 @@
     },
     {
       "image": "assets/uploads/d156bc11-58dc-44b0-8dc9-cff77deb9dd4.png",
-      "alt": ""
+      "alt": "Спальня"
     },
     {
       "image": "assets/uploads/8e7d4aab-73d0-44a7-ae78-da2818f77fc6.png",
-      "alt": ""
+      "alt": "Спальня"
     },
     {
       "image": "assets/uploads/6b0585f4-334e-4615-9301-b3a22af89471.png",
-      "alt": ""
+      "alt": "Спальня"
     },
     {
       "image": "assets/uploads/f2e9382c-af1b-4ed7-a44b-ae59f6436fe5.png",
-      "alt": ""
+      "alt": "Спальня"
     },
     {
       "image": "assets/uploads/0c614434-a74c-4356-acd6-acd639df8838.png",
-      "alt": ""
+      "alt": "Спальня"
     },
     {
       "image": "assets/uploads/2b794643-ba15-468a-8f6c-84aea371b80f.png",
@@ -64,7 +64,7 @@
     },
     {
       "image": "assets/uploads/f14d4b99-7824-4ed3-af2d-7c419fac64c4.png",
-      "alt": ""
+      "alt": "Ванная"
     },
     {
       "image": "assets/uploads/5839b931-4f3a-4eb8-a4b8-5c9fdd58012b.png",
@@ -72,23 +72,23 @@
     },
     {
       "image": "assets/uploads/0259da6a-f64d-4ee7-a7c5-40d3b673aedf.png",
-      "alt": ""
+      "alt": "Гардеробная"
     },
     {
       "image": "assets/uploads/4c8afefe-4f4f-4080-b8db-a8b3be0ce541.png",
-      "alt": ""
+      "alt": "Детская девочки"
     },
     {
       "image": "assets/uploads/414033b5-3dfd-4026-8f1a-70158a5e9335.png",
-      "alt": ""
+      "alt": "Детская девочки"
     },
     {
       "image": "assets/uploads/1bbf9c6b-b41c-43df-beb7-b24c4b5a1e0a.png",
-      "alt": ""
+      "alt": "Детская девочки"
     },
     {
       "image": "assets/uploads/3adafe65-4633-4dcc-ab67-35c79fc41501.png",
-      "alt": ""
+      "alt": "Детская мальчика"
     }
   ],
   "slug": "warm-minimalism",
