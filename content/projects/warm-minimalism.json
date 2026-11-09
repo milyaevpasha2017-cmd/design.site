@@ -3,9 +3,22 @@
   "subtitle": "Квартира · спокойствие в большом городе",
   "description": "Мягкие оттенки, тактильные ткани и натуральное дерево. Концепция квартиры, где спокойная палитра помогает замедлиться, а открытое пространство объединяет близких.",
   "image": "assets/uploads/3665c11b-520c-47af-a923-b9d6b239838a.png",
-  "image_alt": "Тёплый минимализм — иллюстрация интерьера",
+  "image_alt": "",
   "is_concept": false,
-  "images": [],
+  "images": [
+    {
+      "image": "assets/uploads/f77f5930-4389-4707-9746-18ed8c6a9b0d.png",
+      "alt": "Прихожая"
+    },
+    {
+      "image": "assets/uploads/3369f569-6d69-460f-8f45-8e1144f2b2d3.png",
+      "alt": "Прихожая"
+    },
+    {
+      "image": "assets/uploads/49471dad-8d90-4c29-a26d-3cda18ca2cf0.png",
+      "alt": "Прихожая"
+    }
+  ],
   "slug": "warm-minimalism",
   "order": 2,
   "published": true,
