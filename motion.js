@@ -5,6 +5,7 @@ export function initMotion(signal){
   initHeaderOffset(signal);
   initImageAppearance(signal);
   initBackToTop(signal);
+  initProjectSwitcher(signal);
   if(document.body.dataset.page!=='home')return;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const grid=document.querySelector('#selected-projects .project-grid'),controls=document.querySelector('.project-rail-controls');
@@ -83,6 +84,24 @@ function initBackToTop(signal){
 }
 
 
+
+function initProjectSwitcher(signal){
+  const nav=document.querySelector('.project-switcher'),story=document.querySelector('.project-story');
+  if(!nav||!story||!('IntersectionObserver' in window))return;
+  let observer;
+  const update=()=>{
+    observer?.disconnect();
+    const height=innerHeight,header=document.querySelector('.header')?.getBoundingClientRect().height||0;
+    const middle=Math.min(height-1,Math.round((height+header)/2));
+    observer=new IntersectionObserver(entries=>nav.classList.toggle('is-visible',entries[0].isIntersecting),{rootMargin:`-${middle}px 0px -${Math.max(0,height-middle-1)}px 0px`,threshold:0});
+    observer.observe(story);
+  };
+  nav.classList.add('is-floating');update();
+  addEventListener('resize',update,{signal});
+  let headerObserver;
+  if('ResizeObserver' in window){headerObserver=new ResizeObserver(update);headerObserver.observe(document.querySelector('.header'));}
+  signal.addEventListener('abort',()=>{observer?.disconnect();headerObserver?.disconnect();},{once:true});
+}
 
 function initHeaderOffset(signal){
   const header=document.querySelector('.header');if(!header)return;

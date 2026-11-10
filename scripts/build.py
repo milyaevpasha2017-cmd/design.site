@@ -242,16 +242,18 @@ class Site:
         crumbs=f'<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span>/</span><a href="{self.link("projects")}">{e(self.ui["projects"])}</a><span>/</span><span aria-current="page">{inline(p["title"])}</span></nav>'
         body=f'<section class="section project-heading">{crumbs}{heading(p["title"])}<p class="page-intro">{inline(p["subtitle"])}</p><div class="project-facts">'+''.join(f'<span>{e(p[k])}</span>' for k in ['location','area','year'] if p.get(k))+'</div></section>'
         body+='<section class="section project-story">'
-        if photos:body+=f'<button class="project-cover" data-gallery-open="0" aria-label="{e(self.ui["open_photo"])}">{self.photo(p["image"],p["image_alt"],priority=True)}<span class="project-arrow">{icon()}</span></button>'
+        if photos:
+            body+='<div class="project-visual" id="project-visual">'
+            body+=f'<button class="project-cover" data-gallery-open="0" aria-label="{e(self.ui["open_photo"])}">{self.photo(p["image"],p["image_alt"],priority=True)}<span class="project-arrow">{icon()}</span></button>'
+            if len(self.projects)>1:
+                previous=self.projects[(index-1)%len(self.projects)];following=self.projects[(index+1)%len(self.projects)]
+                body+=f'<nav class="project-switcher" aria-label="Переключение проектов"><a class="project-switch-previous" href="{self.project_link(previous)}#project-visual" aria-label="{e(self.ui["previous_project"]+": "+plain_text(previous["title"]))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></a><a class="project-switch-next" href="{self.project_link(following)}#project-visual" aria-label="{e(self.ui["next_project"]+": "+plain_text(following["title"]))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a></nav>'
+            body+='</div>'
         body+=f'<div class="project-narrative"><p class="project-lead">{r(p["description"])}</p>{paragraphs(p.get("body",[]))}</div>'
         if p.get('is_concept'):body+=f'<p class="form-note concept-note">{e(self.ui["concept_note"])}</p>'
         body+='<div class="project-photo-grid">'
         for i,photo in enumerate(photos[1:],1):body+=f'<figure><button data-gallery-open="{i}" aria-label="{e(self.ui["open_photo"])}: {e(photo["alt"])}">{self.photo(photo["source"],photo["alt"],"project-photo")}</button><figcaption>{e(photo["alt"])}</figcaption></figure>'
-        body+='</div></section><nav class="project-pagination section" aria-label="Другие проекты">'
-        if index>0: body+=f'<a class="project-step project-previous" href="{self.project_link(self.projects[index-1])}" aria-label="{e(self.ui["previous_project"]+": "+plain_text(self.projects[index-1]["title"]))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></a>'
-        body+=self.button('projects',self.ui['back_projects'])
-        if index+1<len(self.projects):body+=f'<a class="project-step project-next" href="{self.project_link(self.projects[index+1])}" aria-label="{e(self.ui["next_project"]+": "+plain_text(self.projects[index+1]["title"]))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>'
-        body+='</nav>'+self.cta(self.pages['projects']['cta'])
+        body+='</div></section>'+self.cta(self.pages['projects']['cta'])
         extra=self.gallery_dialog()+f'<script id="gallery-data" type="application/json">{safe_json(dict(title=plain_text(p["title"]),photos=photos))}</script>'
         return self.shell(plain_text(p['title'])+' — дизайн интерьера'+' — Epiphany Interior',p.get('seo_description') or p['description'],body,'projects','projects/'+p['slug']+'/',extra)
 

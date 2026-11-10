@@ -165,16 +165,20 @@ ${this.quizTeaser()}
     const crumbs=`<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="/">${e(this.ui.home)}</a><span>/</span><a href="/projects/">${e(this.ui.projects)}</a><span>/</span><span aria-current="page">${inline(p.title)}</span></nav>`;
     let body=`<section class="section project-heading">${crumbs}${heading(p.title)}<p class="page-intro">${inline(p.subtitle)}</p><div class="project-facts">`+['location','area','year'].filter(k=>p[k]).map(k=>`<span>${e(p[k])}</span>`).join('')+'</div></section>';
     body+='<section class="section project-story">';
-    if(photos.length)body+=`<button class="project-cover" data-gallery-open="0" aria-label="${e(this.ui.open_photo)}">${this.photo(p.image,p.image_alt,'',true)}<span class="project-arrow">${icon()}</span></button>`;
+    if(photos.length){
+      body+='<div class="project-visual" id="project-visual">';
+      body+=`<button class="project-cover" data-gallery-open="0" aria-label="${e(this.ui.open_photo)}">${this.photo(p.image,p.image_alt,'',true)}<span class="project-arrow">${icon()}</span></button>`;
+      if(this.projects.length>1){
+        const previous=this.projects[(index+this.projects.length-1)%this.projects.length],next=this.projects[(index+1)%this.projects.length];
+        body+=`<nav class="project-switcher" aria-label="Переключение проектов"><a class="project-switch-previous" href="${this.projectLink(previous)}#project-visual" aria-label="${e(this.ui.previous_project+': '+plainText(previous.title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></a><a class="project-switch-next" href="${this.projectLink(next)}#project-visual" aria-label="${e(this.ui.next_project+': '+plainText(next.title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a></nav>`;
+      }
+      body+='</div>';
+    }
     body+=`<div class="project-narrative"><p class="project-lead">${r(p.description)}</p>${paragraphs(p.body)}</div>`;
     if(p.is_concept)body+=`<p class="form-note concept-note">${e(this.ui.concept_note)}</p>`;
     body+='<div class="project-photo-grid">';
     for(const [i,photo]of photos.slice(1).entries())body+=`<figure><button data-gallery-open="${i+1}" aria-label="${e(this.ui.open_photo)}: ${e(photo.alt)}">${this.photo(photo.source,photo.alt,'project-photo')}</button><figcaption>${e(photo.alt)}</figcaption></figure>`;
-    body+='</div></section><nav class="project-pagination section" aria-label="Другие проекты">';
-    if(index>0)body+=`<a class="project-step project-previous" href="${this.projectLink(this.projects[index-1])}" aria-label="${e(this.ui.previous_project+': '+plainText(this.projects[index-1].title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></a>`;
-    body+=this.button('projects',this.ui.back_projects);
-    if(index+1<this.projects.length)body+=`<a class="project-step project-next" href="${this.projectLink(this.projects[index+1])}" aria-label="${e(this.ui.next_project+': '+plainText(this.projects[index+1].title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>`;
-    body+='</nav>'+this.cta(this.pages.projects.cta);
+    body+='</div></section>'+this.cta(this.pages.projects.cta);
     const extra=this.galleryDialog()+`<script id="gallery-data" type="application/json">${safeJSON({title:plainText(p.title),photos})}</script>`;
     return this.shell(plainText(p.title)+' — дизайн интерьера'+' — Epiphany Interior',p.seo_description||p.description,body,'projects','projects/'+p.slug+'/',extra);
   }

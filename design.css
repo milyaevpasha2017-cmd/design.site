@@ -483,3 +483,16 @@ body[data-page] .project-pagination>.project-step:hover{background:var(--ink);co
   body[data-page] .header .logo .brand-subtitle{font-size:8px!important}
   body[data-page] .header-apply{font-size:13px;padding-inline:10px}
 }
+
+/* Switch works while their photos remain visible; keep links outside the photo button. */
+.project-visual{position:relative}
+.project-switcher{position:absolute;inset:50% 16px auto;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:20px;z-index:20;transform:translateY(-50%);pointer-events:none}
+.project-switcher a{display:grid;place-items:center;width:56px;height:56px;border:1px solid #ffffff80;border-radius:50%;background:#242b25e8;color:#fff;box-shadow:0 3px 16px #0003;pointer-events:auto;transition:background .2s}
+.project-switcher a:hover{background:var(--accent)}
+.project-switcher .icon{width:24px;height:24px}
+.project-switch-previous{grid-column:1;justify-self:start}
+.project-switch-next{grid-column:2;justify-self:end}
+.project-switcher.is-floating{position:fixed;inset:calc((100svh + var(--header-height,160px))/2) max(20px,calc((100% - 1584px)/2)) auto;visibility:hidden}
+.project-switcher.is-floating.is-visible{visibility:visible}
+body:has(dialog[open]) .project-switcher{visibility:hidden}
+@media(max-width:600px){.project-switcher{inset-inline:12px}.project-switcher a{width:48px;height:48px}.project-switcher.is-floating{inset-inline:12px}}
