@@ -1,0 +1,6 @@
+/* Only preview chrome differs. The section itself uses public site styles. */
+html{scrollbar-width:none}
+body[data-page=home]{margin:0;--header-height:0px;max-width:none}
+body[data-page=home] main{margin:0}
+.decision-scene{top:16px}
+

@@ -2,11 +2,13 @@ import {watermarkImage} from './watermark.js';
 import {renderTypography} from './fonts.js';
 import {plainText} from '../rich-text.mjs';
 import {combineHeadings,combinedValue,addFormatting} from './formatting.mjs';
+import {renderDecisionEditor} from './decision-editor.js';
 const $=selector=>document.querySelector(selector);
 const make=(tag,className,text)=>{const element=document.createElement(tag);if(className)element.className=className;if(text!==undefined)element.textContent=text;return element;};
 const copy=value=>JSON.parse(JSON.stringify(value));
 let schema,csrf='',current=null,baseline='',busy=false,uploading=0,loadNumber=0,projectCursor=null,projectCount=0,projectTicket=0;
 let retryLoad=null,firstDocument=true;
+let decisionCleanup=null;
 const previews=new Set();
 const dirty=()=>current && JSON.stringify(current.data)!==baseline;
 async function api(path,options={}){
@@ -34,6 +36,10 @@ function renderFields(container,fields,data,path=''){
     const key=field.name,id='field-'+(path+key).replaceAll(/[^a-zA-Z0-9_-]/g,'-');
     const group=make('div','field field--'+field.widget+(field.rich?' field--rich':'')+(['slug','location','area','year','order'].includes(key)?' field--compact':''));const optional=field.required===false?' · необязательно':'';
     if(field.fontLibrary){renderTypography(group,data[key],value=>{data[key]=value;updateStatus();});container.append(group);continue;}
+    if(field.name==='decisions'&&current?.kind==='pages'&&current.id==='home'&&!path){
+      if(!data[key])data[key]=copy(field.default||{});
+      decisionCleanup=renderDecisionEditor(container,field,data[key],{renderFields,api,updateStatus});continue;
+    }
     if(field.widget==='object'){
       const details=make('details','object-group');details.open=!field.collapsed;details.append(make('summary','',field.label));
       const inner=make('div','object-fields');const object=data[key]&&typeof data[key]==='object'?data[key]:copy(field.default||{});
@@ -101,7 +107,7 @@ function renderFields(container,fields,data,path=''){
           const uploadedFile=watermark.checked?await watermarkImage(file):file;
           const bytes=new Uint8Array(await uploadedFile.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
           const result=await api('upload',{method:'POST',body:JSON.stringify({content:btoa(binary)})});
-          input.value=result.path;data[key]=result.path;const objectURL=URL.createObjectURL(uploadedFile);previews.add(objectURL);preview.src=objectURL;preview.hidden=false;
+          input.value=result.path;data[key]=result.path;const objectURL=URL.createObjectURL(uploadedFile);previews.add(objectURL);preview.src=objectURL;preview.hidden=false;input.dispatchEvent(new Event('input',{bubbles:true}));
         }catch(error){fail(error);}finally{uploading--;upload.value='';updateStatus();}
       });
       group.append(preview,watermarkLabel,upload,make('p','hint','JPG, PNG или WebP, до 5 МБ. Знак наносится на сам файл до загрузки. Исходник остаётся у вас. После загрузки сохраните запись.'));
@@ -166,6 +172,7 @@ async function openDocument(kind,id,isNew=false){
     current={kind,id,sha:result.sha,data:result.data,isNew};
     document.querySelectorAll('.nav-item').forEach(button=>{const active=button.dataset.kind===kind&&button.dataset.id===id;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
     $('#editor-title').textContent=definition?.label||(isNew?'Новый проект':plainText(result.data.title||id));
+    decisionCleanup?.();decisionCleanup=null;
     $('#editor').replaceChildren();renderSections($('#editor'),fields,current.data,definition?.sections||schema.projectSections);baseline=isNew?'':JSON.stringify(current.data);
     $('#editor').hidden=false;$('#delete-project').hidden=kind!=='projects'||isNew;updateStatus();
     if(matchMedia('(max-width: 900px)').matches)$('#workspace-navigation').open=false;
@@ -222,3 +229,5 @@ workspace.open=!compactWorkspace.matches;compactWorkspace.addEventListener('chan
 const toolbar=document.querySelector('.editor-toolbar');
 const toolbarOffset=()=>document.documentElement.style.setProperty('--editor-offset',Math.ceil(toolbar.getBoundingClientRect().height+32)+'px');
 toolbarOffset();if('ResizeObserver' in window)new ResizeObserver(toolbarOffset).observe(toolbar);else addEventListener('resize',toolbarOffset);
+
+

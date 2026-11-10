@@ -2,6 +2,7 @@ import {COOKIE,cookie,SESSION_SECONDS,randomToken,digest,sessionId,verifyPasswor
 import {schema,validate,repository,slugPattern} from './content.mjs';
 import {publication,currentContent} from './publication.mjs';
 import {Site} from './render.mjs';
+import {typography} from './typography.mjs';
 const privateHeaders={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','X-Frame-Options':'DENY','X-Robots-Tag':'noindex, nofollow'};
 const csp="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https: blob: data:; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
 const json=(body,status=200,extra={})=>Response.json(body,{status,headers:{...privateHeaders,...extra}});
@@ -101,6 +102,20 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
     if(route==='/api/session'&&request.method==='GET')return json({username:user.user,csrf:user.csrf});
     if(route==='/api/logout'&&request.method==='POST'){await state(env,{action:'delete',sid:user.sid});return json({ok:true},200,{'Set-Cookie':cookie('')});}
     if(route==='/api/schema'&&request.method==='GET')return json(schema);
+    // Render unsaved section data through the public renderer; never write it
+    // to the repository or publication store.
+    if(route==='/api/preview/decisions'&&request.method==='POST'){
+      if(!env.SITE_CONTENT)return json({error:'Предпросмотр временно недоступен.'},503);
+      const body=await bodyJSON(request);
+      const field=schema.pages.find(page=>page.id==='home').fields.find(field=>field.name==='decisions');
+      try{validate(field.fields,body.data);}catch(error){return json({error:error.message},400);}
+      const response=await publication(env,{action:'publish:read'});
+      if(!response.ok)return json({error:'Не удалось загрузить оформление сайта. Повторите предпросмотр.'},503);
+      const content=currentContent(env.SITE_CONTENT,await response.json());
+      content['content/pages/home.json']={...content['content/pages/home.json'],decisions:body.data};
+      const site=new Site(content,env.SITE_ORIGIN,env.SITE_CONTENT.icons),fonts=typography(site.settings);
+      return json({html:site.decisions(),bodyFont:fonts.body.id,displayFont:fonts.display.id});
+    }
     if(route==='/api/leads'&&request.method==='GET'){
       if(!env.LEADS)return json({error:'Заявки доступны на основном сервере сайта.'},503);
       return json(await env.LEADS.list({cursor:url.searchParams.get('cursor')||'',limit:Number(url.searchParams.get('limit')||30)}));
@@ -170,3 +185,5 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
   }catch(error){return json({error:error.status?error.message:'Не удалось выполнить действие. Повторите позже.'},error.status||500);}
 }};}
 export default createSiteWorker();
+
+
