@@ -54,8 +54,9 @@ export function renderDecisionEditor(container,field,data,{renderFields,api,upda
     const tab=button(name(),()=>selectTopic(key));topicNav.append(tab);topicButtons.set(key,tab);
     const body=make('div','decision-topic-panel');body.dataset.topic=key;points.append(body);topicPanels.set(key,body);
     body.append(make('p','hint','Этот текст открывается при нажатии на точку '+String(index+1).padStart(2,'0')+' на фотографии.'));
-    fill(body,['title','description','deliverable'],object,'decisions.'+key+'.',definition.fields);
-    extra(body,'Название точки, подпись результата и кнопка',['label','deliverable_label','button'],object,'decisions.'+key+'.',definition.fields);
+    const topicFields=definition.fields.map(field=>field.name==='label'?{...field,widget:'string',rich:false,hint:'Название одновременно меняется на точке фотографии и в списке раскрывающихся пунктов.'}:field);
+    fill(body,['label','title','description','deliverable'],object,'decisions.'+key+'.',topicFields);
+    extra(body,'Подпись результата и кнопка',['deliverable_label','button'],object,'decisions.'+key+'.',definition.fields);
     body.addEventListener('input',()=>{tab.textContent=name();});
   });
   const ending=panel('Завершение',3);ending.append(make('h3','','Нижняя часть секции'));
