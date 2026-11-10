@@ -2,7 +2,7 @@ import {plainText} from '../rich-text.mjs';
 
 const make=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
 const button=(text,handler)=>{const el=make('button','secondary',text);el.type='button';el.addEventListener('click',handler);return el;};
-const topics=['layout','light','materials'];
+const topics=['materials','layout','light'];
 
 // Keep the existing content shape so already published text is never migrated,
 // shortened or rewritten simply by opening the new editor.
@@ -10,7 +10,7 @@ export function renderDecisionEditor(container,field,data,{renderFields,api,upda
   const root=make('div','decision-editor'),settings=make('div','decision-settings');
   const preview=make('dialog','decision-preview');preview.open=true;preview.setAttribute('aria-label','Предпросмотр всей секции');
   root.append(settings,preview);container.append(root);
-  let disposed=false,timer,readyTimer,readyAttempts=0,revision=0,loaded=false,selectedTopic='layout',width=1280,frameDocument,latestResult;
+  let disposed=false,timer,readyTimer,readyAttempts=0,revision=0,loaded=false,selectedTopic='materials',width=1280,frameDocument,latestResult;
   const fields=field.fields;
   const pick=(names,source=fields)=>names.map(name=>source.find(f=>f.name===name)).filter(Boolean);
   const fill=(parent,names,object=data,path='decisions.',source=fields)=>{
@@ -60,7 +60,7 @@ export function renderDecisionEditor(container,field,data,{renderFields,api,upda
   });
   const ending=panel('Завершение',3);ending.append(make('h3','','Нижняя часть секции'));
   fill(ending,['bottom','services_link']);extra(ending,'Подпись над раскрывающимися пунктами',['notes_label']);
-  activate(0);selectTopic('layout');
+  activate(0);selectTopic('materials');
 
   const heading=make('div','decision-preview-heading');heading.append(make('h3','','Весь блок на сайте'));
   const controls=make('div','decision-preview-controls'),devices=make('div','decision-devices');devices.setAttribute('role','group');devices.setAttribute('aria-label','Размер предпросмотра');

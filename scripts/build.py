@@ -183,7 +183,7 @@ class Site:
         items=self.pages['services']['steps']
         return f'<section class="process section"><p class="eyebrow">{e(p["process_label"])}</p>{heading(p["process_title"],p["process_emphasis"],2)}<div class="steps">'+''.join(f'<article><span>{e(x["label"])}</span><h3>{inline(x["title"])}</h3><p>{r(x["description"])}</p></article>' for x in items)+'</div></section>'
     def decisions(self):
-        d=self.pages['home'].get('decisions',DECISIONS['defaults']); topics=['layout','light','materials']
+        d=self.pages['home'].get('decisions',DECISIONS['defaults']); topics=['materials','layout','light']
         pins='';notes=''
         for i,key in enumerate(topics):
             x=d.get(key,{})
@@ -310,3 +310,5 @@ if __name__=='__main__':
     parser.add_argument('--admin-mode',choices=['github','password'],default='github')
     args=parser.parse_args();build(ROOT/'content',args.output,args.site_url,args.admin_mode,args.canonical_url)
     if args.admin_mode=='password':worker_snapshot(ROOT/'content',ROOT/'site-worker/generated/site.json')
+
+

@@ -122,7 +122,7 @@ export class Site {
   steps(p){return `<section class="process section"><p class="eyebrow">${e(p.process_label)}</p>${heading(p.process_title,p.process_emphasis,2)}<div class="steps">`+this.pages.services.steps.map(x=>`<article><span>${e(x.label)}</span><h3>${inline(x.title)}</h3><p>${r(x.description)}</p></article>`).join('')+'</div></section>';}
   decisions(){
     const d=this.pages.home.decisions??DECISIONS.defaults;
-    const topics=['layout','light','materials'];
+    const topics=['materials','layout','light'];
     const pins=topics.map((key,i)=>`<button type="button" class="decision-pin pin-${key}" data-decision="${key}" aria-controls="decision-${key}" aria-expanded="${i===0}" aria-label="${e(plainText(d[key]?.label||''))}"><span>0${i+1}</span><small>${inline(d[key]?.label||'')}</small></button>`).join('');
     const notes=topics.map((key,i)=>{const x=d[key]||{};return `<details id="decision-${key}" class="decision-note"${i===0?' open':''}><summary><span>0${i+1}</span>${inline(x.label||'')}</summary><div class="decision-note-body"><h3 tabindex="-1">${inline(x.title||'')}</h3><p>${r(x.description||'')}</p><div class="decision-deliverable"><span>${inline(x.deliverable_label||'')}</span><p>${r(x.deliverable||'')}</p></div><a class="decision-cta" href="/contact/?interest=${key}#brief-form">${inline(x.button||'')}</a></div></details>`;}).join('');
     return `<section class="decision-section" aria-labelledby="decision-heading"><div class="decision-intro"><p class="eyebrow">${inline(d.label||'')}</p><h2 id="decision-heading">${inline(d.title||'')}${d.emphasis?'<br><em>'+inline(d.emphasis)+'</em>':''}</h2><p>${r(d.intro||'')}</p></div><div class="decision-workbench"><figure class="decision-scene">${this.photo(d.image||'',d.image_alt||'')}<div class="decision-pins" hidden>${pins}</div><figcaption>${r(d.image_note||'')}</figcaption></figure><div class="decision-notes"><p class="eyebrow">${inline(d.notes_label||'')}</p>${notes}</div></div><div class="decision-bottom"><span>${inline(d.bottom||'')}</span><a href="/services/">${inline(d.services_link||'')}</a></div></section>`;
@@ -210,3 +210,5 @@ ${this.quizTeaser()}
     return new Response(this.notFound(),{status:404,headers:{...headers,'X-Robots-Tag':'noindex, follow'}});
   }
 }
+
+
