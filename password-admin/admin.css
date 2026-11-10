@@ -27,6 +27,7 @@
 .watermark-choice{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.5}.watermark-choice input{flex:0 0 20px;width:20px;height:20px;margin:0;accent-color:var(--ink,#242b25)}
 
 /* Edit an entire composition, with one shared live preview. */
+.editor-section:has(.decision-editor){overflow:clip}
 .decision-editor{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr);gap:24px;align-items:start;grid-column:1/-1;min-width:0}
 .decision-settings,.decision-preview{min-width:0}
 .decision-tabs,.decision-topics{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}
@@ -46,7 +47,7 @@
 .decision-preview-controls{justify-content:space-between}
 .decision-preview-controls button{min-height:40px;padding:8px 12px;font-size:11px}
 .decision-preview-status{margin:12px 0;min-height:22px}
-.decision-preview-viewport{overflow:auto;max-height:65dvh;min-width:0;border-radius:12px;background:#222622;border:1px solid var(--line);overscroll-behavior:contain}
+.decision-preview-viewport{overflow:auto;max-height:calc(100dvh - var(--editor-offset,155px) - 160px);min-width:0;border-radius:12px;background:#222622;border:1px solid var(--line);overscroll-behavior:contain}
 .decision-preview-stage{position:relative;margin:0 auto;overflow:hidden}
 .decision-preview-frame{display:block;border:0;max-width:none;transform-origin:top left;position:absolute;left:0;top:0;background:#222622}
 .decision-preview:modal{position:fixed;inset:0;margin:auto;width:min(96vw,1440px);max-height:94dvh;padding:20px;overflow:auto;border-radius:24px}
