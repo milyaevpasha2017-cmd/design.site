@@ -31,7 +31,7 @@
 .decision-settings,.decision-preview{min-width:0}
 .decision-tabs,.decision-topics{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}
 .decision-tabs button,.decision-topics button{padding:9px 13px;min-height:44px;font-size:12px;border-radius:14px}
-.decision-tabs [aria-selected=true],.decision-topics [aria-pressed=true],.decision-devices [aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.decision-tabs [aria-selected=true],.decision-tabs [aria-selected=true]:hover,.decision-topics [aria-pressed=true],.decision-topics [aria-pressed=true]:hover,.decision-devices [aria-pressed=true],.decision-devices [aria-pressed=true]:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .decision-settings-panel>h3{font-size:18px;margin:24px 0 18px}
 .decision-settings-panel .field{margin-bottom:24px}
 .decision-settings-panel .field--image .image-preview{max-height:180px}
