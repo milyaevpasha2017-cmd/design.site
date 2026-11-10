@@ -385,8 +385,6 @@ body.modal-open .back-to-top,body:has(dialog[open]) .back-to-top{visibility:hidd
 .portfolio-section .project-grid>.project-card:nth-child(n) .card-photo{object-position:center}
 .social-icon{display:inline-block;flex:none;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 body[data-page] .contact-links a{justify-content:flex-start;gap:12px}
-.footer-email{display:flex;align-items:center;gap:12px;overflow-wrap:anywhere}
-.footer-email span{min-width:0}
 body .logo .brand-subtitle{text-transform:none}
 @media(max-width:700px){.portfolio-section .project-grid{grid-template-columns:minmax(0,1fr);gap:32px}}
 
@@ -452,4 +450,36 @@ body[data-page]{border-inline:0}
     box-shadow:0 0 0 100vmax var(--wide-background);
     clip-path:inset(0 -100vmax);
   }
+}
+
+/* Designer review: balanced brand, grouped contacts and compact project navigation. */
+body[data-page] .header .logo .brand-mark{width:44px;height:51px}
+body[data-page] footer .logo .brand-mark{width:68px;height:79px}
+body[data-page] .logo .brand-subtitle{align-self:center;font-size:10px!important;line-height:1.4;letter-spacing:.1em!important}
+body[data-page] footer .logo .brand-subtitle{font-size:12px!important}
+.contact-links a span{min-width:0;overflow-wrap:anywhere}
+.page-cta .contact-links a[href^="mailto:"]{font-size:14px}
+.project-pagination{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:20px;padding-block:28px}
+body[data-page] .project-pagination>.project-step{display:grid;place-items:center;width:56px;min-width:56px;height:56px;min-height:56px;padding:0;border:1px solid var(--line);border-radius:50%;color:var(--ink);transition:background .2s,color .2s}
+.project-pagination>.project-previous{grid-column:1;grid-row:1;justify-self:start}
+.project-pagination>.project-next{grid-column:3;grid-row:1;justify-self:end}
+body[data-page] .project-pagination>.text-link{grid-column:2;grid-row:1;order:0;width:auto;min-width:0;justify-self:center}
+.project-pagination .project-step .icon{width:24px;height:24px}
+body[data-page] .project-pagination>.project-step:hover{background:var(--ink);color:var(--paper)}
+@media(max-width:600px){
+  body[data-page] .header .logo .brand-mark{width:32px;height:37px}
+  body[data-page] footer .logo .brand-mark{width:56px;height:65px}
+  body[data-page] footer .logo .brand-name{font-size:clamp(30px,8.5vw,44px)}
+  body[data-page] .header .logo .brand-subtitle{font-size:9px!important}
+  body[data-page] footer .logo .brand-subtitle{font-size:11px!important}
+  .project-pagination{gap:8px;padding-block:20px}
+  body[data-page] .project-pagination>.text-link{font-size:14px;padding-inline:16px}
+}
+@media(max-width:380px){
+  body[data-page] .header{gap:6px}
+  body[data-page] .header .logo .brand-mark{width:26px;height:30px}
+  body[data-page] .header .logo-with-mark{gap:6px}
+  body[data-page] .header .logo .brand-name{font-size:20px}
+  body[data-page] .header .logo .brand-subtitle{font-size:8px!important}
+  body[data-page] .header-apply{font-size:13px;padding-inline:10px}
 }
