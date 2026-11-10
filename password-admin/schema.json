@@ -236,6 +236,307 @@
               "required": false
             }
           ]
+        },
+        {
+          "name": "decisions",
+          "label": "Система решений",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "label",
+              "label": "Надзаголовок",
+              "widget": "string",
+              "required": false,
+              "rich": true,
+              "richLinks": false
+            },
+            {
+              "name": "title",
+              "label": "Заголовок",
+              "widget": "string",
+              "required": false,
+              "rich": true,
+              "richLinks": false
+            },
+            {
+              "name": "emphasis",
+              "label": "Акцент курсивом",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "intro",
+              "label": "Вступление",
+              "widget": "text",
+              "required": false,
+              "rich": true,
+              "richLinks": false
+            },
+            {
+              "name": "image",
+              "label": "Фотография блока",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "image_alt",
+              "label": "Описание фотографии",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "image_note",
+              "label": "Подпись под фотографией",
+              "widget": "text",
+              "required": false,
+              "rich": true,
+              "richLinks": false
+            },
+            {
+              "name": "notes_label",
+              "label": "Надпись над пунктами",
+              "widget": "string",
+              "required": false,
+              "rich": true,
+              "richLinks": false
+            },
+            {
+              "name": "bottom",
+              "label": "Текст внизу блока",
+              "widget": "string",
+              "required": false,
+              "rich": true,
+              "richLinks": false
+            },
+            {
+              "name": "services_link",
+              "label": "Подпись ссылки на услуги",
+              "widget": "string",
+              "required": false,
+              "rich": true,
+              "richLinks": false
+            },
+            {
+              "name": "layout",
+              "label": "Планировка",
+              "widget": "object",
+              "required": false,
+              "fields": [
+                {
+                  "name": "label",
+                  "label": "Название пункта",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "title",
+                  "label": "Заголовок объяснения",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "description",
+                  "label": "Описание",
+                  "widget": "text",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "deliverable_label",
+                  "label": "Название результата",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "deliverable",
+                  "label": "Результат для клиента",
+                  "widget": "text",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "button",
+                  "label": "Текст кнопки",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                }
+              ],
+              "collapsed": true
+            },
+            {
+              "name": "light",
+              "label": "Свет",
+              "widget": "object",
+              "required": false,
+              "fields": [
+                {
+                  "name": "label",
+                  "label": "Название пункта",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "title",
+                  "label": "Заголовок объяснения",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "description",
+                  "label": "Описание",
+                  "widget": "text",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "deliverable_label",
+                  "label": "Название результата",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "deliverable",
+                  "label": "Результат для клиента",
+                  "widget": "text",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "button",
+                  "label": "Текст кнопки",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                }
+              ],
+              "collapsed": true
+            },
+            {
+              "name": "materials",
+              "label": "Материалы",
+              "widget": "object",
+              "required": false,
+              "fields": [
+                {
+                  "name": "label",
+                  "label": "Название пункта",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "title",
+                  "label": "Заголовок объяснения",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "description",
+                  "label": "Описание",
+                  "widget": "text",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "deliverable_label",
+                  "label": "Название результата",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "deliverable",
+                  "label": "Результат для клиента",
+                  "widget": "text",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                },
+                {
+                  "name": "button",
+                  "label": "Текст кнопки",
+                  "widget": "string",
+                  "required": false,
+                  "rich": true,
+                  "richLinks": false
+                }
+              ],
+              "collapsed": true
+            }
+          ],
+          "default": {
+            "label": "EPIPHANY / ЛОГИКА ПРОСТРАНСТВА",
+            "title": "За каждым интерьером —",
+            "emphasis": "система решений.",
+            "intro": "Исследуйте пространство. Узнайте, что стоит за планировкой, светом и материалами.",
+            "image": "assets/living-1536.webp",
+            "image_alt": "Концепция гостиной: зона отдыха, естественный свет и природные материалы",
+            "image_note": "Концептуальная иллюстрация подхода. Не реализованный объект и не рабочая документация.",
+            "notes_label": "РАЗБОР ПРОСТРАНСТВА / 01–03",
+            "bottom": "Сначала — ваша жизнь. Затем — пространство вокруг неё.",
+            "services_link": "Посмотреть форматы работы",
+            "layout": {
+              "label": "Планировка",
+              "title": "Удобство начинается с привычек",
+              "description": "Как вы входите в комнату, где отдыхаете, что храните рядом? Эти сценарии определяют расположение мебели, свободные проходы и места хранения.",
+              "deliverable_label": "Что получаете вы",
+              "deliverable": "Планировочное решение и согласованная расстановка мебели.",
+              "button": "Обсудить это решение"
+            },
+            "light": {
+              "label": "Свет",
+              "title": "Один интерьер — разные сценарии",
+              "description": "Естественный свет, общий и локальный — у каждого своя задача. Свет помогает читать, отдыхать и менять ощущение пространства в течение дня.",
+              "deliverable_label": "Что получаете вы",
+              "deliverable": "Сценарии освещения и чертежи для реализации.",
+              "button": "Обсудить это решение"
+            },
+            "materials": {
+              "label": "Материалы",
+              "title": "Красота, с которой удобно жить",
+              "description": "Материалы важны не только на визуализации: учитываем фактуру, уход, износ и то, как поверхности выглядят рядом при разном освещении.",
+              "deliverable_label": "Что получаете вы",
+              "deliverable": "Подбор отделки и ориентиры для комплектации.",
+              "button": "Обсудить это решение"
+            }
+          }
+        },
+        {
+          "name": "about_image",
+          "label": "О дизайнере: фотография вместо звезды",
+          "widget": "image",
+          "required": false
+        },
+        {
+          "name": "about_image_alt",
+          "label": "Описание фотографии дизайнера",
+          "widget": "string",
+          "required": false
         }
       ],
       "sections": [
@@ -266,6 +567,14 @@
           "collapsed": false
         },
         {
+          "label": "Система решений",
+          "fields": [
+            "decisions"
+          ],
+          "hint": "Фотография, тексты, раскрывающиеся пункты и подписи кнопок на главной.",
+          "collapsed": false
+        },
+        {
           "label": "Избранные проекты",
           "fields": [
             "projects_label",
@@ -282,7 +591,9 @@
             "about_label",
             "about_title",
             "about_emphasis",
-            "about_intro"
+            "about_intro",
+            "about_image",
+            "about_image_alt"
           ],
           "hint": "",
           "collapsed": false
@@ -776,6 +1087,13 @@
               "rich": true,
               "richLinks": true,
               "required": false
+            },
+            {
+              "name": "price",
+              "label": "Стоимость услуги",
+              "widget": "string",
+              "required": false,
+              "hint": "Например: от 3 000 ₽/м². Пустое поле скрывает стоимость."
             }
           ]
         },

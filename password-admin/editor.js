@@ -1,3 +1,4 @@
+import {watermarkImage} from './watermark.js';
 import {renderTypography} from './fonts.js';
 import {plainText} from '../rich-text.mjs';
 import {combineHeadings,combinedValue,addFormatting} from './formatting.mjs';
@@ -35,7 +36,7 @@ function renderFields(container,fields,data,path=''){
     if(field.fontLibrary){renderTypography(group,data[key],value=>{data[key]=value;updateStatus();});container.append(group);continue;}
     if(field.widget==='object'){
       const details=make('details','object-group');details.open=!field.collapsed;details.append(make('summary','',field.label));
-      const inner=make('div','object-fields');const object=data[key]&&typeof data[key]==='object'?data[key]:{};
+      const inner=make('div','object-fields');const object=data[key]&&typeof data[key]==='object'?data[key]:copy(field.default||{});
       if(!data[key])data[key]=object;renderFields(inner,field.fields,object,path+key+'.');details.append(inner);container.append(details);continue;
     }
     if(field.widget==='list'){
@@ -90,18 +91,20 @@ function renderFields(container,fields,data,path=''){
     if(field.widget==='image'){
       const preview=make('img','image-preview');preview.alt='Предпросмотр фотографии';preview.hidden=!assetURL(input.value);if(!preview.hidden)preview.src=assetURL(input.value);
       input.addEventListener('input',()=>{const url=assetURL(input.value);preview.hidden=!url;if(url)preview.src=url;});
+      const watermarkLabel=make('label','watermark-choice'),watermark=make('input');watermark.type='checkbox';watermark.checked=current?.kind==='projects';watermarkLabel.append(watermark,document.createTextNode('Нанести водяной знак Epiphany на загружаемую фотографию'));
       const upload=make('input','upload');upload.type='file';upload.accept='image/jpeg,image/png,image/webp';upload.setAttribute('aria-label','Загрузить фотографию: '+field.label);
       upload.addEventListener('change',async()=>{
         const file=upload.files[0];if(!file)return;
         if(file.size>5*1024*1024){fail(new Error('Выберите фотографию до 5 МБ.'));upload.value='';return;}
         uploading++;updateStatus();$('#error').textContent='';
         try{
-          const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+          const uploadedFile=watermark.checked?await watermarkImage(file):file;
+          const bytes=new Uint8Array(await uploadedFile.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
           const result=await api('upload',{method:'POST',body:JSON.stringify({content:btoa(binary)})});
-          input.value=result.path;data[key]=result.path;const objectURL=URL.createObjectURL(file);previews.add(objectURL);preview.src=objectURL;preview.hidden=false;
+          input.value=result.path;data[key]=result.path;const objectURL=URL.createObjectURL(uploadedFile);previews.add(objectURL);preview.src=objectURL;preview.hidden=false;
         }catch(error){fail(error);}finally{uploading--;upload.value='';updateStatus();}
       });
-      group.append(preview,upload,make('p','hint','JPG, PNG или WebP, до 5 МБ. После загрузки сохраните запись.'));
+      group.append(preview,watermarkLabel,upload,make('p','hint','JPG, PNG или WebP, до 5 МБ. Знак наносится на сам файл до загрузки. Исходник остаётся у вас. После загрузки сохраните запись.'));
     }
     container.append(group);
   }
