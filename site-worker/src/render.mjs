@@ -125,7 +125,7 @@ export class Site {
     const body=`<section class="hero hero-editorial"><div class="hero-top"><p class="eyebrow">${e(p.label)}</p><span class="availability"><i></i>${e(p.availability)}</span></div><div class="hero-composition"><div class="hero-copy"><h1><span>${inline(p.title)}</span> <em>${inline(p.emphasis)}</em></h1><p class="hero-description">${r(p.intro)}</p><div class="hero-actions">${this.button('contact',p.button,'hero-cta')}<a class="hero-secondary" href="#selected-projects">${e(p.explore)}${icon('arrow-down')}</a></div></div><a class="hero-image" href="/projects/" aria-label="${e(p.explore)}">${this.photo(p.image,p.image_alt,'hero-photo',true)}<span class="hero-image-label">EPIPHANY / INTERIOR</span><div class="image-caption"><span>${inline(p.caption)}</span><span>${inline(p.image_note)}</span></div></a></div><div class="hero-bottom"><p>${r(p.bottom)}</p><span>Свет. Материалы. Ощущения.</span></div></section>
 ${DECISIONS.html.replaceAll('__BASE__','/')}
 ${this.quizTeaser()}
-<section id="selected-projects" class="projects section"><div class="section-heading"><div><p class="eyebrow">${e(p.projects_label)}</p>${heading(p.projects_title,p.projects_emphasis,2)}</div><p class="small-note">${r(p.projects_note)}</p></div>${this.cards(this.projects.slice(0,3))}<div class="project-rail-controls" hidden><button type="button" data-rail-prev aria-label="Предыдущий проект">Назад</button><span class="project-rail-count" role="status" aria-live="polite"></span><button type="button" data-rail-next aria-label="Следующий проект">Далее</button></div><div class="section-more">${this.button('projects',this.ui.all_projects)}</div></section>
+<section id="selected-projects" class="projects section"><div class="section-heading"><div><p class="eyebrow">${e(p.projects_label)}</p>${heading(p.projects_title,p.projects_emphasis,2)}</div><p class="small-note">${r(p.projects_note)}</p></div><div class="project-rail-stage">${this.cards(this.projects.slice(0,3))}<div class="project-rail-controls" hidden><button type="button" data-rail-prev aria-label="Предыдущий проект"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></button><span class="project-rail-count" role="status" aria-live="polite" aria-atomic="true"></span><button type="button" data-rail-next aria-label="Следующий проект"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></button></div></div><div class="section-more">${this.button('projects',this.ui.all_projects)}</div></section>
 <section class="intro section"><div class="intro-side"><p class="eyebrow">${e(p.about_label)}</p><img class="intro-mark" src="/assets/branding/logo-mark.png" width="180" height="208" alt="" aria-hidden="true" loading="lazy"></div><div class="intro-copy">${heading(p.about_title,p.about_emphasis,2)}<div class="body-copy">${r(p.about_intro)}</div>${this.button('about',this.ui.more_about)}</div></section>
 <section class="section home-services"><p class="eyebrow">${e(p.services_label)}</p>${heading(p.services_title,p.services_emphasis,2)}<div class="service-teasers">`+
       this.pages.services.items.map((item,i)=>`<a href="/services/#service-${i+1}"><span class="eyebrow">${String(i+1).padStart(2,'0')}</span><h3>${inline(item.title)}</h3>${icon()}</a>`).join('')+`</div>${this.button('services',this.ui.all_services)}</section>`+this.cta(p.cta);
@@ -165,20 +165,16 @@ ${this.quizTeaser()}
     const crumbs=`<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="/">${e(this.ui.home)}</a><span>/</span><a href="/projects/">${e(this.ui.projects)}</a><span>/</span><span aria-current="page">${inline(p.title)}</span></nav>`;
     let body=`<section class="section project-heading">${crumbs}${heading(p.title)}<p class="page-intro">${inline(p.subtitle)}</p><div class="project-facts">`+['location','area','year'].filter(k=>p[k]).map(k=>`<span>${e(p[k])}</span>`).join('')+'</div></section>';
     body+='<section class="section project-story">';
-    if(photos.length){
-      body+='<div class="project-visual" id="project-visual">';
-      body+=`<button class="project-cover" data-gallery-open="0" aria-label="${e(this.ui.open_photo)}">${this.photo(p.image,p.image_alt,'',true)}<span class="project-arrow">${icon()}</span></button>`;
-      if(this.projects.length>1){
-        const previous=this.projects[(index+this.projects.length-1)%this.projects.length],next=this.projects[(index+1)%this.projects.length];
-        body+=`<nav class="project-switcher" aria-label="Переключение проектов"><a class="project-switch-previous" href="${this.projectLink(previous)}#project-visual" aria-label="${e(this.ui.previous_project+': '+plainText(previous.title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></a><a class="project-switch-next" href="${this.projectLink(next)}#project-visual" aria-label="${e(this.ui.next_project+': '+plainText(next.title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a></nav>`;
-      }
-      body+='</div>';
-    }
+    if(photos.length)body+=`<button class="project-cover" data-gallery-open="0" aria-label="${e(this.ui.open_photo)}">${this.photo(p.image,p.image_alt,'',true)}<span class="project-arrow">${icon()}</span></button>`;
     body+=`<div class="project-narrative"><p class="project-lead">${r(p.description)}</p>${paragraphs(p.body)}</div>`;
     if(p.is_concept)body+=`<p class="form-note concept-note">${e(this.ui.concept_note)}</p>`;
     body+='<div class="project-photo-grid">';
     for(const [i,photo]of photos.slice(1).entries())body+=`<figure><button data-gallery-open="${i+1}" aria-label="${e(this.ui.open_photo)}: ${e(photo.alt)}">${this.photo(photo.source,photo.alt,'project-photo')}</button><figcaption>${e(photo.alt)}</figcaption></figure>`;
-    body+='</div></section>'+this.cta(this.pages.projects.cta);
+    body+='</div></section><nav class="project-pagination section" aria-label="Другие проекты">';
+    if(index>0)body+=`<a class="project-step project-previous" href="${this.projectLink(this.projects[index-1])}" aria-label="${e(this.ui.previous_project+': '+plainText(this.projects[index-1].title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></a>`;
+    body+=this.button('projects',this.ui.back_projects);
+    if(index+1<this.projects.length)body+=`<a class="project-step project-next" href="${this.projectLink(this.projects[index+1])}" aria-label="${e(this.ui.next_project+': '+plainText(this.projects[index+1].title))}"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>`;
+    body+='</nav>'+this.cta(this.pages.projects.cta);
     const extra=this.galleryDialog()+`<script id="gallery-data" type="application/json">${safeJSON({title:plainText(p.title),photos})}</script>`;
     return this.shell(plainText(p.title)+' — дизайн интерьера'+' — Epiphany Interior',p.seo_description||p.description,body,'projects','projects/'+p.slug+'/',extra);
   }
