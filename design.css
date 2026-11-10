@@ -494,5 +494,5 @@ body[data-page] .project-pagination>.project-step:hover{background:var(--ink);co
 .project-switch-next{grid-column:2;justify-self:end}
 .project-switcher.is-floating{position:fixed;inset:calc((100svh + var(--header-height,160px))/2) max(20px,calc((100% - 1584px)/2)) auto;visibility:hidden}
 .project-switcher.is-floating.is-visible{visibility:visible}
-body:has(dialog[open]) .project-switcher{visibility:hidden}
+body.modal-open .project-switcher.is-floating,body:has(dialog[open]) .project-switcher.is-floating{visibility:hidden}
 @media(max-width:600px){.project-switcher{inset-inline:12px}.project-switcher a{width:48px;height:48px}.project-switcher.is-floating{inset-inline:12px}}
