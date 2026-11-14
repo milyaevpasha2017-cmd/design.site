@@ -172,14 +172,38 @@ export function createSiteWorker(fetcher=fetch){return {async fetch(request,env)
     const definition=page?schema.pages.find(p=>p.id===page[1]):null;
     const slug=project?.[1];if(!definition&&!(slug&&slugPattern.test(slug)))return json({error:'Раздел не найден.'},404);
     const file=definition?.path||`content/projects/${slug}.json`;const fields=definition?.fields||schema.projectFields;
-    if(request.method==='GET')return json(await repo.read(file));
+    if(request.method==='GET'){
+      const entry=await repo.read(file);
+      if(project)delete entry.data.previous_slugs;
+      return json(entry);
+    }
     const body=await bodyJSON(request);
     if(request.method==='DELETE'&&project){if(!sha(body.sha))return json({error:'Сначала откройте проект заново.'},400);const result=await repo.remove(file,body.sha);return json(await publish(env,result,{action:'publish:update',file,data:null,sha:null,previousSha:body.sha}));}
     if(request.method!=='PUT')return json({error:'Метод не поддерживается.'},405);
     if(body.sha!=null&&!sha(body.sha))return json({error:'Некорректная версия записи.'},400);
     if(page&&!body.sha)return json({error:'Сначала загрузите страницу.'},409);
     try{validate(fields,body.data);}catch(error){return json({error:error.message},400);}
-    if(project&&body.data.slug!==slug)return json({error:'Адрес существующего проекта менять нельзя.'},400);
+    if(project){
+      // The editor key is stable even when the public project URL changes.
+      const stored=body.sha?await repo.read(file):null;
+      if(stored&&stored.sha!==body.sha)return json({error:'Проект уже изменён. Откройте его заново перед сохранением.'},409);
+      const previous=stored?.data;
+      if(!previous&&body.data.slug!==slug)return json({error:'Адрес нового проекта не совпадает с запросом.'},400);
+      const address=body.data.slug;
+      if(address!==previous?.slug){
+        const others=(await repo.list()).filter(item=>item.id!==slug);
+        const entries=await Promise.all(others.map(item=>repo.read(`content/projects/${item.id}.json`)));
+        if(others.some(item=>item.id===address)||entries.some(({data})=>data.slug===address||data.previous_slugs?.includes(address))){
+          return json({error:'Этот адрес уже используется другим проектом или его старой ссылкой.'},409);
+        }
+      }
+      if(previous){
+        const aliases=new Set(previous.previous_slugs||[]);
+        if(previous.slug!==address)aliases.add(previous.slug);
+        aliases.delete(address);
+        if(aliases.size)body.data.previous_slugs=[...aliases];
+      }
+    }
     const result=await repo.save(file,body.data,body.sha);
     return json(await publish(env,result,{action:'publish:update',file,data:body.data,sha:result.sha,previousSha:body.sha}));
   }catch(error){return json({error:error.status?error.message:'Не удалось выполнить действие. Повторите позже.'},error.status||500);}

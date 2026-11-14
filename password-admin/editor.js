@@ -83,7 +83,6 @@ function renderFields(container,fields,data,path=''){
       else if(input.tagName==='INPUT')input.type='text';
       input.value=combinedValue(field,data,current?.id==='home'&&!path&&key==='title');input.maxLength=20000;
       input.dir=field.widget==='image'||field.widget==='number'||field.name==='slug'?'ltr':'auto';
-      if(field.name==='slug'&&current?.kind==='projects'&&!current.isNew)input.readOnly=true;
       input.addEventListener('input',()=>{data[key]=field.widget==='number'?Number(input.value):input.value;if(field.emphasisName)data[field.emphasisName]='';input.setCustomValidity('');updateStatus();});
       if(field.required!==false)input.required=true;
       if(field.pattern)input.addEventListener('change',()=>{input.setCustomValidity(input.value&&!new RegExp(field.pattern[0]).test(input.value)?field.pattern[1]:'');});
@@ -187,8 +186,8 @@ $('#save').addEventListener('click',async()=>{
   if(invalid)for(let parent=invalid.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;
   if(!$('#editor').reportValidity())return;
   const target=current;const saved=copy(target.data);
-  const id=target.kind==='projects'?saved.slug:target.id;
-  if(target.kind==='projects'&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id||'')){fail(new Error('Укажите адрес проекта латиницей, цифрами и дефисами.'));return;}
+  const id=target.isNew?saved.slug:target.id;
+  if(target.kind==='projects'&&!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(saved.slug||'')){fail(new Error('Укажите адрес проекта латиницей, цифрами и дефисами.'));return;}
   busy=true;$('#error').textContent='';updateStatus();
   try{
     const result=await api(`${target.kind}/${id}`,{method:'PUT',body:JSON.stringify({data:saved,sha:target.sha})});
@@ -198,7 +197,6 @@ $('#save').addEventListener('click',async()=>{
     $('#delete-project').hidden=target.kind!=='projects';
     if(target.kind==='projects'){
       $('#editor-title').textContent=plainText(target.data.title);
-      $('#field-slug').readOnly=true;
       try{await projects();}catch(error){fail(error);}
     }
     updateStatus(dirty()?'Сохранено. Есть новые несохранённые изменения.':result.published?'Сохранено и опубликовано. Изменения уже доступны на сайте.':'Сохранено в репозитории. Быстрая публикация недоступна; сайт обновится после сборки.');

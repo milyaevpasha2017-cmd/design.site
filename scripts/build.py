@@ -62,6 +62,9 @@ class Site:
             if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*',slug): raise ValueError(f'Invalid project slug in {file.name}')
             if slug in slugs: raise ValueError(f'Duplicate project slug: {slug}')
             slugs.add(slug)
+            for alias in p.get('previous_slugs',[]):
+                if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*',alias) or alias in slugs: raise ValueError(f'Invalid or duplicate project alias: {alias}')
+                slugs.add(alias)
             if p.get('published',True): self.projects.append(p)
         self.projects.sort(key=lambda p:(p.get('order',10),p['slug']))
     def load(self,path): return json.loads((self.content/path).read_text())
@@ -200,8 +203,8 @@ class Site:
         p=self.pages['home']
         body=f'''<section class="hero hero-editorial"><div class="hero-top"><p class="eyebrow">{e(p['label'])}</p><span class="availability"><i></i>{e(p['availability'])}</span></div><div class="hero-composition"><div class="hero-copy"><h1><span>{inline(p['title'])}</span> <em>{inline(p['emphasis'])}</em></h1><p class="hero-description">{r(p['intro'])}</p><div class="hero-actions">{self.button('contact',p['button'],'hero-cta')}<a class="hero-secondary" href="#selected-projects">{e(p['explore'])}{icon('arrow-down')}</a></div></div><a class="hero-image" href="{self.link('projects')}" aria-label="{e(p['explore'])}">{self.photo(p['image'],p['image_alt'],'hero-photo',True)}<span class="hero-image-label">EPIPHANY / INTERIOR</span><div class="image-caption"><span>{inline(p['caption'])}</span><span>{inline(p['image_note'])}</span></div></a></div><div class="hero-bottom"><p>{r(p['bottom'])}</p></div></section>
 {self.decisions()}
-{self.quiz_teaser()}
 <section id="selected-projects" class="projects section"><div class="section-heading"><div><p class="eyebrow">{e(p['projects_label'])}</p>{heading(p['projects_title'],p['projects_emphasis'],2)}</div><p class="small-note">{r(p['projects_note'])}</p></div><div class="project-rail-stage">{self.cards(self.projects[:3])}<div class="project-rail-controls" hidden><button type="button" data-rail-prev aria-label="Предыдущий проект"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg></button><span class="project-rail-count" role="status" aria-live="polite" aria-atomic="true"></span><button type="button" data-rail-next aria-label="Следующий проект"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></button></div></div><div class="section-more">{self.button('projects',self.ui['all_projects'])}</div></section>
+{self.quiz_teaser()}
 <section class="intro section"><div class="intro-side"><p class="eyebrow">{e(p['about_label'])}</p>{self.photo(p["about_image"],p.get("about_image_alt", "Дизайнер Epiphany"),"intro-portrait") if p.get("about_image") else self.intro_mark()}</div><div class="intro-copy">{heading(p['about_title'],p['about_emphasis'],2)}<div class="body-copy">{r(p['about_intro'])}</div>{self.button('about',self.ui['more_about'])}</div></section>
 <section class="section home-services"><p class="eyebrow">{e(p['services_label'])}</p>{heading(p['services_title'],p['services_emphasis'],2)}<div class="service-teasers">'''
         for i,item in enumerate(self.pages['services']['items']):
@@ -286,6 +289,13 @@ def build(content,output,url=DEFAULT_URL,admin_mode="github",canonical_url=None)
     pages['404.html']=site.shell(u['not_found_title'],u['not_found_text'],f'<section class="section page-heading"><p class="eyebrow">404</p>{heading(u["not_found_title"])}<p class="page-intro">{e(u["not_found_text"])}</p>{site.button("home",u["home"])}</section>','')
     for path,body in pages.items():
         target=output/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(body)
+    for project in site.projects:
+        destination=e(site.project_link(project))
+        canonical=e(site.url+'projects/'+project['slug']+'/')
+        for alias in project.get('previous_slugs',[]):
+            redirect=output/'projects'/alias/'index.html'
+            redirect.parent.mkdir(parents=True,exist_ok=True)
+            redirect.write_text(f'<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Адрес проекта изменился</title><link rel="canonical" href="{canonical}"><meta http-equiv="refresh" content="0; url={destination}"></head><body><a href="{destination}">Открыть проект</a></body></html>')
     shutil.copytree(ROOT/'assets',output/'assets')
     shutil.copy2(ROOT/'assets/branding/favicon.ico',output/'favicon.ico')
     for verification in ['yandex_59d8ac18e7c2c0a9.html', 'google2a6a1606b1efa065.html']:

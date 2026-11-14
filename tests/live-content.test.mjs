@@ -131,3 +131,28 @@ test('out-of-order publications cannot undo newer writes, but deliberate reversi
   assert.equal(await f.storage.getAlarm(),null,'Persistent content must not start the session cleanup alarm.');
 });
 
+
+test('changing a project address preserves its editor record and redirects old public links',async()=>{
+  const f=await fixture(),user=await f.login(),auth={cookie:user.cookie,csrf:user.csrf};
+  const endpoint='/api/projects/warm-minimalism';
+  const record=await (await f.request(endpoint,auth)).json();
+  const save=(slug,sha=record.sha)=>f.request(endpoint,{...auth,method:'PUT',body:{sha,data:{...record.data,slug}}});
+  const changed=await save('quiet-moscow');
+  assert.equal(changed.status,200,await changed.clone().text());
+  assert.equal((await changed.json()).published,true);
+  assert.equal((await f.request('/projects/quiet-moscow/')).status,200);
+  const redirect=await f.request('/projects/warm-minimalism/?utm_source=test');
+  assert.equal(redirect.status,301);
+  assert.equal(redirect.headers.get('Location'),'/projects/quiet-moscow/?utm_source=test');
+  const map=await (await f.request('/sitemap.xml')).text();
+  assert.match(map,/projects\/quiet-moscow\//);
+  assert.doesNotMatch(map,/projects\/warm-minimalism\//);
+  const current=await (await f.request(endpoint,auth)).json();
+  assert.equal(current.data.slug,'quiet-moscow');
+  assert.equal(current.data.previous_slugs,undefined);
+  assert.equal((await save('stale-edit')).status,409);
+  assert.equal((await f.request('/api/projects/quiet-moscow',{...auth,method:'PUT',body:{data:{...record.data,slug:'quiet-moscow'}}})).status,409);
+  const reverted=await save('warm-minimalism',current.sha);
+  assert.equal(reverted.status,200,await reverted.clone().text());
+  assert.equal((await f.request('/projects/quiet-moscow/index.html')).headers.get('Location'),'/projects/warm-minimalism/');
+});

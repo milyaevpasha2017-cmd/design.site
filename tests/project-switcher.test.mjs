@@ -5,7 +5,10 @@ import {Site} from '../site-worker/src/render.mjs';
 
 test('home portfolio keeps its arrow controls beside the photo rail, outside project links',async()=>{
  const snapshot=await sourceSnapshot(),site=new Site(snapshot.content,'https://example.test',snapshot.icons);
- const html=await site.response('/').text(),section=html.match(/<section id="selected-projects"[\s\S]*?<\/section>/)?.[0];
+ const home=await site.response('/').text();
+ assert.ok(home.indexOf('id="decision-heading"')<home.indexOf('id="selected-projects"'));
+ assert.ok(home.indexOf('id="selected-projects"')<home.indexOf('class="section quiz-teaser'));
+ const html=home,section=html.match(/<section id="selected-projects"[\s\S]*?<\/section>/)?.[0];
  assert.ok(section);
  assert.match(section,/<div class="project-rail-stage"><div class="project-grid">/);
  assert.match(section,/<button type="button" data-rail-prev aria-label="Предыдущий проект"><svg[\s\S]*?#icon-arrow-left/);
