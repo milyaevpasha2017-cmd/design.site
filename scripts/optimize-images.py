@@ -15,16 +15,17 @@ def optimize(assets,manifest_path):
                 if getattr(original,'is_animated',False):continue
                 image=ImageOps.exif_transpose(original)
                 key='assets/'+source.relative_to(assets).as_posix()
-                if image.width<640 or source.stat().st_size<150_000:
+                if source.stat().st_size<150_000:
                     result[key]={'width':image.width,'height':image.height};continue
-                image=image.convert('RGBA' if 'A' in image.getbands() else 'RGB')
-                digest=hashlib.sha256(source.read_bytes()).hexdigest()[:20]
-                widths=sorted({min(w,image.width) for w in (480,960,1600)})
+                image=image.convert('RGBA' if 'A' in image.getbands() or 'transparency' in image.info else 'RGB')
+                digest=hashlib.sha256(b'webp-v2\0'+source.read_bytes()).hexdigest()[:20]
+                widths=sorted({min(w,image.width) for w in (320,480,640,960,1600)})
                 variants=[]
                 for width in widths:
                     output=target/f'{digest}-{width}.webp'
                     if not output.exists():
-                        copy=image.copy();copy.thumbnail((width,round(image.height*width/image.width)),Image.Resampling.LANCZOS)
+                        height=max(1,round(image.height*width/image.width))
+                        copy=image.resize((width,height),Image.Resampling.LANCZOS)
                         copy.save(output,'WEBP',quality=82,method=4)
                     variants.append({'path':'assets/optimized/'+output.name,'width':width})
                 social=target/f'{digest}-og-1200x630.jpg'

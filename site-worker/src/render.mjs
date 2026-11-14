@@ -37,7 +37,7 @@ export class Site {
     const optimized=IMAGE_MANIFEST[value.replace(/^\/+/, '')];
     if(optimized?.variants){
       const variants=optimized.variants,src=this.image(variants.at(-1).path);
-      const sizes=cls==='hero-photo'||cls==='project-photo'||priority?'(max-width: 1600px) 100vw, 1680px':'(max-width: 700px) 90vw, 45vw';
+      const sizes=cls==='intro-portrait'?'(max-width: 310px) 90vw, (max-width: 700px) 280px, 320px':cls==='hero-photo'||cls==='project-photo'||priority?'(max-width: 1600px) 100vw, 1680px':'(max-width: 700px) 90vw, 45vw';
       return `<img src="${e(src)}" srcset="${variants.map(v=>e(this.image(v.path))+' '+v.width+'w').join(', ')}" sizes="${sizes}" width="${optimized.width}" height="${optimized.height}" alt="${e(alt)}" class="${cls}" decoding="async" ${priority?'fetchpriority=high loading=eager':'loading=lazy'}>`;
     }
     let responsive=optimized?.width?` width="${optimized.width}" height="${optimized.height}"`:'';

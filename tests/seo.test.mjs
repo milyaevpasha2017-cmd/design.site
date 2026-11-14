@@ -20,6 +20,7 @@ test('SEO: public routes, canonical hierarchy, escaped structured data and non-i
       assert.equal(crumbs.length,path.startsWith('/projects/')&&path!=='/projects/'?3:2);
     }
   }
+  site.pages.videos.items=[];
   let html=await site.response('/videos/').text();assert.match(html,/noindex,follow/);assert.ok(!site.sitemap().includes('/videos/'));
   // Publishing a real video automatically makes its page eligible again.
   site.pages.videos.items=[{url:'https://vk.com/video-1_2',title:'Обзор',description:'Видео'}];

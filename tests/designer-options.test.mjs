@@ -22,5 +22,6 @@ test('custom decision fields, portrait and optional service prices render identi
  const site=new Site(content,'https://studio.example/',icons);
  const python=JSON.parse(execFileSync('python3',['-c',`import json,sys,tempfile,shutil\nfrom pathlib import Path\nfrom scripts.build import Site,ROOT\nwith tempfile.TemporaryDirectory() as d:\n p=Path(d)/'content';shutil.copytree(ROOT/'content',p)\n for name,data in json.load(sys.stdin).items():(p/name.removeprefix('content/')).write_text(json.dumps(data))\n s=Site(p,'https://studio.example/');print(json.dumps([s.home(),s.standard_page('services')]))`],{input:JSON.stringify(content),encoding:'utf8'}));
  assert.equal(site.home(),python[0]);assert.equal(site.standardPage('services'),python[1]);assert.match(python[1],/<p class="service-price">от 3 000 ₽\/м²<\/p>/);
- delete content['content/pages/services.json'].items[0].price;assert.ok(!new Site(content,'https://studio.example/',icons).standardPage('services').includes('class="service-price"'));
+ for(const item of content['content/pages/services.json'].items)delete item.price;
+ assert.ok(!new Site(content,'https://studio.example/',icons).standardPage('services').includes('class="service-price"'));
 });

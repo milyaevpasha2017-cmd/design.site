@@ -83,6 +83,7 @@ class Site:
         if optimized and optimized.get('variants'):
             variants=optimized['variants'];src=self.image(variants[-1]['path'])
             sizes='(max-width: 1600px) 100vw, 1680px' if cls in ('hero-photo','project-photo') or priority else '(max-width: 700px) 90vw, 45vw'
+            if cls=='intro-portrait':sizes='(max-width: 310px) 90vw, (max-width: 700px) 280px, 320px'
             srcset=', '.join(self.image(v['path'])+' '+str(v['width'])+'w' for v in variants)
             return f'<img src="{e(src)}" srcset="{e(srcset)}" sizes="{sizes}" width="{optimized["width"]}" height="{optimized["height"]}" alt="{e(alt)}" class="{cls}" decoding="async" {"fetchpriority=high loading=eager" if priority else "loading=lazy"}>'
         responsive=f' width="{optimized["width"]}" height="{optimized["height"]}"' if optimized and optimized.get('width') else ''

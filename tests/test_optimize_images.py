@@ -10,7 +10,7 @@ class ImageOptimizationTests(unittest.TestCase):
    Image.effect_noise((1800,1200),60).convert('RGB').save(source,quality=97)
    before=source.read_bytes();manifest=Path(tmp)/'manifest.json'
    result=module.optimize(assets,manifest);item=result['assets/photo.jpg']
-   self.assertEqual(source.read_bytes(),before);self.assertEqual([v['width'] for v in item['variants']],[480,960,1600]);self.assertEqual(item['width'],1800)
+   self.assertEqual(source.read_bytes(),before);self.assertEqual([v['width'] for v in item['variants']],[320,480,640,960,1600]);self.assertEqual(item['width'],1800)
    for v in item['variants']:
     path=Path(tmp)/v['path'];self.assertTrue(path.exists())
     with Image.open(path) as image:self.assertEqual(image.width,v['width'])
@@ -25,3 +25,13 @@ class ImageOptimizationTests(unittest.TestCase):
    Image.new('RGB',(320,200),'white').save(source);before=source.read_bytes()
    result=module.optimize(assets,Path(tmp)/'manifest.json')
    self.assertEqual(result['assets/small.png'],{'width':320,'height':200});self.assertEqual(source.read_bytes(),before)
+ def test_large_narrow_image_gets_responsive_copies(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   assets=Path(tmp)/'assets';assets.mkdir();source=assets/'portrait.png'
+   Image.effect_noise((500,900),60).convert('RGB').save(source)
+   before=source.read_bytes()
+   result=module.optimize(assets,Path(tmp)/'manifest.json')
+   variants=result['assets/portrait.png']['variants']
+   self.assertEqual([variant['width'] for variant in variants],[320,480,500])
+   self.assertLess((Path(tmp)/variants[-1]['path']).stat().st_size,len(before))
+   self.assertEqual(source.read_bytes(),before)
