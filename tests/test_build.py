@@ -85,6 +85,10 @@ class BuildTests(unittest.TestCase):
         self.assertTrue((self.root/'public/admin/vendor').exists())
 
     def test_mirror_uses_production_canonical_without_breaking_asset_paths(self):
+        videos=self.content/'pages/videos.json'
+        data=json.loads(videos.read_text())
+        data['items']=[]
+        videos.write_text(json.dumps(data))
         output=self.root/'mirror'
         pages=module.build(self.content,output,'https://example.test/design.site/',canonical_url='https://epiphany-int.ru/')
         self.assertIn('href="/design.site/style.css"',pages['index.html'])
