@@ -97,6 +97,7 @@ function initHeaderOffset(signal){
     if(height!==previous){previous=height;document.documentElement.style.setProperty('--header-height',height+'px');}
   };
   update();
+  document.body.classList.add('header-measured');
   if('ResizeObserver' in window)watch(new ResizeObserver(update),signal).observe(header);
   else addEventListener('resize',update,{signal});
   document.fonts?.ready.then(update).catch(()=>{});

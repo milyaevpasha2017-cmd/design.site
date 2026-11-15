@@ -521,3 +521,9 @@ body[data-page] .project-pagination>.project-step:hover{background:var(--ink);co
   body[data-page]{background:var(--paper)}
   body[data-page]>footer>.logo{flex-shrink:0;margin-inline:auto}
 }
+
+/* Keep the mobile header tied to the viewport in embedded browsers. */
+@media(max-width:600px){
+  body[data-page].header-measured{padding-block-start:var(--header-height)}
+  body[data-page].header-measured>.header{position:fixed;inset-inline:0}
+}
