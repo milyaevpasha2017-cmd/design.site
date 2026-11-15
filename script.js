@@ -20,7 +20,7 @@ function closeMenu(restoreFocus = false) {
 menuButton.addEventListener('click', () => {
   const open = menuButton.getAttribute('aria-expanded') !== 'true';
   menuButton.setAttribute('aria-expanded', String(open)); navigation.classList.toggle('open', open);
-  if (open) navigation.querySelector('a')?.focus();
+  if (open) navigation.querySelector('a')?.focus({preventScroll:true});
 });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(true); },{signal});
 document.addEventListener('click', event => { if (!navigation.contains(event.target) && !menuButton.contains(event.target)) closeMenu(); },{signal});
@@ -159,9 +159,11 @@ if (form) {
     sending = true; button.disabled = true; fields.forEach(field => {field.readOnly = true;if(field.type==='checkbox')field.disabled=true;});
     error.hidden = true; status.textContent = copy.sending || 'Отправляем заявку…';
     form.setAttribute('aria-busy', 'true');
+    const controller = new AbortController();
+    const deadline = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message, quizDelivery: Boolean(form.dataset.quizSummary), website: values.get('website'), consent: values.get('consent') === 'on', consentVersion: values.get('consent_version') }) });
-      let data; try { data = await response.json(); } catch { throw new Error('Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.'); }
+      const response = await fetch('/api/leads', { method: 'POST', credentials: 'same-origin', signal: controller.signal, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: requestId, name: values.get('name'), contact: values.get('contact'), message, quizDelivery: Boolean(form.dataset.quizSummary), website: values.get('website'), consent: values.get('consent') === 'on', consentVersion: values.get('consent_version') }) });
+      let data; try { data = await response.json(); } catch (failure) { if (controller.signal.aborted) throw failure; throw new Error('Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.'); }
       if (!response.ok || !data.ok || data.id !== requestId) throw new Error(data.error || 'Не удалось подтвердить отправку. Повторите попытку или напишите напрямую.');
       accepted = true; form.dataset.accepted = 'true';
       // Count only server-confirmed acceptance; analytics must never break the form.
@@ -169,9 +171,10 @@ if (form) {
       form.reset(); status.textContent = copy.result; status.focus();
     } catch (failure) {
       status.textContent = ''; error.hidden = false;
-      error.textContent = failure.name === 'TimeoutError' || failure instanceof TypeError ? 'Не удалось подтвердить отправку. Проверьте интернет и повторите: повторная попытка не создаст копию заявки.' : failure.message;
+      error.textContent = controller.signal.aborted || failure instanceof TypeError ? 'Не удалось подтвердить отправку. Проверьте интернет и повторите: повторная попытка не создаст копию заявки.' : failure.message;
       error.focus();
     } finally {
+      clearTimeout(deadline);
       sending = false; fields.forEach(field => {field.readOnly = false;if(field.type==='checkbox')field.disabled=false;}); button.disabled = accepted;
       form.removeAttribute('aria-busy');
     }

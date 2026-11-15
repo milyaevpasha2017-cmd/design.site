@@ -243,7 +243,7 @@ input,textarea{font-family:var(--font-body);font-size:15px;border-color:#adb7a4}
 @media(max-width:600px){.quiz-modal{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:10px}.quiz-modal .quiz-modal-panel{padding:28px 22px}#quiz-dialog-title{font-size:34px;margin-top:22px}#quiz-dialog-description{font-size:13px}.quiz-result-cta{font-size:12px;gap:16px}}
 /* Art direction: immersive imagery, sharp typography, restrained controls. */
 :root{--paper:#f3f2ed;--ink:#222622;--accent:#68715d;--line:#d2d5cc}
-body[data-page=home] .header{background:#222622;color:#f3f2ed;border-color:#444a41;backdrop-filter:blur(16px)}
+body[data-page=home] .header{background:#222622;color:#f3f2ed;border-color:#444a41}
 body[data-page=home] .header .brand-mark{filter:brightness(0) invert(1)}
 body[data-page=home] .header-apply{background:var(--paper);color:var(--ink)}
 body[data-page=home] .menu-toggle{color:var(--paper);border-color:#6b7365}
@@ -511,3 +511,13 @@ body[data-page] .project-pagination>.project-step:hover{background:var(--ink);co
 @media(max-width:700px){.service-detail-body .service-action{margin-top:22px}}
 .service-price{font:500 clamp(24px,2.4vw,36px)/1.25 var(--font-body);letter-spacing:-.035em;margin:0;color:var(--ink)}
 @media(max-width:700px){#selected-projects .project-rail>.project-card:nth-child(n){flex-basis:86%;width:86%}#selected-projects .project-rail>.project-card:nth-child(n) .project-image{aspect-ratio:4/3}.intro-side .intro-portrait{max-width:280px}.service-detail-body .service-action{gap:14px}}
+
+@media(max-width:700px){
+  .hero-editorial .hero-top{align-items:center}
+  .hero-editorial .availability{margin-block:0}
+}
+@media(max-width:600px){
+  html{background:linear-gradient(var(--paper) 50%,#1d241e 50%);overscroll-behavior-y:none}
+  body[data-page]{background:var(--paper)}
+  body[data-page]>footer>.logo{flex-shrink:0;margin-inline:auto}
+}
