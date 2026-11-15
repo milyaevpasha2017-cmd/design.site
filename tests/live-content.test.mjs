@@ -156,3 +156,22 @@ test('changing a project address preserves its editor record and redirects old p
   assert.equal(reverted.status,200,await reverted.clone().text());
   assert.equal((await f.request('/projects/quiet-moscow/index.html')).headers.get('Location'),'/projects/warm-minimalism/');
 });
+
+test('page notes can be edited in the admin and cleared independently',async()=>{
+  const f=await fixture(),user=await f.login(),auth={cookie:user.cookie,csrf:user.csrf};
+  for(const [id,route] of [['about','/about/'],['projects','/projects/'],['contact','/contact/']]){
+    const endpoint='/api/pages/'+id;
+    const record=await (await f.request(endpoint,auth)).json();
+    record.data.page_note={title:'Проверка вставки',text:'Текст для **клиента**'};
+    const saved=await f.request(endpoint,{...auth,method:'PUT',body:record});
+    assert.equal(saved.status,200,await saved.clone().text());
+    const page=await (await f.request(route)).text();
+    assert.match(page,/class="section text-block"><h2><span>Проверка вставки/);
+    assert.match(page,/<strong>клиента<\/strong>/);
+    record.sha=(await saved.json()).sha;
+    record.data.page_note={title:'',text:''};
+    assert.equal((await f.request(endpoint,{...auth,method:'PUT',body:record})).status,200);
+    assert.doesNotMatch(await (await f.request(route)).text(),/Проверка вставки/);
+  }
+  assert.doesNotMatch(await (await f.request('/')).text(),/Проверка вставки/);
+});

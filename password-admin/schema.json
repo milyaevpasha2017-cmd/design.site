@@ -805,6 +805,29 @@
               "required": false
             }
           ]
+        },
+        {
+          "name": "page_note",
+          "label": "Где я работаю",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -846,6 +869,14 @@
             "process_emphasis"
           ],
           "hint": "",
+          "collapsed": false
+        },
+        {
+          "label": "Где я работаю",
+          "fields": [
+            "page_note"
+          ],
+          "hint": "Показывается отдельным блоком на этой странице. Чтобы скрыть блок, очистите заголовок и текст.",
           "collapsed": false
         },
         {
@@ -982,6 +1013,29 @@
               "required": false
             }
           ]
+        },
+        {
+          "name": "page_note",
+          "label": "О портфолио",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -994,6 +1048,14 @@
             "intro"
           ],
           "hint": "Заголовок страницы и вводный текст.",
+          "collapsed": false
+        },
+        {
+          "label": "О портфолио",
+          "fields": [
+            "page_note"
+          ],
+          "hint": "Показывается отдельным блоком на этой странице. Чтобы скрыть блок, очистите заголовок и текст.",
           "collapsed": false
         },
         {
@@ -1650,6 +1712,29 @@
               "required": false
             }
           ]
+        },
+        {
+          "name": "page_note",
+          "label": "Как начать работу",
+          "widget": "object",
+          "required": false,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Заголовок",
+              "widget": "string",
+              "rich": true,
+              "required": false
+            },
+            {
+              "name": "text",
+              "label": "Текст",
+              "widget": "text",
+              "rich": true,
+              "richLinks": true,
+              "required": false
+            }
+          ]
         }
       ],
       "sections": [
@@ -1671,6 +1756,14 @@
             "form"
           ],
           "hint": "Подписи полей и тексты, которые видит посетитель.",
+          "collapsed": false
+        },
+        {
+          "label": "Как начать работу",
+          "fields": [
+            "page_note"
+          ],
+          "hint": "Показывается отдельным блоком на этой странице. Чтобы скрыть блок, очистите заголовок и текст.",
           "collapsed": false
         },
         {

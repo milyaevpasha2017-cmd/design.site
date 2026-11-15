@@ -161,14 +161,17 @@ class Site:
         tags.append(('og:image:alt',alt))
         twitter=[('twitter:card','summary_large_image'),('twitter:title',title),('twitter:description',description),('twitter:image',image),('twitter:image:alt',alt)]
         return ''.join(f'<meta property="{key}" content="{e(value)}">' for key,value in tags)+''.join(f'<meta name="{key}" content="{e(value)}">' for key,value in twitter)
+    def text_block(self,block):
+        block=block or {}
+        title=block.get('title') or ''
+        text=block.get('text') or ''
+        if not title.strip() and not text.strip(): return ''
+        return '<section class="section text-block">'+(heading(title,'',2) if title.strip() else '')+('<div class="body-copy">'+r(text)+'</div>' if text.strip() else '')+'</section>'
     def shell(self,title,description,body,current,path='',extra=''):
         s=self.settings;fonts=json.loads((ROOT/'site-worker/src/font-library.json').read_text());chosen=s.get('typography') or {};body_font=next((f for f in fonts if f['id']==chosen.get('body')),fonts[0]);display_font=next((f for f in fonts if f['id']==chosen.get('display')),fonts[1]);canonical=self.url+path;indexable=self.indexable(current)
         font_preloads=''.join(f'<link rel="preload" href="{self.base}assets/fonts/{file}" as="font" type="font/woff2" crossorigin>' for file in dict.fromkeys([body_font['file'],display_font['file'],display_font.get('italic')]) if file)
         record=next((p for p in self.projects if path=='projects/'+p['slug']+'/'),None) or self.pages.get(current,{})
-        for block in record.get('text_blocks',[]):
-            title_text=block.get('title','');text=block.get('text','')
-            if title_text.strip() or text.strip():
-                body+='<section class="section text-block">'+(heading(title_text,'',2) if title_text.strip() else '')+('<div class="body-copy">'+r(text)+'</div>' if text.strip() else '')+'</section>'
+        body+=''.join(self.text_block(block) for block in (record.get('text_blocks') or []))
         title=plain_text(title);description=plain_text(description)
         project=next((p for p in self.projects if path=='projects/'+p['slug']+'/'),None)
         seo=(f'<link rel="canonical" href="{e(canonical)}">' if current else '')+('<meta name="robots" content="index,follow,max-image-preview:large">'+self.structured(title,description,current,path) if indexable else '<meta name="robots" content="noindex,follow">')
@@ -252,6 +255,7 @@ class Site:
                 body+=f'<div class="empty-video"><span class="eyebrow">EPIPHANY INTERIOR</span><h2>{inline(p["empty_title"])}</h2><p class="body-copy">{r(p["empty_text"])}</p>{self.contacts()}</div>'
             body+='</div></section><script id="video-data" type="application/json">'+safe_json({'unavailable':self.ui['video_unavailable']})+'</script>'
         elif key=='contact':body+=f'<section class="section inquiry-page"><div class="inquiry-intro"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="{self.link("home")}">{e(self.ui["home"])}</a><span aria-hidden="true">/</span><span aria-current="page">{e(self.ui["contact"])}</span></nav><p class="eyebrow">{e(p["label"])}</p>{heading(p["title"],p["emphasis"])}<p class="page-intro">{r(p["intro"])}</p></div><div class="inquiry-form">{self.form(p)}</div><aside class="inquiry-alternatives" aria-label="Другие способы связи"><h2>Удобнее написать напрямую?</h2>{self.contacts()}</aside></section>'
+        body+=self.text_block(p.get('page_note'))
         if 'cta' in p:body+=self.cta(p['cta'])
         return self.shell(p['seo_title'],p['seo_description'],body,key,ROUTES[key])
     def gallery_dialog(self):

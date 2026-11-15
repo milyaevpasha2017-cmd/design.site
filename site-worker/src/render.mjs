@@ -102,10 +102,14 @@ export class Site {
     tags.push(['og:image:alt',alt]);
     return tags.map(([property,content])=>`<meta property="${property}" content="${e(content)}">`).join('')+[['twitter:card','summary_large_image'],['twitter:title',title],['twitter:description',description],['twitter:image',image],['twitter:image:alt',alt]].map(([name,content])=>`<meta name="${name}" content="${e(content)}">`).join('');
   }
+  textBlock(block){
+    const title=block?.title||'',text=block?.text||'';
+    if(!title.trim()&&!text.trim())return '';
+    return `<section class="section text-block">${title.trim()?heading(title,'',2):''}${text.trim()?`<div class="body-copy">${r(text)}</div>`:''}</section>`;
+  }
   shell(title,description,body,current,path='',extra=''){
     const record=this.projects.find(p=>path==='projects/'+p.slug+'/')||this.pages[current];
-    const blocks=(record?.text_blocks||[]).filter(b=>b.title?.trim()||b.text?.trim());
-    body+=blocks.map(b=>`<section class="section text-block">${b.title?.trim()?heading(b.title,'',2):''}${b.text?.trim()?`<div class="body-copy">${r(b.text)}</div>`:''}</section>`).join('');
+    body+=(record?.text_blocks||[]).map(block=>this.textBlock(block)).join('');
     const fonts=typography(this.settings);
     title=plainText(title);description=plainText(description);
     const s=this.settings,canonical=this.url+path,indexable=this.indexable(current);
@@ -163,6 +167,7 @@ ${this.quizTeaser()}
       if(!p.items?.length)body+=`<div class="empty-video"><span class="eyebrow">EPIPHANY INTERIOR</span><h2>${inline(p.empty_title)}</h2><p class="body-copy">${r(p.empty_text)}</p>${this.contacts()}</div>`;
       body+='</div></section><script id="video-data" type="application/json">'+safeJSON({unavailable:this.ui.video_unavailable})+'</script>';
     }else if(key==='contact')body+=`<section class="section inquiry-page"><div class="inquiry-intro"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="/">${e(this.ui.home)}</a><span aria-hidden="true">/</span><span aria-current="page">${e(this.ui.contact)}</span></nav><p class="eyebrow">${e(p.label)}</p>${heading(p.title,p.emphasis)}<p class="page-intro">${r(p.intro)}</p></div><div class="inquiry-form">${this.form(p)}</div><aside class="inquiry-alternatives" aria-label="Другие способы связи"><h2>Удобнее написать напрямую?</h2>${this.contacts()}</aside></section>`;
+    body+=this.textBlock(p.page_note);
     if(p.cta)body+=this.cta(p.cta);
     return this.shell(p.seo_title,p.seo_description,body,key,routes[key]);
   }
